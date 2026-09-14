@@ -18,30 +18,49 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Show Python information
+      - name: Show host Python information
         shell: pwsh
         run: |
           python --version
           python -m pip --version
 
-      - name: Install project
+      - name: Create virtual environment
         shell: pwsh
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
+          python -m venv .venv
+          .\.venv\Scripts\python.exe --version
+          .\.venv\Scripts\python.exe -m pip --version
+
+      - name: Install project in virtual environment
+        shell: pwsh
+        run: |
+          .\.venv\Scripts\python.exe -m pip install --upgrade pip
+          .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 
       - name: Import package
         shell: pwsh
-        run: python -c "import net_monitor; print(net_monitor.__version__)"
+        run: .\.venv\Scripts\python.exe -c "import net_monitor; print(net_monitor.__version__)"
 
       - name: Verify psutil
         shell: pwsh
-        run: python -c "import psutil; print(psutil.net_io_counters())"
+        run: .\.venv\Scripts\python.exe -c "import psutil; print(psutil.net_io_counters())"
 
       - name: Verify PySide6
         shell: pwsh
-        run: python -c "import PySide6; print(PySide6.__version__)"
+        run: .\.venv\Scripts\python.exe -c "import PySide6; print(PySide6.__version__)"
 
       - name: Run tests
         shell: pwsh
-        run: python -m pytest -v
+        run: .\.venv\Scripts\python.exe -m pytest -v
+
+      - name: Verify virtual environment is ignored
+        shell: pwsh
+        run: |
+          if (git status --short -- .venv) {
+            Write-Error ".venv must not be tracked or reported as an unignored change"
+            exit 1
+          }
+
+      - name: Show repository status
+        shell: pwsh
+        run: git status --short
