@@ -18,35 +18,27 @@ Net Monitor 是一个面向 Windows 11 的第三方应用网络使用监视器�
 
 ### v0.2 开发中
 
-当前 `feat/etw-process-collector` 已完成 Stage 2A、2B、2C 和 2D 的核心工作：
+当前 `feat/etw-process-collector` 已完成 Stage 2A～2E 的核心工作：
 
 - Windows ETW 按进程网络事件采集
-- 真实 PID 级上传/下载 byte counters
-- 按真实采样时间计算上传/下载 B/s
+- 真实 PID 级上传/下载 byte counters 与 B/s
 - `(pid, create_time)` 处理 PID reuse
-- 已退出 PID 的聚合数据清理
-- ETW Session 生命周期与退出清理
-- 权限感知降级，不伪造数据
-- GUI 显示进程网络采集状态
-- `SYSTEM / APPLICATION / UNKNOWN` 进程分类
+- ETW Session 生命周期、退出清理与权限感知降级
+- `SYSTEM / APPLICATION / UNKNOWN` 保守分类
 - 默认隐藏 Windows OS 系统进程，UNKNOWN 默认显示
-- 可通过“显示 Windows 系统进程”查看全部进程
-- 顶部汇总只计算非系统应用的真实 ETW 网络速率
-- `仅显示有网络活动的进程` 与系统进程开关可组合
-- 网络速率/累计量按原始数值排序
-- 明确区分 `—`（不可用）与 `0 B/s`（采集正常但当前无流量）
-- MonitorService 采样移出 Qt UI 主线程
-- 进程完整枚举降为低频缓存，网络快照保持高频更新
-- 表格按 `(pid, create_time)` 增量增删和更新，不再每个采样周期整表重建
-- 排序在批量数据更新期间暂停，避免每个单元格更新触发排序风暴
+- 后台 SamplingWorker，采集不再阻塞 Qt UI 主线程
+- 完整进程枚举低频缓存，网络快照保持高频更新
+- 第三方应用按 executable 路径进行保守聚合
+- 顶层显示应用汇总，展开后查看各 PID 网络明细
+- 网络排序使用原始数值，严格区分 `—` 与真实 `0 B/s`
 
 > psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数、系统总流量平均分配等方式伪造按进程流量。
 
-## Stage 2D：第三方应用视图
+## Stage 2D：第三方应用过滤与 GUI 性能
 
 ### 进程分类
 
-展示层使用明确分类：
+展示层使用：
 
 ```text
 SYSTEM
@@ -62,13 +54,13 @@ UNKNOWN
 - executable 明确位于 `%SystemRoot%` / `%WINDIR%` -> `SYSTEM`
 - executable 明确位于 Windows 目录之外 -> `APPLICATION`
 - executable 无法读取时，仅对少量明确 Windows 核心进程名使用系统 fallback；其他 -> `UNKNOWN`
-- `C:\Program Files\WindowsApps\...` 不会因为目录名而整体判定为系统，当前保守归为 `UNKNOWN`
+- `C:\Program Files\WindowsApps\...` 当前保守归为 `UNKNOWN`
 - `C:\WindowsSomething\app.exe` 不会因字符串前缀误判为 Windows 目录
-- 即使进程名看起来像系统进程，只要 executable 明确位于 Windows 目录之外，也优先视为 `APPLICATION`
+- executable 明确位于 Windows 目录之外时，路径证据优先于看起来像系统进程的名称
 
-`UNKNOWN` 默认显示。该设计宁可多显示一个无法分类的进程，也不把真正联网的第三方程序错误隐藏。
+`UNKNOWN` 默认显示：宁可多显示一个无法确定归属的进程，也不错误隐藏真正联网的第三方程序。
 
-Microsoft Edge、OneDrive、Visual Studio Code 等用户应用不会因为厂商是 Microsoft 就自动隐藏；分类关注它是否属于 Windows OS 系统目录，而不是 publisher。
+Microsoft Edge、OneDrive、Visual Studio Code 等用户应用不会仅因为厂商是 Microsoft 就自动隐藏。
 
 ### 默认 GUI 行为
 
@@ -84,46 +76,18 @@ GUI 提供：
 
 ```text
 ☐ 显示 Windows 系统进程
-☐ 仅显示有网络活动的进程
+☐ 仅显示有网络活动的应用
 ```
 
 两个开关可以组合。打开系统进程开关只改变展示，不改变 ETW Provider 或底层聚合数据。
 
-顶部显示：
+顶部汇总只统计非系统应用的真实网络速率，即使临时打开系统进程，也不会把 Windows 后台流量混入第三方应用总速率。
 
-```text
-第三方应用总上传速度
-第三方应用总下载速度
-当前显示进程数
-```
+### GUI 性能重构
 
-第三方应用汇总始终排除 `SYSTEM`，即使用户临时打开系统进程视图也不会把 Windows 后台流量混入第三方应用总速率。
+Stage 2D 前的主要卡顿路径是：Qt 主线程定时调用 `MonitorService.snapshot()`，同步运行 `psutil.process_iter()`，随后整表重建。窗口移动、缩放和绘制也依赖同一事件循环，因此会出现周期性停顿。
 
-## Stage 2D：GUI 性能重构
-
-### 原始卡顿路径
-
-Stage 2D 开始前，Qt 主线程中的 `QTimer` 每秒直接执行：
-
-```text
-QTimer / UI thread
-    ↓
-MonitorService.snapshot()
-    ↓
-psutil.process_iter(...)
-    ↓
-系统网络 + 按进程网络处理
-    ↓
-setRowCount(...)
-    ↓
-重新创建整张表全部 QTableWidgetItem
-```
-
-窗口拖动、缩放和绘制同样依赖 Qt 主线程，因此同步进程枚举与整表重建会周期性抢占事件循环，造成真实 Windows 桌面环境下的拖动卡顿。
-
-### 新线程模型
-
-现在改为：
+现在的线程关系：
 
 ```text
 Microsoft-Windows-Kernel-Network
@@ -136,49 +100,73 @@ SamplingWorker / QThread
         ↓
 MonitorService.snapshot()
         ↓
-immutable MonitorSnapshot
+MonitorSnapshot
         ↓ Qt signal
 Qt UI thread
         ↓
-增量更新可见表格
+过滤、聚合、增量更新可见视图
 ```
 
-职责边界：
+默认 SamplingWorker 间隔约 `500 ms`；完整进程枚举默认约 `2 s` 刷新一次。Worker 不访问 QWidget，窗口关闭时会停止 worker、关闭 MonitorService 并清理 ETW Session。
 
-- ETW consumer thread：持续消费真实网络事件。
-- SamplingWorker QThread：执行 `MonitorService.snapshot()`，包括 psutil 进程枚举和网络快照组织，不访问 QWidget。
-- Qt UI thread：只消费已经准备好的 snapshot、执行过滤和必要的可见表格更新。
+## Stage 2E：应用级聚合视图
 
-默认 SamplingWorker 间隔约 `500 ms`；完整进程枚举默认约 `2 s` 刷新一次，中间网络 snapshot 复用进程列表。这样网络速率仍能较快更新，而 `psutil.process_iter()` 不再每次网络刷新都扫描全部进程。
+Stage 2E 将主视图从“一个 PID 一行”进一步调整为“一个应用一行，PID 可展开查看”。
 
-### 增量表格更新
+例如多个 Chrome 进程：
 
-表格现在用 `(pid, create_time)` 作为行身份：
+```text
+chrome.exe        8 个进程    4.2 MB/s    95 KB/s
+├─ chrome.exe     PID 4120
+├─ chrome.exe     PID 6844
+├─ chrome.exe     PID 9180
+└─ ...
+```
 
-- 新进程 -> 插入新行
-- 已退出进程 -> 删除对应行
-- 仍存在进程 -> 复用已有 `QTableWidgetItem`，只更新变化的值
-- 数据不变 -> 避免无意义地创建整套新 Item
+### 聚合规则
 
-批量更新时临时关闭排序，全部数据写入后再恢复一次排序，避免单元格更新期间反复重排。
+当前聚合故意保持保守：
 
-当前仍使用 `QTableWidget`，因为增量更新已经能消除原先最明显的全表重建问题；暂未为架构形式强行迁移到 `QAbstractTableModel`。
+- executable 可读时，仅将**规范化后 executable 路径完全相同**的进程合并。
+- Windows 路径比较大小写不敏感。
+- 仅名称相同但 executable 路径不同的进程不会合并。
+- executable 不可读的 UNKNOWN 进程不会仅凭名称互相合并，而是继续保持独立身份。
+- 应用 key 基于规范化 executable 路径，因此同一程序某个子进程退出、另一个子进程出现时，顶层应用 identity 可以保持稳定。
 
-### 开发级性能观测
+当前不会根据 publisher、图标、产品名或“看起来属于同一厂商”做猜测式合并。
 
-当前保留轻量性能数据，不默认刷屏输出：
+### 聚合网络数据语义
 
-- `MonitorService.last_performance.total_seconds`
-- `MonitorService.last_performance.process_enumeration_seconds`
-- `MonitorService.last_performance.process_count`
-- `MainWindow.last_apply_seconds`
-- `MainWindow.last_visible_rows`
+应用顶层网络数字来自当前成员 PID 的真实 `ProcessNetworkStats` 求和。
 
-这些数据用于后续 Windows 11 x64 实机性能验收，而不是 CI 中设置脆弱的毫秒级阈值。
+如果某个成员对应的网络数据不可获得，应用聚合值同样保持不可用 `—`，不会把缺失值当成 `0`。
+
+因此：
+
+```text
+—      = 当前无法获得真实网络数据
+0 B/s  = 采集正常，但当前确实没有流量
+```
+
+展开应用行后仍可以检查每个 PID 的下载/上传速度与累计字节，底层 PID 级 ETW accounting 没有被应用聚合替代。
+
+### 增量树形更新
+
+UI 当前使用 `QTreeWidget`：
+
+- 顶层 item 对应应用 group key
+- 子 item 使用 `(pid, create_time)` 作为进程 identity
+- 应用仍存在时复用已有顶层 item
+- 子进程出现/退出时只增删相应子 item
+- 已展开应用在普通 snapshot 更新后保持展开状态
+- 批量更新时暂停排序，完成后只恢复一次排序
+- 数值列按 raw numeric role 排序，而不是按格式化字符串排序
+
+Stage 2E 开发过程中曾发现 PySide6 `QTreeWidgetItem.__lt__` fallback 经 `super().__lt__()` 会重新进入 Python override，造成递归 stack overflow。当前实现已移除该递归路径，并由双平台 GUI smoke 测试覆盖。
 
 ## ETW 实现
 
-使用 Provider：
+Provider：
 
 - `Microsoft-Windows-Kernel-Network`
 - GUID `{7DD42A49-5329-4832-8DFD-43D979153A88}`
@@ -196,7 +184,6 @@ Qt UI thread
 - 正式 `WindowsProcessNetworkCollector` 懒启动 ETW Session
 - `(pid, create_time)` 身份基线，降低 PID 重用污染风险
 - `retain_pids` 清理已退出进程的历史计数
-- 窗口/worker/application 退出时关闭 MonitorService 和 ETW Session
 - 正式 Collector 端到端 loopback probe
 
 数据链路：
@@ -214,16 +201,18 @@ WindowsProcessNetworkCollector
         ↓
 MonitorService / MonitorSnapshot
         ↓
-ProcessClassifier / UI filtering
+ProcessClassifier
         ↓
-PySide6 UI
+Application aggregation
+        ↓
+PySide6 application tree
 ```
 
 UI 不直接访问 ETW API 或 psutil 采集逻辑。
 
 ## 采集状态与权限
 
-进程网络采集使用明确状态模型：
+进程网络采集状态：
 
 ```text
 STARTING
@@ -232,14 +221,6 @@ PERMISSION_DENIED
 UNAVAILABLE
 STOPPED
 ```
-
-主要语义：
-
-- `STARTING`：Collector 尚未完成首次 ETW 启动尝试。
-- `AVAILABLE`：ETW Session 已成功启动，可提供真实按进程数据。
-- `PERMISSION_DENIED`：实际启动 ETW 时收到权限错误，例如 `StartTraceW` error 5。
-- `UNAVAILABLE`：非权限类 ETW 初始化/运行错误或采集器不可用。
-- `STOPPED`：Collector 已关闭。
 
 GUI 对应显示：
 
@@ -251,106 +232,61 @@ GUI 对应显示：
 进程网络监控：已停止
 ```
 
-权限不足不会让应用退出；应用列表和分类仍可显示，但按进程网络字段与第三方应用总速率显示 `—`，而不是伪造为 `0 B/s`。
+权限不足不会让程序退出；应用/进程结构仍可显示，但网络字段保持 `—`。
 
-当 ETW 正常运行但进程当前没有流量时，速度显示真实的 `0 B/s`；累计值保持实际计数。
+## 自动验证
 
-“仅显示有网络活动的进程”按本次 Collector Session 中累计上传或下载字节是否大于 0 判断，因此短暂停顿不会让已产生流量的进程立即从列表消失。
+除必须在 Windows 11 x64 物理桌面完成的真实交互体验外，项目验证尽量放入 GitHub Actions。
 
-## Stage 2D 验证
+### Full CI
 
-### 主 CI
-
-2026-09-15 Stage 2D 最终代码在 Windows Server 2025 x64、Python 3.14.7 上通过：
+主 CI 在以下两个环境运行完整测试套件：
 
 ```text
-49 passed
+Windows Server 2025 x64
+Windows 11 Enterprise ARM64
+Python 3.14
+PySide6 offscreen
 ```
 
-覆盖包括：
+Stage 2E 当前完整套件为 `56` 项，覆盖：
 
+- ETW event/session/collector 单元测试
 - SYSTEM / APPLICATION / UNKNOWN 分类
-- WindowsApps 保守分类
-- Windows 路径边界与大小写
-- executable 不可读时 UNKNOWN 默认显示
-- 系统进程默认隐藏 / 手动显示
-- 系统过滤与网络活动过滤组合
-- `—` 与 `0 B/s`
-- 网络数字排序
-- 300 行 fake snapshot
-- 增量更新复用现有表格 Item
-- 进程枚举低频缓存
-- snapshot 确实运行在非 UI worker thread
-- worker / service / window shutdown 生命周期
-- PID reuse 和 inactive PID cleanup
+- 应用 executable-path 聚合
+- unavailable 值传播
+- 应用 group identity 稳定性
+- 应用树展开与 PID 子项
+- 应用级网络活动过滤
+- 系统过滤组合
+- raw numeric sorting
+- 增量 item 复用
+- 大量 fake application snapshot
+- SamplingWorker 非 UI 线程采样与关闭生命周期
+- PID reuse / inactive PID cleanup
 
-同时验证：PySide6、psutil、ETW module import、`.venv` ignore 和 repository clean。
+### ETW Experiment
 
-### Windows 11 ARM64 ETW Experiment
+ETW Experiment 同样在 Windows 11 ARM64 和 Windows Server 2025 x64 上执行：
 
-最终 Stage 2D 回归运行环境：
+- ETW / Collector 专项单元测试
+- 底层真实 loopback probe 连续两次
+- 正式 `WindowsProcessNetworkCollector` probe 连续两次
+- 同一 Session 名的 restart / cleanup
+- 标准本地用户权限表征
 
-- Microsoft Windows 11 Enterprise
-- OS `10.0.26200`
-- ARM64
-- Python `3.14.7` ARM64
-
-结果：
-
-- ETW / Collector 单元测试：`25 passed`
-- 底层真实 loopback probe 使用同一 Session 名连续两次：通过
-- 正式 `WindowsProcessNetworkCollector` probe 使用同一 Session 名连续两次：通过
-- 标准本地用户权限表征：通过，`StartTraceW` 仍返回 error `5`
-- repository status：clean
-
-正式 Collector 两次结果：
-
-```text
-run 1:
-upload_bytes:               524288
-download_bytes:             524288
-upload_bytes_per_second:    2095313.15
-download_bytes_per_second:  2095313.15
-collector_available:        true
-collector_closed:           true
-
-run 2:
-upload_bytes:               524288
-download_bytes:             524288
-upload_bytes_per_second:    2096003.39
-download_bytes_per_second:  2096003.39
-collector_available:        true
-collector_closed:           true
-```
-
-### Windows Server 2025 x64 ETW Experiment
-
-最终 Stage 2D 回归运行环境：
-
-- Microsoft Windows Server 2025 Datacenter
-- OS `10.0.26100`
-- x64
-- Python `3.14.7` x64
-
-结果：
-
-- ETW / Collector 单元测试：`25 passed`
-- 底层真实 loopback 双次捕获：通过
-- 正式 Collector 双次捕获：通过
-- Session cleanup / restart：通过
-- 标准用户权限表征：通过，`StartTraceW` error `5`
-
-正式 Collector 两次均得到 `524288` upload bytes 和 `524288` download bytes，且 `collector_available = true`、close 后 `collector_closed = true`。
+Stage 2E 的 application aggregation / GUI / worker 相关文件也已纳入 ETW workflow 的触发路径，因此以后修改应用视图时会自动重新验证真实 ETW 数据链路。
 
 ## 已知限制
 
-- GitHub 托管 Windows 11 实验环境仍是 ARM64，不是 Windows 11 x64 物理桌面机。
-- Stage 2D 已从代码层移除同步 UI-thread 采集与整表重建，但 Windows 11 x64 物理机上的实际拖动、缩放、滚动流畅度仍需用户更新代码后重新验收，README 不提前宣称实机性能已经通过。
-- 系统进程分类采用 conservative rules；`UNKNOWN` 会默认显示，因此可能看到少量无法确定归属的系统/受保护进程，这是为了避免误隐藏真正的第三方应用。
-- WindowsApps 当前保守归为 `UNKNOWN`，尚未实现 packaged-app publisher / package identity 级分类。
-- 当前仍以进程为行，不做 Chrome、Edge、Electron 等多进程应用聚合。
-- 当前已测试环境中，标准本地用户启动该 ETW Session 会收到 error 5；不同机器上的安全策略可能不同。
-- ETW Provider 的 byte counters 表示所捕获网络事件中的字节计数；项目不会未经证据把它宣称为“应用层有效载荷的绝对精确字节数”。
+- GitHub 托管 Windows 11 环境为 ARM64，不等同于 Windows 11 x64 物理桌面机。
+- Windows 11 x64 物理机上的窗口拖动、缩放、滚动、长期运行手感仍属于重要实机验收项，不能由 offscreen Actions 替代。
+- 系统进程分类采用 conservative rules；`UNKNOWN` 默认显示，可能包含少量无法确定归属的系统/受保护进程。
+- WindowsApps 当前保守归为 `UNKNOWN`，尚未实现 package identity / publisher 级分类。
+- 应用聚合当前只认相同 executable 路径，不尝试跨 executable 合并同一产品的 helper / updater / launcher。
+- 当前应用累计量是**当前活跃成员 PID 计数的聚合**。子进程退出后，其已退出 PID 不会作为永久应用历史保留；真正的“本次 Session 应用历史总流量”需要后续持久化/会话归因层。
+- 当前已测试环境中，标准本地用户启动 ETW Session 会收到 `StartTraceW` error 5；不同机器策略可能不同。
+- ETW Provider byte counters 表示所捕获网络事件中的字节计数，项目不会未经证据把它描述为应用层 payload 的绝对精确字节数。
 
 ## 环境与本地启动
 
@@ -364,35 +300,17 @@ py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
-python -m pytest
 python -m net_monitor
 ```
 
-在当前已测试环境中，需要具备 ETW Session 权限才能看到真实每进程上传/下载数据。权限不足时应用列表、分类与过滤仍可使用，但网络数字保持不可用状态。
+普通自动化测试主要由 GitHub Actions 完成；本地主要用于 Windows 11 x64 物理桌面交互和长期运行验收。
 
 ## ETW 诊断入口
 
-确认 Provider：
-
 ```powershell
 logman query providers "Microsoft-Windows-Kernel-Network"
-```
-
-交互式 ETW PoC：
-
-```powershell
 python -m net_monitor.collectors.etw
-```
-
-底层受控 loopback 验证：
-
-```powershell
 python -m net_monitor.collectors.etw.probe
-```
-
-正式 Collector 端到端验证：
-
-```powershell
 python -m net_monitor.collectors.etw.collector_probe
 ```
 
@@ -402,7 +320,7 @@ python -m net_monitor.collectors.etw.collector_probe
 Collector -> Service -> Model -> UI
 ```
 
-Stage 2D 后的运行线程关系：
+当前运行线程关系：
 
 ```text
 ETW ProcessTrace thread
@@ -416,21 +334,10 @@ MonitorService
 MonitorSnapshot
         ↓
 Qt UI thread
+        ↓
+Process classification
+        ↓
+Application aggregation
+        ↓
+Incremental application tree
 ```
-
-## CI
-
-主 CI 在 Windows Server 2025 x64 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、ETW module、GUI tests 与完整 pytest。
-
-独立 `ETW Experiment` workflow 在 `windows-2025` 与 `windows-11-arm` 上执行：
-
-```text
-Provider 查询
-ETW / Collector 单元测试
-底层 ETW 真实 loopback 双次捕获
-正式 WindowsProcessNetworkCollector 双次端到端捕获
-同名 Session cleanup / restart
-标准本地用户权限表征
-```
-
-ETW Experiment 的路径触发范围包括 ETW Collector、核心状态/分类和 MonitorService 变化，确保服务层重构后重新验证真实 ETW 数据链路。
