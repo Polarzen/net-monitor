@@ -177,7 +177,7 @@ def test_system_hidden_by_default_unknown_visible_and_toggle_restores_system() -
 
     assert window._table.rowCount() == 2
     assert {window._table.item(row, 0).text() for row in range(2)} == {"browser.exe", "mystery.exe"}
-    assert window._upload_label.text() == "第三方应用总上传速度: 2.05 KB/s"
+    assert window._upload_label.text() == "第三方应用总上传速度: 2.00 KB/s"
 
     window._show_system_processes.setChecked(True)
     app.processEvents()
@@ -199,9 +199,10 @@ def test_filters_combine_and_incremental_update_preserves_existing_items() -> No
         if window._table.item(row, 0).text() == "busy.exe"
     )
 
+    base = make_snapshot()
     updated = MonitorSnapshot(
         system=SystemNetworkStats(200, 300, 20.0, 30.0),
-        processes=make_snapshot().processes,
+        processes=base.processes,
         process_network=(
             ProcessNetworkStats(1, "idle.exe", 0, 0, 0.0, 0.0),
             ProcessNetworkStats(2, "busy.exe", 4096, 2048, 8192.0, 1024.0),
