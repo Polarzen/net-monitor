@@ -29,11 +29,21 @@ Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Pyth
 - TDH 按 schema 读取事件中的 `PID` 与 `size`
 - 区分 TCP/UDP 的 SEND / RECEIVE 事件
 - 后台线程运行 `ProcessTrace`
-- PID 级发送/接收字节累计
+- PID 级发送/接收字节与事件次数累计
 - Session stop / cleanup
 - 受控 loopback 子进程验证 PID 与双向字节
+- 同一 Session 名连续启动两次的 cleanup / restart 验证
 
-GitHub Actions 的受控探针已确认测试子进程 PID 可以被匹配，并可获得真实的发送与接收字节。本阶段仍属于 PoC，尚未替换 GUI 当前使用的占位 `WindowsProcessNetworkCollector`。
+GitHub Actions 的受控探针已确认测试子进程 PID 可以被匹配，并可获得真实的发送与接收事件及字节。使用同一个 Session 名连续执行两次探针均成功，说明正常 stop 后没有遗留同名 ETW Session。本阶段仍属于 PoC，尚未替换 GUI 当前使用的占位 `WindowsProcessNetworkCollector`。
+
+### 权限验证
+
+在 GitHub Actions 的 Windows Server 2025 Runner 上实际验证：
+
+- `runneradmin` 管理员上下文：ETW Session 可以启动、消费并停止，真实 loopback 探针通过。
+- 临时创建且未授予额外组权限的标准本地用户：`StartTraceW` 返回 Windows error `5`（Access Denied）。
+
+这说明当前 PoC 在该 Windows Server 2025 环境中需要相应 ETW 权限。Windows 11 目标机器仍需分别以普通用户和管理员身份复核；不能仅凭 CI 的 Server 2025 结果断言所有 Windows 11 环境的权限行为完全相同。
 
 Windows PID 会被重用；2B 正式 Collector 应使用 `(pid, process_create_time)` 或等价方式管理长生命周期进程身份。
 
@@ -97,4 +107,4 @@ NetworkAggregator
 
 ## CI
 
-GitHub Actions 在 `windows-latest` 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、GUI smoke test 与 pytest。`feat/etw-network-poc` 分支还会查询 Kernel Network Provider，并运行真实 ETW loopback 探针验证 PoC。
+GitHub Actions 在 `windows-latest` 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、GUI smoke test 与 pytest。`feat/etw-network-poc` 分支还会查询 Kernel Network Provider、运行真实 ETW loopback 探针，并表征管理员与标准本地用户的 ETW Session 权限行为。
