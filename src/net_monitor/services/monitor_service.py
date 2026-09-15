@@ -31,7 +31,12 @@ class MonitorService:
         now = self._clock()
         system = self._build_system_stats(counters, now)
         process_network = self._process_network_collector.collect(processes)
-        return MonitorSnapshot(system=system, processes=processes, process_network=process_network)
+        return MonitorSnapshot(
+            system=system,
+            processes=processes,
+            process_network=process_network,
+            process_network_state=self._process_network_collector.state,
+        )
 
     def close(self) -> None:
         close = getattr(self._process_network_collector, "close", None)
