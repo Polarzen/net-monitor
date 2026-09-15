@@ -4,12 +4,15 @@ import sys
 
 from PySide6.QtWidgets import QApplication
 
-from net_monitor.ui.main_window import MainWindow
+from net_monitor.ui.controller import UiController
+from net_monitor.ui.theme import DARK_STYLESHEET
 
 
 def main() -> int:
     app = QApplication.instance() or QApplication(sys.argv)
-    window = MainWindow()
-    app.aboutToQuit.connect(window.shutdown)
-    window.show()
+    app.setApplicationName("Net Monitor")
+    app.setStyleSheet(DARK_STYLESHEET)
+    controller = UiController()
+    app.aboutToQuit.connect(controller.shutdown)
+    controller.show_compact()
     return app.exec()

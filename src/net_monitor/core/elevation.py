@@ -5,16 +5,23 @@ import os
 import subprocess
 import sys
 from ctypes import wintypes
+from pathlib import Path
+
+
+def gui_python_executable() -> str:
+    """Return a no-console Python executable when the current venv provides one."""
+    executable = Path(sys.executable)
+    if os.name != "nt":
+        return str(executable)
+    if executable.name.casefold() == "python.exe":
+        pythonw = executable.with_name("pythonw.exe")
+        if pythonw.exists():
+            return str(pythonw)
+    return str(executable)
 
 
 def restart_as_administrator() -> bool:
-    """Ask Windows to relaunch Net Monitor with elevation.
-
-    Elevation is always initiated by an explicit user action. The current
-    process is not terminated here; the caller decides what to do after a
-    successful ShellExecuteW request.
-    """
-
+    """Ask Windows to relaunch Net Monitor with elevation after explicit user action."""
     if os.name != "nt":
         return False
 
@@ -33,7 +40,7 @@ def restart_as_administrator() -> bool:
     result = shell_execute(
         None,
         "runas",
-        sys.executable,
+        gui_python_executable(),
         parameters,
         os.getcwd(),
         1,
