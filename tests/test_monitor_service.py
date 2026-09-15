@@ -12,7 +12,11 @@ from net_monitor.services.monitor_service import MonitorService
 
 
 class FakeProcessCollector:
+    def __init__(self) -> None:
+        self.calls = 0
+
     def collect(self) -> tuple[ProcessInfo, ...]:
+        self.calls += 1
         return (ProcessInfo(pid=1, name="demo.exe"),)
 
 
@@ -48,12 +52,16 @@ def make_service(
     samples: list[NetworkCounters],
     times: list[float],
     process_network_collector: ProcessNetworkCollector | None = None,
+    *,
+    process_collector: FakeProcessCollector | None = None,
+    process_refresh_interval: float = 2.0,
 ) -> MonitorService:
     return MonitorService(
-        process_collector=FakeProcessCollector(),
+        process_collector=process_collector or FakeProcessCollector(),
         system_network_collector=FakeSystemCollector(samples),
         process_network_collector=process_network_collector or FakeProcessNetworkCollector(),
         clock=FakeClock(times),
+        process_refresh_interval=process_refresh_interval,
     )
 
 
@@ -122,3 +130,25 @@ def test_no_network_change_has_zero_rates() -> None:
     snapshot = service.snapshot()
     assert snapshot.system.upload_bytes_per_second == 0
     assert snapshot.system.download_bytes_per_second == 0
+
+
+def test_process_enumeration_is_cached_between_fast_network_snapshots() -> None:
+    process_collector = FakeProcessCollector()
+    service = make_service(
+        [NetworkCounters(1, 1), NetworkCounters(2, 2), NetworkCounters(3, 3)],
+        [10.0, 10.5, 12.1],
+        process_collector=process_collector,
+    )
+
+    service.snapshot()
+    first_metrics = service.last_performance
+    service.snapshot()
+    cached_metrics = service.last_performance
+    service.snapshot()
+    refreshed_metrics = service.last_performance
+
+    assert process_collector.calls == 2
+    assert first_metrics.process_enumeration_seconds is not None
+    assert cached_metrics.process_enumeration_seconds is None
+    assert refreshed_metrics.process_enumeration_seconds is not None
+    assert refreshed_metrics.process_count == 1
