@@ -19,12 +19,17 @@ class FakeClock:
 class FakeSession:
     instances: list["FakeSession"] = []
     start_error: Exception | None = None
+    stop_error: Exception | None = None
 
     def __init__(self, on_event: Callable[[NetworkEvent], None]) -> None:
         self.on_event = on_event
         self.started = False
         self.stopped = False
         self.start_calls = 0
+        self.stop_calls = 0
+        self.stop_errors = [self.stop_error] if self.stop_error is not None else []
+        self.health_error: Exception | None = None
+        self.health_calls = 0
         FakeSession.instances.append(self)
 
     def start(self) -> None:
@@ -34,8 +39,16 @@ class FakeSession:
         self.started = True
 
     def stop(self, *, timeout: float = 5.0) -> None:
+        self.stop_calls += 1
+        if self.stop_errors:
+            raise self.stop_errors.pop(0)
         self.stopped = True
         self.started = False
+
+    def raise_if_failed(self) -> None:
+        self.health_calls += 1
+        if self.health_error is not None:
+            raise self.health_error
 
     def emit(self, pid: int, direction: NetworkDirection, size: int) -> None:
         self.on_event(NetworkEvent(timestamp=0.0, pid=pid, direction=direction, size=size))
@@ -44,6 +57,7 @@ class FakeSession:
 def setup_function() -> None:
     FakeSession.instances.clear()
     FakeSession.start_error = None
+    FakeSession.stop_error = None
 
 
 def process(pid: int = 10, create_time: float | None = 100.0) -> ProcessInfo:
@@ -80,6 +94,23 @@ def test_collector_starts_lazily_and_computes_rates() -> None:
     assert second.download_bytes == 600
     assert second.upload_bytes_per_second == 100
     assert second.download_bytes_per_second == 300
+
+
+def test_collector_reports_asynchronous_session_failure_before_snapshot() -> None:
+    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector.collect((process(),))
+    session = FakeSession.instances[0]
+    error = RuntimeError("consumer exploded")
+    session.health_error = error
+
+    result = collector.collect((process(),))[0]
+
+    assert result.upload_bytes is None
+    assert collector.state.status is ProcessNetworkStatus.UNAVAILABLE
+    assert collector.available is False
+    assert collector.last_error is error
+    assert session.stopped is True
+    assert session.health_calls == 2
 
 
 def test_new_process_identity_resets_baseline_for_reused_pid() -> None:
@@ -161,3 +192,53 @@ def test_close_stops_session_is_idempotent_and_sets_stopped_state() -> None:
     assert collector.state.status is ProcessNetworkStatus.STOPPED
     unavailable = collector.collect((process(),))[0]
     assert unavailable.upload_bytes is None
+
+
+def test_close_retains_failed_session_for_retry_while_staying_stopped() -> None:
+    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector.collect((process(),))
+    session = FakeSession.instances[0]
+    cleanup_error = RuntimeError("cleanup failed")
+    session.stop_errors = [cleanup_error]
+
+    collector.close()
+
+    assert collector.state.status is ProcessNetworkStatus.STOPPED
+    assert collector.available is False
+    assert collector.last_error is cleanup_error
+    assert session.stop_calls == 1
+    assert collector._session is session
+
+    collector.close()
+
+    assert session.stop_calls == 2
+    assert session.stopped is True
+    assert collector._session is None
+    assert collector.collect((process(),))[0].upload_bytes is None
+    assert len(FakeSession.instances) == 1
+
+
+def test_start_failure_retains_session_when_startup_cleanup_fails_until_close() -> None:
+    start_error = RuntimeError("start failed")
+    cleanup_error = RuntimeError("startup cleanup failed")
+    FakeSession.start_error = start_error
+    FakeSession.stop_error = cleanup_error
+    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+
+    result = collector.collect((process(),))[0]
+    session = FakeSession.instances[0]
+
+    assert result.upload_bytes is None
+    assert collector.state.status is ProcessNetworkStatus.UNAVAILABLE
+    assert collector.last_error is start_error
+    assert session.stop_calls == 1
+    assert collector._session is session
+
+    collector.close()
+
+    assert session.stop_calls == 2
+    assert session.stopped is True
+    assert collector._session is None
+    assert collector.state.status is ProcessNetworkStatus.STOPPED
+    assert collector.collect((process(),))[0].upload_bytes is None
+    assert len(FakeSession.instances) == 1

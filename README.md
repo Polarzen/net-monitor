@@ -64,6 +64,8 @@ Detailed View 只消费 controller 已有的 snapshot，不创建第二个采集
 - TDH
 - `ctypes`
 
+实时 ETW 会话使用独立会话模式，避免并发或残留会话在启用同一 provider 时互相影响。
+
 系统与进程信息使用 `psutil`。项目不会用连接数、随机数或系统总流量平均分配来伪造按进程流量。
 
 应用可见性继续采用保守分类：

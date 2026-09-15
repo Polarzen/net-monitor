@@ -23,6 +23,8 @@ class _SessionProtocol(Protocol):
 
     def stop(self, *, timeout: float = 5.0) -> None: ...
 
+    def raise_if_failed(self) -> None: ...
+
 
 SessionFactory = Callable[[Callable[[NetworkEvent], None]], _SessionProtocol]
 ProcessIdentity = tuple[int, float | None]
@@ -60,6 +62,14 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
     def collect(self, processes: tuple[ProcessInfo, ...]) -> tuple[ProcessNetworkStats, ...]:
         if self._closed or not self._ensure_started():
             return self._unavailable(processes)
+
+        session = self._session
+        if session is not None:
+            try:
+                session.raise_if_failed()
+            except Exception as exc:
+                self._record_session_failure(session, exc)
+                return self._unavailable(processes)
 
         totals = self._aggregator.snapshot()
         now = self._clock()
@@ -115,7 +125,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
 
     def _ensure_started(self) -> bool:
         if self._session is not None:
-            return True
+            return self._state.status is ProcessNetworkStatus.AVAILABLE
         if self._start_attempted:
             return False
 
@@ -135,7 +145,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 try:
                     session.stop()
                 except Exception:
-                    pass
+                    self._session = session
             return False
         except Exception as exc:
             self._last_error = exc
@@ -148,7 +158,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 try:
                     session.stop()
                 except Exception:
-                    pass
+                    self._session = session
             return False
 
         self._session = session
@@ -156,16 +166,31 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         self._state = ProcessNetworkState(ProcessNetworkStatus.AVAILABLE)
         return True
 
+    def _record_session_failure(self, session: _SessionProtocol, exc: Exception) -> None:
+        self._last_error = exc
+        self._state = ProcessNetworkState(
+            ProcessNetworkStatus.UNAVAILABLE,
+            "进程网络监控当前不可用。",
+            getattr(exc, "error_code", None),
+        )
+        if self._session is session:
+            self._session = None
+        try:
+            session.stop()
+        except Exception:
+            # Retain ownership so a later close/retry can finish cleanup.
+            if self._session is None:
+                self._session = session
+
     @staticmethod
     def _unavailable(processes: tuple[ProcessInfo, ...]) -> tuple[ProcessNetworkStats, ...]:
         return tuple(ProcessNetworkStats(pid=process.pid, name=process.name) for process in processes)
 
     def close(self) -> None:
-        if self._closed:
+        if self._closed and self._session is None:
             return
         self._closed = True
         session = self._session
-        self._session = None
         self._state = ProcessNetworkState(ProcessNetworkStatus.STOPPED)
         if session is None:
             return
@@ -173,6 +198,9 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
             session.stop()
         except Exception as exc:
             self._last_error = exc
+        else:
+            if self._session is session:
+                self._session = None
 
     @property
     def state(self) -> ProcessNetworkState:

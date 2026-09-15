@@ -20,15 +20,18 @@ from net_monitor.collectors.etw.api import (
 )
 from net_monitor.collectors.etw.constants import (
     ERROR_CANCELLED,
+    ERROR_CTX_CLOSE_PENDING,
     ERROR_SUCCESS,
     EVENT_CONTROL_CODE_DISABLE_PROVIDER,
     EVENT_CONTROL_CODE_ENABLE_PROVIDER,
     EVENT_TRACE_CONTROL_STOP,
+    EVENT_TRACE_INDEPENDENT_SESSION_MODE,
     EVENT_TRACE_REAL_TIME_MODE,
     KERNEL_NETWORK_KEYWORDS,
     PROVIDER_GUID,
     TRACE_LEVEL_INFORMATION,
     WNODE_FLAG_TRACED_GUID,
+    ERROR_WMI_INSTANCE_NOT_FOUND,
 )
 from net_monitor.collectors.etw.events import NetworkEvent
 from net_monitor.collectors.etw.parser import EventIdentity, parse_network_event
@@ -62,6 +65,8 @@ class EtwSession:
         self._thread: threading.Thread | None = None
         self._callback: EVENT_RECORD_CALLBACK | None = None
         self._thread_error: Exception | None = None
+        self._stop_requested = False
+        self._controller_active = False
         self._started = False
         self._lock = threading.Lock()
 
@@ -76,19 +81,26 @@ class EtwSession:
         with self._lock:
             if self._started:
                 raise RuntimeError("ETW session is already started")
+            if self._thread is not None or self._consumer_handle is not None or self._properties is not None:
+                raise RuntimeError("ETW session resources are still being cleaned up")
 
+            self._thread_error = None
+            self._stop_requested = False
+            self._thread = None
             storage, properties = allocate_trace_properties(
                 self.session_name,
-                real_time_mode=EVENT_TRACE_REAL_TIME_MODE,
+                real_time_mode=EVENT_TRACE_REAL_TIME_MODE | EVENT_TRACE_INDEPENDENT_SESSION_MODE,
                 wnode_flag=WNODE_FLAG_TRACED_GUID,
             )
             self._properties_storage = storage
             self._properties = properties
 
-            status = self._api.StartTraceW(ctypes.byref(self._session_handle), self.session_name, properties)
-            raise_for_status("StartTraceW", int(status), self.session_name)
-
+            trace_started = False
             try:
+                status = self._api.StartTraceW(ctypes.byref(self._session_handle), self.session_name, properties)
+                raise_for_status("StartTraceW", int(status), self.session_name)
+                trace_started = self._controller_active = True
+
                 status = self._api.EnableTraceEx2(
                     CONTROLTRACE_ID(self._session_handle.value),
                     ctypes.byref(self._provider_guid),
@@ -101,13 +113,14 @@ class EtwSession:
                 )
                 raise_for_status("EnableTraceEx2", int(status), PROVIDER_GUID)
                 self._open_consumer()
-            except Exception:
-                self._stop_controller(ignore_errors=True)
+                self._started = True
+                self._thread = threading.Thread(target=self._consume, name="NetMonitor-ETW-Consumer", daemon=False)
+                self._thread.start()
+            except BaseException:
+                self._started = False
+                self._stop_requested = True
+                self._cleanup_after_start_failure(trace_started)
                 raise
-
-            self._started = True
-            self._thread = threading.Thread(target=self._consume, name="NetMonitor-ETW-Consumer", daemon=False)
-            self._thread.start()
 
     def _open_consumer(self) -> None:
         self._callback = EVENT_RECORD_CALLBACK(self._handle_record)
@@ -126,11 +139,29 @@ class EtwSession:
         self._consumer_handle = PROCESSTRACE_HANDLE(handle)
 
     def _consume(self) -> None:
-        assert self._consumer_handle is not None
-        handles = (PROCESSTRACE_HANDLE * 1)(self._consumer_handle.value)
-        status = int(self._api.ProcessTrace(handles, 1, None, None))
-        if status not in (ERROR_SUCCESS, ERROR_CANCELLED):
-            self._thread_error = EtwError("ProcessTrace", status, self.session_name)
+        error: Exception | None = None
+        try:
+            handle = self._consumer_handle
+            if handle is None:
+                error = RuntimeError("ETW consumer started without a ProcessTrace handle")
+            else:
+                handles = (PROCESSTRACE_HANDLE * 1)(handle.value)
+                status = int(self._api.ProcessTrace(handles, 1, None, None))
+                stopping = self._stop_requested
+                if status == ERROR_SUCCESS:
+                    if not stopping:
+                        error = RuntimeError(
+                            f"ProcessTrace exited before ETW session {self.session_name!r} was stopped"
+                        )
+                elif status == ERROR_CANCELLED and stopping:
+                    pass
+                else:
+                    error = EtwError("ProcessTrace", status, self.session_name)
+        except Exception as exc:
+            error = exc
+        finally:
+            if error is not None:
+                self._thread_error = error
 
     def _handle_record(self, record: ctypes.POINTER(EVENT_RECORD)) -> None:
         try:
@@ -153,10 +184,77 @@ class EtwSession:
 
     def stop(self, *, timeout: float = 5.0) -> None:
         with self._lock:
-            if not self._started:
+            if (
+                self._thread is None
+                and self._consumer_handle is None
+                and self._properties is None
+                and not self._controller_active
+            ):
                 return
+            was_started = self._started
             self._started = False
+            self._stop_requested = True
+            cleanup_errors: list[Exception] = []
 
+            if was_started:
+                try:
+                    status = int(self._api.EnableTraceEx2(
+                        CONTROLTRACE_ID(self._session_handle.value),
+                        ctypes.byref(self._provider_guid),
+                        EVENT_CONTROL_CODE_DISABLE_PROVIDER,
+                        0,
+                        0,
+                        0,
+                        0,
+                        None,
+                    ))
+                    raise_for_status("EnableTraceEx2", status, PROVIDER_GUID)
+                except Exception as exc:
+                    cleanup_errors.append(exc)
+
+            if self._controller_active:
+                try:
+                    self._stop_controller(ignore_errors=False)
+                except Exception as exc:
+                    cleanup_errors.append(exc)
+
+            thread = self._thread
+
+            # Keep the lifecycle lock through joins so a concurrent start/stop
+            # cannot release or replace handles while ProcessTrace is unwinding.
+            if thread is not None and thread.ident is not None:
+                thread.join(timeout)
+                if thread.is_alive():
+                    self._close_consumer(ignore_errors=True)
+                    thread.join(timeout)
+                if thread.is_alive():
+                    cleanup_errors.append(EtwError("ProcessTrace", -1, "consumer thread did not stop"))
+
+            try:
+                self._close_consumer(ignore_errors=False)
+            except Exception as exc:
+                cleanup_errors.append(exc)
+
+            if thread is None or not thread.is_alive():
+                self._thread = None
+                if self._consumer_handle is None:
+                    self._callback = None
+                if not self._controller_active:
+                    self._properties = None
+                    self._properties_storage = None
+                    self._session_handle = TRACEHANDLE()
+                if self._consumer_handle is None and not self._controller_active:
+                    self._stop_requested = False
+
+            if self._thread_error is not None:
+                raise self._thread_error
+            if cleanup_errors:
+                raise cleanup_errors[0]
+
+    def _cleanup_after_start_failure(self, trace_started: bool) -> None:
+        """Best-effort rollback used while start still owns the session resources."""
+
+        if trace_started:
             try:
                 self._api.EnableTraceEx2(
                     CONTROLTRACE_ID(self._session_handle.value),
@@ -168,46 +266,83 @@ class EtwSession:
                     0,
                     None,
                 )
-            finally:
-                self._stop_controller(ignore_errors=False)
+            except Exception:
+                pass
+            try:
+                self._stop_controller(ignore_errors=True)
+            except Exception:
+                pass
 
         thread = self._thread
-        if thread is not None:
-            thread.join(timeout)
+        self._close_consumer(ignore_errors=True)
+        if thread is not None and thread.ident is not None:
+            thread.join(5.0)
             if thread.is_alive():
                 self._close_consumer(ignore_errors=True)
-                thread.join(timeout)
-            if thread.is_alive():
-                raise EtwError("ProcessTrace", -1, "consumer thread did not stop")
-
-        self._close_consumer(ignore_errors=False)
-        if self._thread_error is not None:
-            error = self._thread_error
-            self._thread_error = None
-            raise error
+                thread.join(5.0)
+        if thread is None or not thread.is_alive():
+            self._thread = None
+            if self._consumer_handle is None:
+                self._callback = None
+            if not self._controller_active:
+                self._properties = None
+                self._properties_storage = None
+                self._session_handle = TRACEHANDLE()
+            if self._consumer_handle is None and not self._controller_active:
+                self._stop_requested = False
 
     def _stop_controller(self, *, ignore_errors: bool) -> None:
         if self._properties is None:
             return
-        status = int(
-            self._api.ControlTraceW(
-                CONTROLTRACE_ID(self._session_handle.value),
-                self.session_name,
-                self._properties,
-                EVENT_TRACE_CONTROL_STOP,
+        try:
+            status = int(
+                self._api.ControlTraceW(
+                    CONTROLTRACE_ID(self._session_handle.value),
+                    self.session_name,
+                    self._properties,
+                    EVENT_TRACE_CONTROL_STOP,
+                )
             )
-        )
-        if not ignore_errors and status != ERROR_SUCCESS:
-            raise_for_status("ControlTraceW", status, self.session_name)
+            if status in (ERROR_SUCCESS, ERROR_WMI_INSTANCE_NOT_FOUND):
+                self._controller_active = False
+            elif not ignore_errors:
+                raise_for_status("ControlTraceW", status, self.session_name)
+        except Exception:
+            if not ignore_errors:
+                raise
 
     def _close_consumer(self, *, ignore_errors: bool) -> None:
         if self._consumer_handle is None:
             return
         handle = self._consumer_handle
+        try:
+            status = int(self._api.CloseTrace(handle))
+            if status == ERROR_CTX_CLOSE_PENDING:
+                # The OS owns the pending close; the ProcessTrace callback must
+                # remain strongly referenced until its thread has returned.
+                self._consumer_handle = None
+                return
+            if status not in (ERROR_SUCCESS, ERROR_CANCELLED):
+                if ignore_errors:
+                    self._consumer_handle = handle
+                    return
+                raise_for_status("CloseTrace", status, self.session_name)
+        except Exception:
+            if not ignore_errors:
+                raise
+            self._consumer_handle = handle
+            return
         self._consumer_handle = None
-        status = int(self._api.CloseTrace(handle))
-        if not ignore_errors and status not in (ERROR_SUCCESS, ERROR_CANCELLED):
-            raise_for_status("CloseTrace", status, self.session_name)
+
+    def raise_if_failed(self) -> None:
+        """Raise an asynchronous consumer failure, if one has been observed."""
+
+        if self._thread_error is None and self._started and self._thread is not None and not self._thread.is_alive():
+            self._thread_error = RuntimeError(
+                f"ETW consumer thread for {self.session_name!r} exited without a result"
+            )
+        if self._thread_error is not None:
+            raise self._thread_error
 
     @property
     def started(self) -> bool:
