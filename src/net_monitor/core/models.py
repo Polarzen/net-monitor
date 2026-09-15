@@ -59,6 +59,26 @@ class ProcessNetworkStats:
 
 
 @dataclass(slots=True, frozen=True)
+class RetiredProcessNetworkStats:
+    """Final cumulative counters captured when a tracked process identity exits."""
+
+    process: ProcessInfo
+    network: ProcessNetworkStats
+
+
+@dataclass(slots=True, frozen=True)
+class ApplicationSessionStats:
+    """Application totals observed during the current Net Monitor process session."""
+
+    key: str
+    name: str
+    executable: str | None
+    upload_bytes: int
+    download_bytes: int
+    active_process_count: int
+
+
+@dataclass(slots=True, frozen=True)
 class SystemNetworkStats:
     bytes_sent: int
     bytes_received: int
@@ -78,6 +98,7 @@ class MonitorSnapshot:
     processes: tuple[ProcessInfo, ...]
     process_network: tuple[ProcessNetworkStats, ...]
     process_network_state: ProcessNetworkState = ProcessNetworkState(ProcessNetworkStatus.STARTING)
+    application_session: tuple[ApplicationSessionStats, ...] = ()
 
 
 @dataclass(slots=True, frozen=True)

@@ -15,6 +15,7 @@ from net_monitor.core.models import (
     ProcessNetworkState,
     ProcessNetworkStats,
     ProcessNetworkStatus,
+    RetiredProcessNetworkStats,
 )
 
 
@@ -32,6 +33,7 @@ ProcessIdentity = tuple[int, float | None]
 
 @dataclass(slots=True)
 class _ProcessState:
+    process: ProcessInfo
     baseline_sent: int
     baseline_received: int
     previous_sent: int = 0
@@ -53,6 +55,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         self._clock = clock
         self._session: _SessionProtocol | None = None
         self._states: dict[ProcessIdentity, _ProcessState] = {}
+        self._retired: list[RetiredProcessNetworkStats] = []
         self._previous_time: float | None = None
         self._last_error: Exception | None = None
         self._start_attempted = False
@@ -75,16 +78,18 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         now = self._clock()
         elapsed = None if self._previous_time is None else now - self._previous_time
         active_identities: set[ProcessIdentity] = set()
+        active_pids = {process.pid for process in processes}
         results: list[ProcessNetworkStats] = []
 
         for process in processes:
-            identity = (process.pid, process.create_time)
+            identity = process.identity
             active_identities.add(identity)
             total = totals.get(process.pid, ProcessNetworkTotals(pid=process.pid))
             state = self._states.get(identity)
 
             if state is None:
                 state = _ProcessState(
+                    process=process,
                     baseline_sent=total.bytes_sent,
                     baseline_received=total.bytes_received,
                 )
@@ -94,8 +99,8 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 upload_rate = 0.0
                 download_rate = 0.0
             else:
-                observed_sent = max(0, total.bytes_sent - state.baseline_sent)
-                observed_received = max(0, total.bytes_received - state.baseline_received)
+                state.process = process
+                observed_sent, observed_received = self._observed_totals(state, total)
                 if elapsed is not None and elapsed > 0:
                     upload_rate = max(0, observed_sent - state.previous_sent) / elapsed
                     download_rate = max(0, observed_received - state.previous_received) / elapsed
@@ -116,12 +121,66 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 )
             )
 
+        self._capture_retired(totals, active_identities, active_pids)
         self._states = {
             identity: state for identity, state in self._states.items() if identity in active_identities
         }
-        self._aggregator.retain_pids({process.pid for process in processes})
+        self._aggregator.retain_pids(active_pids)
         self._previous_time = now
         return tuple(results)
+
+    def drain_retired(self) -> tuple[RetiredProcessNetworkStats, ...]:
+        """Return and clear final counters for identities retired by the last collects."""
+
+        retired = tuple(self._retired)
+        self._retired.clear()
+        return retired
+
+    @staticmethod
+    def _observed_totals(
+        state: _ProcessState,
+        total: ProcessNetworkTotals,
+    ) -> tuple[int, int]:
+        return (
+            max(0, total.bytes_sent - state.baseline_sent),
+            max(0, total.bytes_received - state.baseline_received),
+        )
+
+    def _capture_retired(
+        self,
+        totals: dict[int, ProcessNetworkTotals],
+        active_identities: set[ProcessIdentity],
+        active_pids: set[int],
+    ) -> None:
+        for identity, state in self._states.items():
+            if identity in active_identities:
+                continue
+
+            pid = identity[0]
+            # If the PID is already occupied by a new identity, the ETW
+            # aggregator's PID bucket may contain bytes from both lifetimes.
+            # Keep the old identity's last confirmed counters rather than
+            # attributing any of the new process's bytes to it.
+            if pid in active_pids:
+                observed_sent = state.previous_sent
+                observed_received = state.previous_received
+            else:
+                total = totals.get(pid, ProcessNetworkTotals(pid=pid))
+                observed_sent, observed_received = self._observed_totals(state, total)
+                observed_sent = max(observed_sent, state.previous_sent)
+                observed_received = max(observed_received, state.previous_received)
+
+            self._retired.append(
+                RetiredProcessNetworkStats(
+                    process=state.process,
+                    network=ProcessNetworkStats(
+                        pid=pid,
+                        name=state.process.name,
+                        upload_bytes=observed_sent,
+                        download_bytes=observed_received,
+                    ),
+                )
+            )
 
     def _ensure_started(self) -> bool:
         if self._session is not None:
