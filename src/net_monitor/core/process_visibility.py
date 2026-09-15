@@ -3,7 +3,7 @@ from __future__ import annotations
 import ntpath
 import os
 
-from net_monitor.core.models import ProcessInfo
+from net_monitor.core.models import ProcessCategory, ProcessInfo
 
 _SYSTEM_PIDS = {0, 4}
 _SYSTEM_PROCESS_NAMES = {
@@ -26,11 +26,58 @@ _SYSTEM_PROCESS_NAMES = {
 }
 
 
-def _is_within_windows_directory(executable: str, windows_directory: str) -> bool:
-    executable_path = ntpath.normcase(ntpath.normpath(executable))
-    windows_path = ntpath.normcase(ntpath.normpath(windows_directory))
-    prefix = windows_path.rstrip("\\/") + "\\"
-    return executable_path == windows_path or executable_path.startswith(prefix)
+def _normalize(path: str) -> str:
+    return ntpath.normcase(ntpath.normpath(path))
+
+
+def _is_within_directory(executable: str, directory: str) -> bool:
+    executable_path = _normalize(executable)
+    directory_path = _normalize(directory).rstrip("\\/")
+    return executable_path == directory_path or executable_path.startswith(directory_path + "\\")
+
+
+def _looks_like_windows_apps(executable: str) -> bool:
+    parts = [part.casefold() for part in _normalize(executable).split("\\") if part]
+    return len(parts) >= 2 and any(
+        parts[index] == "program files" and parts[index + 1] == "windowsapps"
+        for index in range(len(parts) - 1)
+    )
+
+
+class ProcessClassifier:
+    """Conservative Windows process classifier used only for presentation.
+
+    A process is hidden only when it can be identified as a Windows OS component
+    with high confidence. Uncertain entries remain UNKNOWN and stay visible.
+    """
+
+    def __init__(self, *, windows_directory: str | None = None) -> None:
+        self._windows_directory = (
+            windows_directory
+            or os.environ.get("SystemRoot")
+            or os.environ.get("WINDIR")
+        )
+
+    def classify(self, process: ProcessInfo) -> ProcessCategory:
+        if process.pid in _SYSTEM_PIDS:
+            return ProcessCategory.SYSTEM
+
+        if process.name.casefold() in _SYSTEM_PROCESS_NAMES:
+            return ProcessCategory.SYSTEM
+
+        executable = process.executable
+        if not executable:
+            return ProcessCategory.UNKNOWN
+
+        # WindowsApps contains both Microsoft and third-party packaged apps. Do not
+        # hide it merely because it lives under Program Files.
+        if _looks_like_windows_apps(executable):
+            return ProcessCategory.UNKNOWN
+
+        if self._windows_directory and _is_within_directory(executable, self._windows_directory):
+            return ProcessCategory.SYSTEM
+
+        return ProcessCategory.APPLICATION
 
 
 def is_windows_system_process(
@@ -38,31 +85,31 @@ def is_windows_system_process(
     *,
     windows_directory: str | None = None,
 ) -> bool:
-    """Return True for Windows OS processes that should stay out of the app view.
+    """Compatibility predicate for code that only needs a system/non-system answer."""
 
-    The monitor still collects all process/network data. This predicate is only a
-    presentation policy: user-facing apps such as Edge or OneDrive remain visible
-    because they do not execute from the Windows OS directory.
-    """
+    return (
+        ProcessClassifier(windows_directory=windows_directory).classify(process)
+        is ProcessCategory.SYSTEM
+    )
 
-    if process.pid in _SYSTEM_PIDS:
-        return True
 
-    if process.name.casefold() in _SYSTEM_PROCESS_NAMES:
-        return True
-
-    executable = process.executable
-    if not executable:
-        return False
-
-    system_root = windows_directory or os.environ.get("SystemRoot") or os.environ.get("WINDIR")
-    if system_root and _is_within_windows_directory(executable, system_root):
-        return True
-
-    return False
+def visible_processes(
+    processes: tuple[ProcessInfo, ...],
+    *,
+    show_system: bool = False,
+    classifier: ProcessClassifier | None = None,
+) -> tuple[ProcessInfo, ...]:
+    classifier = classifier or ProcessClassifier()
+    if show_system:
+        return processes
+    return tuple(
+        process
+        for process in processes
+        if classifier.classify(process) is not ProcessCategory.SYSTEM
+    )
 
 
 def third_party_processes(processes: tuple[ProcessInfo, ...]) -> tuple[ProcessInfo, ...]:
-    """Return the user-facing, non-Windows-system process view."""
+    """Backward-compatible default application view (SYSTEM hidden, UNKNOWN shown)."""
 
-    return tuple(process for process in processes if not is_windows_system_process(process))
+    return visible_processes(processes)
