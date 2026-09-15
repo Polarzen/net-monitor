@@ -19,6 +19,7 @@ from net_monitor.core.models import (
     ProcessNetworkStats,
     ProcessNetworkStatus,
 )
+from net_monitor.core.process_visibility import third_party_processes
 from net_monitor.services.monitor_service import MonitorService
 
 
@@ -40,9 +41,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Net Monitor")
         self.resize(980, 620)
 
-        self._upload_label = QLabel("总上传速度: 0 B/s")
-        self._download_label = QLabel("总下载速度: 0 B/s")
-        self._process_count_label = QLabel("当前进程数: 0")
+        self._upload_label = QLabel("第三方应用总上传速度: —")
+        self._download_label = QLabel("第三方应用总下载速度: —")
+        self._process_count_label = QLabel("第三方进程数: 0")
         self._network_status_label = QLabel("进程网络监控：正在启动")
         self._network_activity_only = QCheckBox("仅显示有网络活动的进程")
         self._network_activity_only.setChecked(False)
@@ -61,7 +62,7 @@ class MainWindow(QMainWindow):
 
         self._table = QTableWidget(0, 6)
         self._table.setHorizontalHeaderLabels(
-            ["进程", "PID", "下载速度", "上传速度", "下载总量", "上传总量"]
+            ["应用", "PID", "下载速度", "上传速度", "下载总量", "上传总量"]
         )
         self._table.setSortingEnabled(True)
 
@@ -81,18 +82,27 @@ class MainWindow(QMainWindow):
 
     def refresh(self) -> None:
         snapshot = self._service.snapshot()
+        rows = {item.pid: item for item in snapshot.process_network}
+        processes = list(third_party_processes(snapshot.processes))
+        visible_pids = {process.pid for process in processes}
+
+        upload_rate, download_rate = self._third_party_rates(
+            snapshot.process_network_state,
+            snapshot.process_network,
+            visible_pids,
+        )
         self._upload_label.setText(
-            f"总上传速度: {format_bytes_per_second(snapshot.system.upload_bytes_per_second)}"
+            "第三方应用总上传速度: "
+            + ("—" if upload_rate is None else format_bytes_per_second(upload_rate))
         )
         self._download_label.setText(
-            f"总下载速度: {format_bytes_per_second(snapshot.system.download_bytes_per_second)}"
+            "第三方应用总下载速度: "
+            + ("—" if download_rate is None else format_bytes_per_second(download_rate))
         )
-        self._process_count_label.setText(f"当前进程数: {len(snapshot.processes)}")
+        self._process_count_label.setText(f"第三方进程数: {len(processes)}")
         self._network_status_label.setText(self._status_text(snapshot.process_network_state))
         self._network_status_label.setToolTip(snapshot.process_network_state.message or "")
 
-        rows = {item.pid: item for item in snapshot.process_network}
-        processes = list(snapshot.processes)
         if self._network_activity_only.isChecked():
             processes = [
                 process
@@ -149,6 +159,26 @@ class MainWindow(QMainWindow):
         if state.status is ProcessNetworkStatus.STOPPED:
             return "进程网络监控：已停止"
         return "进程网络监控：正在启动"
+
+    @staticmethod
+    def _third_party_rates(
+        state: ProcessNetworkState,
+        network_rows: tuple[ProcessNetworkStats, ...],
+        visible_pids: set[int],
+    ) -> tuple[float | None, float | None]:
+        if not state.available:
+            return None, None
+        upload = sum(
+            row.upload_bytes_per_second or 0.0
+            for row in network_rows
+            if row.pid in visible_pids
+        )
+        download = sum(
+            row.download_bytes_per_second or 0.0
+            for row in network_rows
+            if row.pid in visible_pids
+        )
+        return upload, download
 
     @staticmethod
     def _has_network_activity(network: ProcessNetworkStats | None) -> bool:
