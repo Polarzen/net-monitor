@@ -30,6 +30,8 @@ Net Monitor 是一个面向 Windows 11 的第三方应用网络使用监视器�
 - 完整进程枚举低频缓存，网络快照保持高频更新
 - 第三方应用按 executable 路径进行保守聚合
 - 顶层显示应用汇总，展开后查看各 PID 网络明细
+- 默认只显示**当前有实时上传/下载速率**的应用，减少后台进程噪声
+- 权限不足时提供显式“以管理员身份重启”按钮，由用户主动触发 UAC
 - 网络排序使用原始数值，严格区分 `—` 与真实 `0 B/s`
 
 > psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数、系统总流量平均分配等方式伪造按进程流量。
@@ -70,14 +72,19 @@ Microsoft Edge、OneDrive、Visual Studio Code 等用户应用不会仅因为厂
 SYSTEM      隐藏
 APPLICATION 显示
 UNKNOWN     显示
+当前联网筛选 开启
 ```
 
 GUI 提供：
 
 ```text
 ☐ 显示 Windows 系统进程
-☐ 仅显示有网络活动的应用
+☑ 仅显示当前联网应用
 ```
+
+“仅显示当前联网应用”依据当前聚合后的上传/下载 B/s 判断，而不是“本次 Session 曾经产生过流量”。因此已经停止传输的应用会从默认视图退出，避免列表随运行时间不断膨胀；取消勾选后仍可查看全部可见应用。
+
+实时网络筛选只有在 ETW 进程网络监控处于 `AVAILABLE` 时才有可靠依据。权限不足或采集不可用时，该筛选会暂时禁用，而不是把未知网络状态误判成“无流量”。
 
 两个开关可以组合。打开系统进程开关只改变展示，不改变 ETW Provider 或底层聚合数据。
 
@@ -232,7 +239,9 @@ GUI 对应显示：
 进程网络监控：已停止
 ```
 
-权限不足不会让程序退出；应用/进程结构仍可显示，但网络字段保持 `—`。
+在当前已测试 Windows 环境中，普通用户启动 ETW Session 会得到 `StartTraceW` error 5。权限不足时应用/进程结构仍可显示，但上传/下载字段保持 `—`，绝不会伪造数据。
+
+当状态为 `PERMISSION_DENIED` 时，GUI 会显示“以管理员身份重启”按钮。只有用户点击该按钮后，程序才通过 Windows `ShellExecuteW(..., "runas", ...)` 请求 UAC 提权；成功启动管理员实例后，旧窗口关闭。程序不会在后台自动提权。
 
 ## 自动验证
 
@@ -257,7 +266,8 @@ Stage 2E 当前完整套件为 `56` 项，覆盖：
 - unavailable 值传播
 - 应用 group identity 稳定性
 - 应用树展开与 PID 子项
-- 应用级网络活动过滤
+- 默认当前联网应用过滤及切换为全部应用
+- 权限不足时的管理员重启 UI 路径
 - 系统过滤组合
 - raw numeric sorting
 - 增量 item 复用
@@ -281,7 +291,7 @@ Stage 2E 的 application aggregation / GUI / worker 相关文件也已纳入 ETW
 
 - GitHub 托管 Windows 11 环境为 ARM64，不等同于 Windows 11 x64 物理桌面机。
 - Windows 11 x64 物理机上的窗口拖动、缩放、滚动、长期运行手感仍属于重要实机验收项，不能由 offscreen Actions 替代。
-- 系统进程分类采用 conservative rules；`UNKNOWN` 默认显示，可能包含少量无法确定归属的系统/受保护进程。
+- 系统进程分类采用 conservative rules；`UNKNOWN` 默认显示，取消“仅显示当前联网应用”后仍可能看到少量无法确定归属的系统/受保护进程。
 - WindowsApps 当前保守归为 `UNKNOWN`，尚未实现 package identity / publisher 级分类。
 - 应用聚合当前只认相同 executable 路径，不尝试跨 executable 合并同一产品的 helper / updater / launcher。
 - 当前应用累计量是**当前活跃成员 PID 计数的聚合**。子进程退出后，其已退出 PID 不会作为永久应用历史保留；真正的“本次 Session 应用历史总流量”需要后续持久化/会话归因层。
