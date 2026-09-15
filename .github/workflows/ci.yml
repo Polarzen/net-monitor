@@ -87,7 +87,7 @@ jobs:
 
       - name: Run complete test suite
         shell: pwsh
-        run: .\.venv\Scripts\python.exe -m pytest -x -vv
+        run: .\.venv\Scripts\python.exe -m pytest -v
 
       - name: Verify virtual environment is ignored
         shell: pwsh
