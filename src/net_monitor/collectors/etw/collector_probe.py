@@ -163,7 +163,7 @@ def _terminate_child(
     try:
         child.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
-        # Cleanup remains bounded.  The process handle is owned by Popen and
+        # Cleanup remains bounded. The process handle is owned by Popen and
         # will be released when it is finalized; do not block the probe here.
         return
 
@@ -180,27 +180,40 @@ def _close_pipe(stream: Any) -> None:
 def _wait_for_bidirectional_stats(
     collector: WindowsProcessNetworkCollector,
     process: ProcessInfo,
-) -> ProcessNetworkStats:
-    """Allow the asynchronous ProcessTrace consumer time to drain ETW buffers.
+) -> tuple[ProcessNetworkStats, float, float]:
+    """Wait for bytes and observe positive rates across the bounded poll window.
 
-    The probe remains strict: it only succeeds after the production collector has
-    observed positive send and receive totals and rates. Polling removes a timing
-    race between TCP completion and delivery of the corresponding ETW buffers on
-    slower/contended hosted runners.
+    ProcessTrace may deliver send and receive events in different drain cycles.
+    Because collector rates are interval deltas, a direction can legitimately
+    return to 0 B/s on a later poll after its cumulative bytes were captured.
+    The probe therefore keeps the peak positive rate observed for each direction
+    independently while retaining the latest cumulative byte counters.
     """
+
     deadline = time.monotonic() + _RESULT_TIMEOUT_SECONDS
-    latest = collector.collect((process,))[0]
-    while time.monotonic() < deadline:
+    peak_upload_rate = 0.0
+    peak_download_rate = 0.0
+
+    while True:
+        latest = collector.collect((process,))[0]
+        peak_upload_rate = max(
+            peak_upload_rate,
+            latest.upload_bytes_per_second or 0.0,
+        )
+        peak_download_rate = max(
+            peak_download_rate,
+            latest.download_bytes_per_second or 0.0,
+        )
         if (
             (latest.upload_bytes or 0) > 0
             and (latest.download_bytes or 0) > 0
-            and (latest.upload_bytes_per_second or 0.0) > 0
-            and (latest.download_bytes_per_second or 0.0) > 0
+            and peak_upload_rate > 0
+            and peak_download_rate > 0
         ):
-            return latest
+            return latest, peak_upload_rate, peak_download_rate
+        if time.monotonic() >= deadline:
+            return latest, peak_upload_rate, peak_download_rate
         time.sleep(_RESULT_POLL_INTERVAL_SECONDS)
-        latest = collector.collect((process,))[0]
-    return latest
 
 
 def run_probe(*, session_name: str | None = None) -> dict[str, object]:
@@ -282,13 +295,16 @@ def run_probe(*, session_name: str | None = None) -> dict[str, object]:
         if server_errors:
             raise RuntimeError(f"collector probe TCP server failed: {server_errors[0]}")
 
-        stats = _wait_for_bidirectional_stats(collector, process)
+        stats, observed_upload_rate, observed_download_rate = _wait_for_bidirectional_stats(
+            collector,
+            process,
+        )
         result = {
             "test_pid": child_pid,
             "upload_bytes": stats.upload_bytes or 0,
             "download_bytes": stats.download_bytes or 0,
-            "upload_bytes_per_second": stats.upload_bytes_per_second or 0.0,
-            "download_bytes_per_second": stats.download_bytes_per_second or 0.0,
+            "upload_bytes_per_second": observed_upload_rate,
+            "download_bytes_per_second": observed_download_rate,
             "collector_available": collector.available,
         }
     finally:

@@ -10,12 +10,15 @@ from types import SimpleNamespace
 
 import pytest
 
+from net_monitor.collectors.etw import collector_probe
 from net_monitor.collectors.etw.collector_probe import (
     _baseline_then_signal,
     _read_child_pid,
     _serve_once,
     _terminate_child,
+    _wait_for_bidirectional_stats,
 )
+from net_monitor.core.models import ProcessInfo, ProcessNetworkStats
 
 
 class _RecordingStdin:
@@ -38,6 +41,14 @@ class _BaselineCollector:
 
     def collect(self, processes: tuple[object, ...]) -> None:
         self.events.append(("collect", processes))
+
+
+class _SequencedStatsCollector:
+    def __init__(self, samples: tuple[ProcessNetworkStats, ...]) -> None:
+        self._samples = iter(samples)
+
+    def collect(self, processes: tuple[ProcessInfo, ...]) -> tuple[ProcessNetworkStats, ...]:
+        return (next(self._samples),)
 
 
 def test_reported_child_pid_is_used_when_launcher_pid_differs() -> None:
@@ -71,6 +82,44 @@ def test_baseline_is_collected_before_start_signal() -> None:
     assert events[0][0] == "collect"
     assert events[0][1][0].pid == 4242  # type: ignore[index]
     assert events[1:] == [("write", "start\n"), ("flush", ""), ("close", "")]
+
+
+def test_wait_for_bidirectional_stats_keeps_rates_seen_in_different_polls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    process = ProcessInfo(pid=42, name="probe-child")
+    collector = _SequencedStatsCollector(
+        (
+            ProcessNetworkStats(
+                pid=42,
+                name=process.name,
+                upload_bytes=524288,
+                download_bytes=0,
+                upload_bytes_per_second=1024.0,
+                download_bytes_per_second=0.0,
+            ),
+            ProcessNetworkStats(
+                pid=42,
+                name=process.name,
+                upload_bytes=524288,
+                download_bytes=524288,
+                upload_bytes_per_second=0.0,
+                download_bytes_per_second=2048.0,
+            ),
+        )
+    )
+    monkeypatch.setattr(collector_probe.time, "sleep", lambda _: None)
+
+    latest, observed_upload_rate, observed_download_rate = _wait_for_bidirectional_stats(
+        collector,  # type: ignore[arg-type]
+        process,
+    )
+
+    assert latest.upload_bytes == 524288
+    assert latest.download_bytes == 524288
+    assert latest.upload_bytes_per_second == 0.0
+    assert observed_upload_rate == 1024.0
+    assert observed_download_rate == 2048.0
 
 
 def test_handshake_timeout_and_server_shutdown_are_bounded() -> None:
