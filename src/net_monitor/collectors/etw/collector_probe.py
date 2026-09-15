@@ -10,10 +10,12 @@ import time
 
 from net_monitor.collectors.etw.session import EtwSession
 from net_monitor.collectors.windows_network import WindowsProcessNetworkCollector
-from net_monitor.core.models import ProcessInfo
+from net_monitor.core.models import ProcessInfo, ProcessNetworkStats
 
 _PAYLOAD_SIZE = 512 * 1024
 _SESSION_NAME_ENV = "NET_MONITOR_ETW_SESSION_NAME"
+_RESULT_TIMEOUT_SECONDS = 5.0
+_RESULT_POLL_INTERVAL_SECONDS = 0.25
 
 
 def _serve_once(listener: socket.socket) -> None:
@@ -26,6 +28,32 @@ def _serve_once(listener: socket.socket) -> None:
                 break
             remaining -= len(chunk)
         conn.sendall(b"R" * _PAYLOAD_SIZE)
+
+
+def _wait_for_bidirectional_stats(
+    collector: WindowsProcessNetworkCollector,
+    process: ProcessInfo,
+) -> ProcessNetworkStats:
+    """Allow the asynchronous ProcessTrace consumer time to drain ETW buffers.
+
+    The probe remains strict: it only succeeds after the production collector has
+    observed positive send and receive totals and rates. Polling removes a timing
+    race between TCP completion and delivery of the corresponding ETW buffers on
+    slower/contended hosted runners.
+    """
+    deadline = time.monotonic() + _RESULT_TIMEOUT_SECONDS
+    latest = collector.collect((process,))[0]
+    while time.monotonic() < deadline:
+        if (
+            (latest.upload_bytes or 0) > 0
+            and (latest.download_bytes or 0) > 0
+            and (latest.upload_bytes_per_second or 0.0) > 0
+            and (latest.download_bytes_per_second or 0.0) > 0
+        ):
+            return latest
+        time.sleep(_RESULT_POLL_INTERVAL_SECONDS)
+        latest = collector.collect((process,))[0]
+    return latest
 
 
 def run_probe(*, session_name: str | None = None) -> dict[str, object]:
@@ -75,9 +103,8 @@ def run_probe(*, session_name: str | None = None) -> dict[str, object]:
         server.join(timeout=12)
         if server.is_alive():
             raise RuntimeError("collector probe TCP server did not finish")
-        time.sleep(1.5)
 
-        stats = collector.collect((process,))[0]
+        stats = _wait_for_bidirectional_stats(collector, process)
         result = {
             "test_pid": child.pid,
             "upload_bytes": stats.upload_bytes or 0,
