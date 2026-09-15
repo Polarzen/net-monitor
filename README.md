@@ -1,8 +1,8 @@
 # Net Monitor
 
-Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Python 3.14、PySide6 和 psutil 构建；Windows 下的按进程网络流量通过 ETW + TDH + ctypes 获取。
+Net Monitor 是一个面向 Windows 11 的第三方应用网络使用监视器，使用 Python 3.14、PySide6 和 psutil 构建；Windows 下的按进程网络流量通过 ETW + TDH + ctypes 获取。
 
-产品方向不是复制任务管理器，而是回答：**哪些非 Windows 系统应用正在联网、用了多少流量。**
+产品目标不是复制任务管理器，而是优先回答：**哪些用户应用正在联网、哪个应用正在上传或下载、用了多少流量。** Windows OS 核心组件默认从主视图隐藏，但底层 ETW 仍保持完整采集。
 
 ## 版本状态
 
@@ -18,7 +18,7 @@ Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Pyth
 
 ### v0.2 开发中
 
-当前 `feat/etw-process-collector` 已完成 Stage 2A、2B、2C 的核心工作，并开始收敛为“应用网络视图”：
+当前 `feat/etw-process-collector` 已完成 Stage 2A、2B、2C 和 2D 的核心工作：
 
 - Windows ETW 按进程网络事件采集
 - 真实 PID 级上传/下载 byte counters
@@ -28,38 +28,153 @@ Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Pyth
 - ETW Session 生命周期与退出清理
 - 权限感知降级，不伪造数据
 - GUI 显示进程网络采集状态
-- 默认隐藏 Windows OS 核心进程
-- 顶部汇总只计算可见非系统应用的 ETW 网络速率
-- `仅显示有网络活动的进程` 筛选
+- `SYSTEM / APPLICATION / UNKNOWN` 进程分类
+- 默认隐藏 Windows OS 系统进程，UNKNOWN 默认显示
+- 可通过“显示 Windows 系统进程”查看全部进程
+- 顶部汇总只计算非系统应用的真实 ETW 网络速率
+- `仅显示有网络活动的进程` 与系统进程开关可组合
 - 网络速率/累计量按原始数值排序
 - 明确区分 `—`（不可用）与 `0 B/s`（采集正常但当前无流量）
+- MonitorService 采样移出 Qt UI 主线程
+- 进程完整枚举降为低频缓存，网络快照保持高频更新
+- 表格按 `(pid, create_time)` 增量增删和更新，不再每个采样周期整表重建
+- 排序在批量数据更新期间暂停，避免每个单元格更新触发排序风暴
 
 > psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数、系统总流量平均分配等方式伪造按进程流量。
 
-## 应用视图与系统进程过滤
+## Stage 2D：第三方应用视图
 
-底层 Collector 仍然采集完整进程和网络数据；“隐藏系统进程”是 UI 展示策略，不会在采集层丢弃事件。
+### 进程分类
 
-当前将以下内容视为 Windows OS 核心进程并默认隐藏：
+展示层使用明确分类：
 
-- PID `0`、`4`
-- `System`、`System Idle Process`、`Registry`、`Memory Compression`、`Secure System`
-- `smss.exe`、`csrss.exe`、`wininit.exe`、`winlogon.exe`、`services.exe`、`lsass.exe`、`svchost.exe`、`fontdrvhost.exe`、`dwm.exe`、`sihost.exe`、`taskhostw.exe`
-- 可执行文件实际位于 `%SystemRoot%` / `%WINDIR%` 下的进程
+```text
+SYSTEM
+APPLICATION
+UNKNOWN
+```
 
-该规则的目标是“非 Windows 系统应用”，不是按软件厂商签名做严格的“非 Microsoft”判定。因此 Edge、OneDrive 等用户可见应用仍会展示，只要它们不是从 Windows OS 系统目录运行。
+分类采用保守隐藏策略：只有高置信度 Windows OS 组件才会隐藏。
 
-如果进程因权限原因无法读取 executable，又不在明确的系统进程名单中，默认保留，避免误隐藏第三方程序。
+主要规则：
 
-GUI 顶部现在显示：
+- PID `0`、`4` -> `SYSTEM`
+- executable 明确位于 `%SystemRoot%` / `%WINDIR%` -> `SYSTEM`
+- executable 明确位于 Windows 目录之外 -> `APPLICATION`
+- executable 无法读取时，仅对少量明确 Windows 核心进程名使用系统 fallback；其他 -> `UNKNOWN`
+- `C:\Program Files\WindowsApps\...` 不会因为目录名而整体判定为系统，当前保守归为 `UNKNOWN`
+- `C:\WindowsSomething\app.exe` 不会因字符串前缀误判为 Windows 目录
+- 即使进程名看起来像系统进程，只要 executable 明确位于 Windows 目录之外，也优先视为 `APPLICATION`
+
+`UNKNOWN` 默认显示。该设计宁可多显示一个无法分类的进程，也不把真正联网的第三方程序错误隐藏。
+
+Microsoft Edge、OneDrive、Visual Studio Code 等用户应用不会因为厂商是 Microsoft 就自动隐藏；分类关注它是否属于 Windows OS 系统目录，而不是 publisher。
+
+### 默认 GUI 行为
+
+启动后默认：
+
+```text
+SYSTEM      隐藏
+APPLICATION 显示
+UNKNOWN     显示
+```
+
+GUI 提供：
+
+```text
+☐ 显示 Windows 系统进程
+☐ 仅显示有网络活动的进程
+```
+
+两个开关可以组合。打开系统进程开关只改变展示，不改变 ETW Provider 或底层聚合数据。
+
+顶部显示：
 
 ```text
 第三方应用总上传速度
 第三方应用总下载速度
-第三方进程数
+当前显示进程数
 ```
 
-这些汇总来自当前可见非系统进程的真实 ETW 数据，不再使用包含 Windows 后台流量的全系统 `psutil.net_io_counters()` 数字作为用户界面总量。
+第三方应用汇总始终排除 `SYSTEM`，即使用户临时打开系统进程视图也不会把 Windows 后台流量混入第三方应用总速率。
+
+## Stage 2D：GUI 性能重构
+
+### 原始卡顿路径
+
+Stage 2D 开始前，Qt 主线程中的 `QTimer` 每秒直接执行：
+
+```text
+QTimer / UI thread
+    ↓
+MonitorService.snapshot()
+    ↓
+psutil.process_iter(...)
+    ↓
+系统网络 + 按进程网络处理
+    ↓
+setRowCount(...)
+    ↓
+重新创建整张表全部 QTableWidgetItem
+```
+
+窗口拖动、缩放和绘制同样依赖 Qt 主线程，因此同步进程枚举与整表重建会周期性抢占事件循环，造成真实 Windows 桌面环境下的拖动卡顿。
+
+### 新线程模型
+
+现在改为：
+
+```text
+Microsoft-Windows-Kernel-Network
+        ↓
+ETW ProcessTrace thread
+        ↓
+NetworkAggregator
+
+SamplingWorker / QThread
+        ↓
+MonitorService.snapshot()
+        ↓
+immutable MonitorSnapshot
+        ↓ Qt signal
+Qt UI thread
+        ↓
+增量更新可见表格
+```
+
+职责边界：
+
+- ETW consumer thread：持续消费真实网络事件。
+- SamplingWorker QThread：执行 `MonitorService.snapshot()`，包括 psutil 进程枚举和网络快照组织，不访问 QWidget。
+- Qt UI thread：只消费已经准备好的 snapshot、执行过滤和必要的可见表格更新。
+
+默认 SamplingWorker 间隔约 `500 ms`；完整进程枚举默认约 `2 s` 刷新一次，中间网络 snapshot 复用进程列表。这样网络速率仍能较快更新，而 `psutil.process_iter()` 不再每次网络刷新都扫描全部进程。
+
+### 增量表格更新
+
+表格现在用 `(pid, create_time)` 作为行身份：
+
+- 新进程 -> 插入新行
+- 已退出进程 -> 删除对应行
+- 仍存在进程 -> 复用已有 `QTableWidgetItem`，只更新变化的值
+- 数据不变 -> 避免无意义地创建整套新 Item
+
+批量更新时临时关闭排序，全部数据写入后再恢复一次排序，避免单元格更新期间反复重排。
+
+当前仍使用 `QTableWidget`，因为增量更新已经能消除原先最明显的全表重建问题；暂未为架构形式强行迁移到 `QAbstractTableModel`。
+
+### 开发级性能观测
+
+当前保留轻量性能数据，不默认刷屏输出：
+
+- `MonitorService.last_performance.total_seconds`
+- `MonitorService.last_performance.process_enumeration_seconds`
+- `MonitorService.last_performance.process_count`
+- `MainWindow.last_apply_seconds`
+- `MainWindow.last_visible_rows`
+
+这些数据用于后续 Windows 11 x64 实机性能验收，而不是 CI 中设置脆弱的毫秒级阈值。
 
 ## ETW 实现
 
@@ -81,7 +196,7 @@ GUI 顶部现在显示：
 - 正式 `WindowsProcessNetworkCollector` 懒启动 ETW Session
 - `(pid, create_time)` 身份基线，降低 PID 重用污染风险
 - `retain_pids` 清理已退出进程的历史计数
-- `MonitorService.close()`、窗口关闭和应用退出时停止 ETW Session
+- 窗口/worker/application 退出时关闭 MonitorService 和 ETW Session
 - 正式 Collector 端到端 loopback probe
 
 数据链路：
@@ -99,14 +214,14 @@ WindowsProcessNetworkCollector
         ↓
 MonitorService / MonitorSnapshot
         ↓
-应用视图过滤
+ProcessClassifier / UI filtering
         ↓
 PySide6 UI
 ```
 
-UI 不直接访问 ETW API 或 psutil 网络采集逻辑。
+UI 不直接访问 ETW API 或 psutil 采集逻辑。
 
-## Stage 2C：采集状态与 GUI
+## 采集状态与权限
 
 进程网络采集使用明确状态模型：
 
@@ -136,101 +251,113 @@ GUI 对应显示：
 进程网络监控：已停止
 ```
 
-权限不足不会让应用退出；非系统应用列表仍可显示，但按进程网络字段和第三方应用总速率显示 `—`，而不是伪造为 `0 B/s`。
+权限不足不会让应用退出；应用列表和分类仍可显示，但按进程网络字段与第三方应用总速率显示 `—`，而不是伪造为 `0 B/s`。
 
 当 ETW 正常运行但进程当前没有流量时，速度显示真实的 `0 B/s`；累计值保持实际计数。
 
 “仅显示有网络活动的进程”按本次 Collector Session 中累计上传或下载字节是否大于 0 判断，因此短暂停顿不会让已产生流量的进程立即从列表消失。
 
-网络速度和累计字节列保存原始数值用于排序，不使用格式化字符串的字典序。
+## Stage 2D 验证
 
-## Windows 11 Actions 实验
+### 主 CI
 
-独立 workflow `.github/workflows/etw-experiment.yml` 当前验证矩阵：
+2026-09-15 Stage 2D 最终代码在 Windows Server 2025 x64、Python 3.14.7 上通过：
 
 ```text
-windows-2025
-windows-11-arm
+49 passed
 ```
 
-Windows 11 Runner 实际环境：
+覆盖包括：
+
+- SYSTEM / APPLICATION / UNKNOWN 分类
+- WindowsApps 保守分类
+- Windows 路径边界与大小写
+- executable 不可读时 UNKNOWN 默认显示
+- 系统进程默认隐藏 / 手动显示
+- 系统过滤与网络活动过滤组合
+- `—` 与 `0 B/s`
+- 网络数字排序
+- 300 行 fake snapshot
+- 增量更新复用现有表格 Item
+- 进程枚举低频缓存
+- snapshot 确实运行在非 UI worker thread
+- worker / service / window shutdown 生命周期
+- PID reuse 和 inactive PID cleanup
+
+同时验证：PySide6、psutil、ETW module import、`.venv` ignore 和 repository clean。
+
+### Windows 11 ARM64 ETW Experiment
+
+最终 Stage 2D 回归运行环境：
 
 - Microsoft Windows 11 Enterprise
-- OS 10.0.26200
+- OS `10.0.26200`
 - ARM64
-- Python 3.14.7 ARM64
+- Python `3.14.7` ARM64
 
-2026-09-15 的 Stage 2C 最终 ETW Experiment 中：
+结果：
 
 - ETW / Collector 单元测试：`25 passed`
-- 底层 loopback probe 使用同一 Session 名连续运行两次：通过
-- 正式 `WindowsProcessNetworkCollector` probe 使用同一 Session 名连续运行两次：通过
-- 两次正式 probe 均获得 `524288` upload bytes 与 `524288` download bytes
-- `collector_available = true`
-- close 后 `collector_closed = true`
+- 底层真实 loopback probe 使用同一 Session 名连续两次：通过
+- 正式 `WindowsProcessNetworkCollector` probe 使用同一 Session 名连续两次：通过
+- 标准本地用户权限表征：通过，`StartTraceW` 仍返回 error `5`
+- repository status：clean
 
-该实验中 Windows 11 ARM64 正式 Collector 两次测得：
+正式 Collector 两次结果：
 
 ```text
 run 1:
 upload_bytes:               524288
 download_bytes:             524288
-upload_bytes_per_second:    2092071.61
-download_bytes_per_second:  2092071.61
+upload_bytes_per_second:    2095313.15
+download_bytes_per_second:  2095313.15
+collector_available:        true
+collector_closed:           true
 
 run 2:
 upload_bytes:               524288
 download_bytes:             524288
-upload_bytes_per_second:    2095041.04
-download_bytes_per_second:  2095041.04
+upload_bytes_per_second:    2096003.39
+download_bytes_per_second:  2096003.39
+collector_available:        true
+collector_closed:           true
 ```
 
-正式 probe 对异步 ETW buffer delivery 使用有限轮询窗口，但验收条件没有放宽：必须实际观察到正的双向 bytes 和正的双向 B/s 才通过。
+### Windows Server 2025 x64 ETW Experiment
 
-## Windows Server 2025 实验
-
-当前 Runner：
+最终 Stage 2D 回归运行环境：
 
 - Microsoft Windows Server 2025 Datacenter
-- OS 10.0.26100
+- OS `10.0.26100`
 - x64
-- Python 3.14.7 x64
+- Python `3.14.7` x64
 
-同一轮 ETW Experiment 中：
+结果：
 
 - ETW / Collector 单元测试：`25 passed`
-- 底层双次 loopback probe：通过
-- 正式 Collector 双次 probe：通过
-- 两次正式 probe 均得到 `524288` upload bytes 与 `524288` download bytes
+- 底层真实 loopback 双次捕获：通过
+- 正式 Collector 双次捕获：通过
 - Session cleanup / restart：通过
+- 标准用户权限表征：通过，`StartTraceW` error `5`
 
-## 权限行为
-
-在 GitHub Actions 的 Windows Server 2025 与 Windows 11 Enterprise ARM64 Runner 上均实际验证：
-
-- 管理员 `runneradmin`：ETW Session 可启动、消费并停止，正式 Collector 可输出真实按进程流量。
-- 临时标准本地用户：`StartTraceW` 返回 Windows error `5`（Access Denied）。
-
-正式 Collector 将该错误映射为 `PERMISSION_DENIED`，GUI 显示需要管理员权限；其他 ETW 初始化异常映射为 `UNAVAILABLE`。
-
-最终是否可用以 ETW Session 的真实启动结果为准，而不是单纯根据“当前用户是否管理员”进行猜测。
+正式 Collector 两次均得到 `524288` upload bytes 和 `524288` download bytes，且 `collector_available = true`、close 后 `collector_closed = true`。
 
 ## 已知限制
 
-- 当前 GitHub 托管 Windows 11 实验环境是 ARM64，不是 Windows 11 x64 物理桌面机。
-- Windows 11 x64 物理机上的权限表现、长期运行和真实桌面 GUI 体验仍需最终本机验证。
+- GitHub 托管 Windows 11 实验环境仍是 ARM64，不是 Windows 11 x64 物理桌面机。
+- Stage 2D 已从代码层移除同步 UI-thread 采集与整表重建，但 Windows 11 x64 物理机上的实际拖动、缩放、滚动流畅度仍需用户更新代码后重新验收，README 不提前宣称实机性能已经通过。
+- 系统进程分类采用 conservative rules；`UNKNOWN` 会默认显示，因此可能看到少量无法确定归属的系统/受保护进程，这是为了避免误隐藏真正的第三方应用。
+- WindowsApps 当前保守归为 `UNKNOWN`，尚未实现 packaged-app publisher / package identity 级分类。
+- 当前仍以进程为行，不做 Chrome、Edge、Electron 等多进程应用聚合。
 - 当前已测试环境中，标准本地用户启动该 ETW Session 会收到 error 5；不同机器上的安全策略可能不同。
 - ETW Provider 的 byte counters 表示所捕获网络事件中的字节计数；项目不会未经证据把它宣称为“应用层有效载荷的绝对精确字节数”。
-- 当前 GUI 每秒仍会重建表格；隐藏系统进程减少了可见行数，但窗口拖动卡顿需要后续性能阶段单独解决。
 
-## 环境
+## 环境与本地启动
 
-- Windows 11（目标环境）
+- Windows 11（主要目标环境）
 - Python 3.14
 - PySide6
 - psutil
-
-## 本地安装与启动
 
 ```powershell
 py -3.14 -m venv .venv
@@ -241,7 +368,7 @@ python -m pytest
 python -m net_monitor
 ```
 
-在当前已测试环境中，需要具备 ETW Session 权限才能看到真实每进程上传/下载数据。权限不足时应用列表仍可使用，但网络数字保持不可用状态。
+在当前已测试环境中，需要具备 ETW Session 权限才能看到真实每进程上传/下载数据。权限不足时应用列表、分类与过滤仍可使用，但网络数字保持不可用状态。
 
 ## ETW 诊断入口
 
@@ -275,17 +402,25 @@ python -m net_monitor.collectors.etw.collector_probe
 Collector -> Service -> Model -> UI
 ```
 
-## CI
-
-主 CI 在 Windows Server 2025 x64 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、ETW module、GUI tests 与完整 pytest。当前应用视图回归为：
+Stage 2D 后的运行线程关系：
 
 ```text
-43 passed
+ETW ProcessTrace thread
+        ↓
+NetworkAggregator
+
+SamplingWorker QThread
+        ↓
+MonitorService
+        ↓
+MonitorSnapshot
+        ↓
+Qt UI thread
 ```
 
-其中包含 Windows 系统进程过滤、用户应用保留、不可读 executable 的保守策略，以及系统流量不进入应用汇总的 GUI 回归测试。
+## CI
 
-主 CI 还验证 `.venv` 未被 Git 跟踪或作为未忽略改动出现，并确认仓库工作区干净。
+主 CI 在 Windows Server 2025 x64 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、ETW module、GUI tests 与完整 pytest。
 
 独立 `ETW Experiment` workflow 在 `windows-2025` 与 `windows-11-arm` 上执行：
 
@@ -298,4 +433,4 @@ ETW / Collector 单元测试
 标准本地用户权限表征
 ```
 
-ETW Experiment 仅安装实验需要的最小 Python 依赖，避免 GUI 依赖影响 ETW 可行性结论。
+ETW Experiment 的路径触发范围包括 ETW Collector、核心状态/分类和 MonitorService 变化，确保服务层重构后重新验证真实 ETW 数据链路。
