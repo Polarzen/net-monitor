@@ -1,12 +1,21 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
   pull_request:
 
 jobs:
   test:
-    runs-on: windows-latest
+    name: Full validation ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - windows-2025
+          - windows-11-arm
+    runs-on: ${{ matrix.image }}
+    timeout-minutes: 20
     env:
       QT_QPA_PLATFORM: offscreen
     steps:
@@ -18,11 +27,14 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Show host Python information
+      - name: Show Windows and Python information
         shell: pwsh
         run: |
           python --version
           python -m pip --version
+          Write-Output "RUNNER_ARCH=$env:RUNNER_ARCH"
+          Write-Output "PROCESSOR_ARCHITECTURE=$env:PROCESSOR_ARCHITECTURE"
+          Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsName, OsVersion, OsArchitecture | Format-List
 
       - name: Create virtual environment
         shell: pwsh
@@ -72,55 +84,9 @@ jobs:
           $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
           Write-Output "IsAdministrator=$isAdmin"
 
-      - name: Run tests
+      - name: Run complete test suite
         shell: pwsh
         run: .\.venv\Scripts\python.exe -m pytest -v
-
-      - name: Run live ETW loopback probe twice with the same session name
-        if: github.ref == 'refs/heads/feat/etw-network-poc'
-        shell: pwsh
-        run: |
-          $env:NET_MONITOR_ETW_SESSION_NAME = "NetMonitor-CI-Restart-Probe"
-          .\.venv\Scripts\python.exe -m net_monitor.collectors.etw.probe
-          .\.venv\Scripts\python.exe -m net_monitor.collectors.etw.probe
-
-      - name: Characterize ETW permission as a standard local user
-        if: github.ref == 'refs/heads/feat/etw-network-poc'
-        shell: pwsh
-        run: |
-          $userName = "NetMonitorEtwCI"
-          $plainPassword = "Nm!" + [Guid]::NewGuid().ToString("N") + "aA1"
-          $securePassword = ConvertTo-SecureString $plainPassword -AsPlainText -Force
-          $stdoutPath = Join-Path $env:RUNNER_TEMP "net-monitor-etw-standard-user.out"
-          $stderrPath = Join-Path $env:RUNNER_TEMP "net-monitor-etw-standard-user.err"
-          try {
-            if (Get-LocalUser -Name $userName -ErrorAction SilentlyContinue) {
-              Remove-LocalUser -Name $userName
-            }
-            New-LocalUser -Name $userName -Password $securePassword -AccountNeverExpires -PasswordNeverExpires | Out-Null
-            $credential = [PSCredential]::new("$env:COMPUTERNAME\$userName", $securePassword)
-            $process = Start-Process `
-              -FilePath "$PWD\.venv\Scripts\python.exe" `
-              -ArgumentList "-m", "net_monitor.collectors.etw.permission_probe" `
-              -WorkingDirectory $PWD `
-              -Credential $credential `
-              -Wait `
-              -PassThru `
-              -RedirectStandardOutput $stdoutPath `
-              -RedirectStandardError $stderrPath
-            Write-Output "StandardUserExitCode=$($process.ExitCode)"
-            if (Test-Path $stdoutPath) { Get-Content $stdoutPath }
-            if (Test-Path $stderrPath) { Get-Content $stderrPath }
-            if ($process.ExitCode -ne 0) {
-              Write-Error "Standard-user permission probe failed unexpectedly"
-              exit $process.ExitCode
-            }
-          }
-          finally {
-            if (Get-LocalUser -Name $userName -ErrorAction SilentlyContinue) {
-              Remove-LocalUser -Name $userName
-            }
-          }
 
       - name: Verify virtual environment is ignored
         shell: pwsh
