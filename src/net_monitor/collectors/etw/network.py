@@ -6,7 +6,7 @@ from net_monitor.collectors.etw.events import NetworkDirection, NetworkEvent, Pr
 
 
 class NetworkAggregator:
-    """Thread-safe accumulation of ETW network bytes by PID.
+    """Thread-safe accumulation of ETW network bytes and event counts by PID.
 
     PID reuse is intentionally not solved in the 2A PoC. The 2B production
     collector should key long-lived process state by (pid, process create time).
@@ -17,9 +17,6 @@ class NetworkAggregator:
         self._totals: dict[int, ProcessNetworkTotals] = {}
 
     def record(self, event: NetworkEvent) -> None:
-        if event.size < 0:
-            raise ValueError("event size must be non-negative")
-
         with self._lock:
             current = self._totals.get(event.pid, ProcessNetworkTotals(pid=event.pid))
             if event.direction is NetworkDirection.SEND:
@@ -27,12 +24,16 @@ class NetworkAggregator:
                     pid=event.pid,
                     bytes_sent=current.bytes_sent + event.size,
                     bytes_received=current.bytes_received,
+                    send_events=current.send_events + 1,
+                    receive_events=current.receive_events,
                 )
             else:
                 updated = ProcessNetworkTotals(
                     pid=event.pid,
                     bytes_sent=current.bytes_sent,
                     bytes_received=current.bytes_received + event.size,
+                    send_events=current.send_events,
+                    receive_events=current.receive_events + 1,
                 )
             self._totals[event.pid] = updated
 
