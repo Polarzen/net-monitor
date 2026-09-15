@@ -29,9 +29,13 @@ class ProcessNetworkTotals:
     pid: int
     bytes_sent: int = 0
     bytes_received: int = 0
+    send_events: int = 0
+    receive_events: int = 0
 
     def __post_init__(self) -> None:
         if self.pid < 0:
             raise ValueError("pid must be non-negative")
         if self.bytes_sent < 0 or self.bytes_received < 0:
             raise ValueError("network totals must be non-negative")
+        if self.send_events < 0 or self.receive_events < 0:
+            raise ValueError("event totals must be non-negative")
