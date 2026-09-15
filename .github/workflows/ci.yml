@@ -63,14 +63,26 @@ jobs:
             exit $LASTEXITCODE
           }
 
+      - name: Show ETW execution identity
+        shell: pwsh
+        run: |
+          whoami
+          $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+          $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+          $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+          Write-Output "IsAdministrator=$isAdmin"
+
       - name: Run tests
         shell: pwsh
         run: .\.venv\Scripts\python.exe -m pytest -v
 
-      - name: Run live ETW loopback probe on PoC branch
+      - name: Run live ETW loopback probe twice with the same session name
         if: github.ref == 'refs/heads/feat/etw-network-poc'
         shell: pwsh
-        run: .\.venv\Scripts\python.exe -m net_monitor.collectors.etw.probe
+        run: |
+          $env:NET_MONITOR_ETW_SESSION_NAME = "NetMonitor-CI-Restart-Probe"
+          .\.venv\Scripts\python.exe -m net_monitor.collectors.etw.probe
+          .\.venv\Scripts\python.exe -m net_monitor.collectors.etw.probe
 
       - name: Verify virtual environment is ignored
         shell: pwsh
