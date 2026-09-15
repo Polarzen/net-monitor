@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
@@ -59,13 +60,18 @@ def make_snapshot(
     )
 
 
-def make_window(snapshot: MonitorSnapshot) -> tuple[QApplication, MainWindow, FakeService]:
+def make_window(
+    snapshot: MonitorSnapshot,
+    *,
+    elevation_launcher: Callable[[], bool] | None = None,
+) -> tuple[QApplication, MainWindow, FakeService]:
     app = QApplication.instance() or QApplication([])
     service = FakeService(snapshot)
     window = MainWindow(
         service=service,
         start_worker=False,
         classifier=ProcessClassifier(windows_directory=r"C:\Windows"),
+        elevation_launcher=elevation_launcher,
     )
     window._on_snapshot(snapshot)
     return app, window, service
@@ -95,6 +101,10 @@ def test_main_window_can_be_created_and_shutdown_closes_service() -> None:
 def test_available_state_and_real_zero_are_distinct_from_unavailable() -> None:
     app, window, _ = make_window(make_snapshot(ProcessNetworkStatus.AVAILABLE))
     assert window._network_status_label.text() == "进程网络监控：运行中"
+    assert window._restart_as_admin_button.isHidden() is True
+
+    window._network_activity_only.setChecked(False)
+    app.processEvents()
     idle = find_top_level(window, "idle.exe")
     assert idle.text(2) == "0 B/s"
     assert idle.text(3) == "0 B/s"
@@ -102,7 +112,13 @@ def test_available_state_and_real_zero_are_distinct_from_unavailable() -> None:
     app.processEvents()
 
 
-def test_permission_denied_and_unavailable_status_text() -> None:
+def test_permission_denied_exposes_explicit_elevation_action() -> None:
+    launches: list[bool] = []
+
+    def launch() -> bool:
+        launches.append(True)
+        return False
+
     app, denied, _ = make_window(
         make_snapshot(
             ProcessNetworkStatus.PERMISSION_DENIED,
@@ -110,12 +126,20 @@ def test_permission_denied_and_unavailable_status_text() -> None:
                 ProcessNetworkStats(1, "idle.exe"),
                 ProcessNetworkStats(2, "busy.exe"),
             ),
-        )
+        ),
+        elevation_launcher=launch,
     )
     assert denied._network_status_label.text() == "进程网络监控：不可用（需要管理员权限）"
     assert denied._network_status_label.toolTip().startswith("需要以管理员身份运行")
     assert find_top_level(denied, "idle.exe").text(2) == "—"
     assert denied._upload_label.text() == "第三方应用总上传速度: —"
+    assert denied._network_activity_only.isEnabled() is False
+    assert denied._restart_as_admin_button.isHidden() is False
+
+    denied._restart_as_admin_button.click()
+    app.processEvents()
+    assert launches == [True]
+    assert denied._restart_as_admin_button.isEnabled() is True
     denied.close()
     app.processEvents()
 
@@ -129,19 +153,29 @@ def test_permission_denied_and_unavailable_status_text() -> None:
         )
     )
     assert unavailable._network_status_label.text() == "进程网络监控：不可用"
+    assert unavailable._restart_as_admin_button.isHidden() is True
     unavailable.close()
     app.processEvents()
 
 
-def test_network_activity_filter_uses_application_session_totals() -> None:
+def test_current_network_activity_filter_is_enabled_by_default() -> None:
     app, window, _ = make_window(make_snapshot())
-    assert window._tree.topLevelItemCount() == 2
-
-    window._network_activity_only.setChecked(True)
-    app.processEvents()
-
+    assert window._network_activity_only.isChecked() is True
     assert window._tree.topLevelItemCount() == 1
     assert window._tree.topLevelItem(0).text(0) == "busy.exe"
+
+    totals_without_current_rate = make_snapshot(
+        stats=(
+            ProcessNetworkStats(1, "idle.exe", 0, 0, 0.0, 0.0),
+            ProcessNetworkStats(2, "busy.exe", 2048, 1024, 0.0, 0.0),
+        )
+    )
+    window._on_snapshot(totals_without_current_rate)
+    assert window._tree.topLevelItemCount() == 0
+
+    window._network_activity_only.setChecked(False)
+    app.processEvents()
+    assert window._tree.topLevelItemCount() == 2
     window.close()
     app.processEvents()
 
@@ -272,7 +306,7 @@ def test_same_executable_processes_are_one_expandable_application() -> None:
     app.processEvents()
 
 
-def test_large_snapshot_is_aggregated_without_losing_applications() -> None:
+def test_large_snapshot_is_aggregated_without_losing_active_applications() -> None:
     processes = tuple(
         ProcessInfo(index, f"app-{index}.exe", executable=fr"D:\Apps\app-{index}.exe", create_time=float(index))
         for index in range(10, 310)
