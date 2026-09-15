@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 20
     env:
       QT_QPA_PLATFORM: offscreen
+      PYTHONFAULTHANDLER: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -86,7 +87,7 @@ jobs:
 
       - name: Run complete test suite
         shell: pwsh
-        run: .\.venv\Scripts\python.exe -m pytest -v
+        run: .\.venv\Scripts\python.exe -m pytest -x -vv
 
       - name: Verify virtual environment is ignored
         shell: pwsh
