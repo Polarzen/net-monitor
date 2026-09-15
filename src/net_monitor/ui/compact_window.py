@@ -59,6 +59,7 @@ class CompactAppRow(QFrame):
 class CompactWindow(QMainWindow):
     details_requested = Signal()
     visibility_close_requested = Signal()
+    exit_requested = Signal()
     always_on_top_changed = Signal(bool)
 
     def __init__(
@@ -227,6 +228,8 @@ class CompactWindow(QMainWindow):
             self.hide()
             self.visibility_close_requested.emit()
             return
+        if not self._tray_available and not self._shutdown_in_progress:
+            self.exit_requested.emit()
         super().closeEvent(event)
 
     def _apply_state(self, state: ProcessNetworkState) -> None:
