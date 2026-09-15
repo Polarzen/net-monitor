@@ -41,6 +41,18 @@ def test_snapshot_does_not_expose_mutable_internal_state() -> None:
     assert 1 in aggregator.snapshot()
 
 
+def test_retain_pids_discards_inactive_processes() -> None:
+    aggregator = NetworkAggregator()
+    aggregator.record(NetworkEvent(1.0, 1, NetworkDirection.SEND, 10))
+    aggregator.record(NetworkEvent(1.0, 2, NetworkDirection.RECEIVE, 20))
+
+    aggregator.retain_pids({2})
+
+    snapshot = aggregator.snapshot()
+    assert 1 not in snapshot
+    assert snapshot[2].bytes_received == 20
+
+
 def test_aggregator_is_thread_safe_for_basic_updates() -> None:
     aggregator = NetworkAggregator()
 

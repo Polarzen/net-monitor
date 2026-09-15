@@ -6,11 +6,7 @@ from net_monitor.collectors.etw.events import NetworkDirection, NetworkEvent, Pr
 
 
 class NetworkAggregator:
-    """Thread-safe accumulation of ETW network bytes and event counts by PID.
-
-    PID reuse is intentionally not solved in the 2A PoC. The 2B production
-    collector should key long-lived process state by (pid, process create time).
-    """
+    """Thread-safe accumulation of ETW network bytes and event counts by PID."""
 
     def __init__(self) -> None:
         self._lock = Lock()
@@ -40,6 +36,11 @@ class NetworkAggregator:
     def snapshot(self) -> dict[int, ProcessNetworkTotals]:
         with self._lock:
             return dict(self._totals)
+
+    def retain_pids(self, pids: set[int]) -> None:
+        """Discard counters for processes that are no longer active."""
+        with self._lock:
+            self._totals = {pid: total for pid, total in self._totals.items() if pid in pids}
 
     def clear(self) -> None:
         with self._lock:

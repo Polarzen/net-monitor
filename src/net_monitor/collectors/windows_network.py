@@ -107,6 +107,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         self._states = {
             identity: state for identity, state in self._states.items() if identity in active_identities
         }
+        self._aggregator.retain_pids({process.pid for process in processes})
         self._previous_time = now
         return tuple(results)
 
