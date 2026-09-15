@@ -11,6 +11,8 @@ on:
       - "src/net_monitor/collectors/etw/**"
       - "src/net_monitor/collectors/windows_network.py"
       - "src/net_monitor/core/models.py"
+      - "src/net_monitor/core/process_visibility.py"
+      - "src/net_monitor/services/monitor_service.py"
       - "tests/test_etw_events.py"
       - "tests/test_etw_session.py"
       - "tests/test_network_aggregator.py"
