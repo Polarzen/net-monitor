@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 
 from PySide6.QtCore import QMetaObject, QThread, Qt
 from PySide6.QtGui import QCloseEvent
@@ -9,6 +10,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMainWindow,
+    QPushButton,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
@@ -19,6 +21,7 @@ from net_monitor.core.application_aggregation import (
     ApplicationNetworkGroup,
     aggregate_application_network,
 )
+from net_monitor.core.elevation import restart_as_administrator
 from net_monitor.core.formatting import format_bytes_per_second
 from net_monitor.core.models import (
     MonitorSnapshot,
@@ -65,10 +68,12 @@ class MainWindow(QMainWindow):
         start_worker: bool = True,
         sampling_interval_ms: int = 500,
         classifier: ProcessClassifier | None = None,
+        elevation_launcher: Callable[[], bool] | None = None,
     ) -> None:
         super().__init__()
         self._service = service or MonitorService()
         self._classifier = classifier or ProcessClassifier()
+        self._elevation_launcher = elevation_launcher or restart_as_administrator
         self._latest_snapshot: MonitorSnapshot | None = None
         self._sampling_thread: QThread | None = None
         self._sampling_worker: SamplingWorker | None = None
@@ -83,8 +88,12 @@ class MainWindow(QMainWindow):
         self._download_label = QLabel("第三方应用总下载速度: —")
         self._process_count_label = QLabel("当前显示应用数: 0")
         self._network_status_label = QLabel("进程网络监控：正在启动")
-        self._network_activity_only = QCheckBox("仅显示有网络活动的应用")
-        self._network_activity_only.setChecked(False)
+        self._restart_as_admin_button = QPushButton("以管理员身份重启")
+        self._restart_as_admin_button.setVisible(False)
+        self._restart_as_admin_button.clicked.connect(self._restart_with_elevation)
+
+        self._network_activity_only = QCheckBox("仅显示当前联网应用")
+        self._network_activity_only.setChecked(True)
         self._show_system_processes = QCheckBox("显示 Windows 系统进程")
         self._show_system_processes.setChecked(False)
         self._network_activity_only.toggled.connect(self._apply_latest_snapshot)
@@ -98,6 +107,7 @@ class MainWindow(QMainWindow):
 
         network_controls = QHBoxLayout()
         network_controls.addWidget(self._network_status_label)
+        network_controls.addWidget(self._restart_as_admin_button)
         network_controls.addStretch()
         network_controls.addWidget(self._show_system_processes)
         network_controls.addWidget(self._network_activity_only)
@@ -179,10 +189,8 @@ class MainWindow(QMainWindow):
             )
         )
 
-        upload_rate, download_rate = self._third_party_rates(
-            snapshot.process_network_state,
-            third_party_groups,
-        )
+        state = snapshot.process_network_state
+        upload_rate, download_rate = self._third_party_rates(state, third_party_groups)
         self._upload_label.setText(
             "第三方应用总上传速度: "
             + ("—" if upload_rate is None else format_bytes_per_second(upload_rate))
@@ -191,16 +199,48 @@ class MainWindow(QMainWindow):
             "第三方应用总下载速度: "
             + ("—" if download_rate is None else format_bytes_per_second(download_rate))
         )
-        self._network_status_label.setText(self._status_text(snapshot.process_network_state))
-        self._network_status_label.setToolTip(snapshot.process_network_state.message or "")
+        self._network_status_label.setText(self._status_text(state))
+        self._network_status_label.setToolTip(state.message or "")
 
-        if self._network_activity_only.isChecked():
-            groups = [group for group in groups if self._group_has_network_activity(group)]
+        permission_denied = state.status is ProcessNetworkStatus.PERMISSION_DENIED
+        self._restart_as_admin_button.setVisible(permission_denied)
+        if permission_denied:
+            self._restart_as_admin_button.setEnabled(True)
+            self._restart_as_admin_button.setText("以管理员身份重启")
+            self._restart_as_admin_button.setToolTip("触发 Windows UAC 提示并重新启动 Net Monitor")
+
+        self._network_activity_only.setEnabled(state.available)
+        self._network_activity_only.setToolTip(
+            ""
+            if state.available
+            else "按实时网络活动筛选需要先启用进程网络监控"
+        )
+        if self._network_activity_only.isChecked() and state.available:
+            groups = [group for group in groups if self._group_is_currently_active(group)]
 
         self._sync_tree(groups, network_rows)
         self._process_count_label.setText(f"当前显示应用数: {len(groups)}")
         self._last_visible_rows = len(groups)
         self._last_apply_seconds = time.perf_counter() - started
+
+    def _restart_with_elevation(self) -> None:
+        self._restart_as_admin_button.setEnabled(False)
+        self._restart_as_admin_button.setText("正在请求管理员权限…")
+        try:
+            started = self._elevation_launcher()
+        except Exception as exc:  # pragma: no cover - defensive OS boundary
+            self._restart_as_admin_button.setText("以管理员身份重启")
+            self._restart_as_admin_button.setEnabled(True)
+            self._restart_as_admin_button.setToolTip(f"管理员重启失败：{exc}")
+            return
+
+        if started:
+            self.close()
+            return
+
+        self._restart_as_admin_button.setText("以管理员身份重启")
+        self._restart_as_admin_button.setEnabled(True)
+        self._restart_as_admin_button.setToolTip("Windows 未能启动管理员实例，请重试")
 
     def _sync_tree(
         self,
@@ -380,5 +420,7 @@ class MainWindow(QMainWindow):
         return upload, download
 
     @staticmethod
-    def _group_has_network_activity(group: ApplicationNetworkGroup) -> bool:
-        return (group.upload_bytes or 0) > 0 or (group.download_bytes or 0) > 0
+    def _group_is_currently_active(group: ApplicationNetworkGroup) -> bool:
+        return (group.upload_bytes_per_second or 0.0) > 0.0 or (
+            group.download_bytes_per_second or 0.0
+        ) > 0.0
