@@ -71,6 +71,18 @@ def make_window(snapshot: MonitorSnapshot) -> tuple[QApplication, MainWindow, Fa
     return app, window, service
 
 
+def top_level_items(window: MainWindow):
+    return [window._tree.topLevelItem(index) for index in range(window._tree.topLevelItemCount())]
+
+
+def top_level_names(window: MainWindow) -> set[str]:
+    return {item.text(0) for item in top_level_items(window)}
+
+
+def find_top_level(window: MainWindow, name: str):
+    return next(item for item in top_level_items(window) if item.text(0) == name)
+
+
 def test_main_window_can_be_created_and_shutdown_closes_service() -> None:
     app, window, service = make_window(make_snapshot())
     assert window.windowTitle() == "Net Monitor"
@@ -83,8 +95,9 @@ def test_main_window_can_be_created_and_shutdown_closes_service() -> None:
 def test_available_state_and_real_zero_are_distinct_from_unavailable() -> None:
     app, window, _ = make_window(make_snapshot(ProcessNetworkStatus.AVAILABLE))
     assert window._network_status_label.text() == "进程网络监控：运行中"
-    assert window._table.item(0, 2).text() == "0 B/s"
-    assert window._table.item(0, 3).text() == "0 B/s"
+    idle = find_top_level(window, "idle.exe")
+    assert idle.text(2) == "0 B/s"
+    assert idle.text(3) == "0 B/s"
     window.close()
     app.processEvents()
 
@@ -101,7 +114,7 @@ def test_permission_denied_and_unavailable_status_text() -> None:
     )
     assert denied._network_status_label.text() == "进程网络监控：不可用（需要管理员权限）"
     assert denied._network_status_label.toolTip().startswith("需要以管理员身份运行")
-    assert denied._table.item(0, 2).text() == "—"
+    assert find_top_level(denied, "idle.exe").text(2) == "—"
     assert denied._upload_label.text() == "第三方应用总上传速度: —"
     denied.close()
     app.processEvents()
@@ -120,20 +133,20 @@ def test_permission_denied_and_unavailable_status_text() -> None:
     app.processEvents()
 
 
-def test_network_activity_filter_uses_session_totals() -> None:
+def test_network_activity_filter_uses_application_session_totals() -> None:
     app, window, _ = make_window(make_snapshot())
-    assert window._table.rowCount() == 2
+    assert window._tree.topLevelItemCount() == 2
 
     window._network_activity_only.setChecked(True)
     app.processEvents()
 
-    assert window._table.rowCount() == 1
-    assert window._table.item(0, 0).text() == "busy.exe"
+    assert window._tree.topLevelItemCount() == 1
+    assert window._tree.topLevelItem(0).text(0) == "busy.exe"
     window.close()
     app.processEvents()
 
 
-def test_network_columns_sort_by_raw_numeric_values() -> None:
+def test_network_columns_sort_by_raw_aggregate_numeric_values() -> None:
     stats = (
         ProcessNetworkStats(1, "small.exe", 900 * 1024, 0, 900 * 1024.0, 0.0),
         ProcessNetworkStats(2, "large.exe", 1024 * 1024, 0, 1024 * 1024.0, 0.0),
@@ -149,11 +162,11 @@ def test_network_columns_sort_by_raw_numeric_values() -> None:
     )
     app, window, _ = make_window(snapshot)
 
-    window._table.sortItems(3, Qt.SortOrder.DescendingOrder)
+    window._tree.sortItems(3, Qt.SortOrder.DescendingOrder)
     app.processEvents()
 
-    assert window._table.item(0, 0).text() == "large.exe"
-    assert window._table.item(0, 3).data(Qt.ItemDataRole.UserRole) == 1024 * 1024.0
+    assert window._tree.topLevelItem(0).text(0) == "large.exe"
+    assert window._tree.topLevelItem(0).data(3, Qt.ItemDataRole.UserRole) == 1024 * 1024.0
     window.close()
     app.processEvents()
 
@@ -175,29 +188,21 @@ def test_system_hidden_by_default_unknown_visible_and_toggle_restores_system() -
     )
     app, window, _ = make_window(snapshot)
 
-    assert window._table.rowCount() == 2
-    assert {window._table.item(row, 0).text() for row in range(2)} == {"browser.exe", "mystery.exe"}
+    assert window._tree.topLevelItemCount() == 2
+    assert top_level_names(window) == {"browser.exe", "mystery.exe"}
     assert window._upload_label.text() == "第三方应用总上传速度: 3.03 KB/s"
 
     window._show_system_processes.setChecked(True)
     app.processEvents()
-    assert window._table.rowCount() == 3
-    assert {window._table.item(row, 0).text() for row in range(3)} == {
-        "svchost.exe",
-        "browser.exe",
-        "mystery.exe",
-    }
+    assert window._tree.topLevelItemCount() == 3
+    assert top_level_names(window) == {"svchost.exe", "browser.exe", "mystery.exe"}
     window.close()
     app.processEvents()
 
 
-def test_filters_combine_and_incremental_update_preserves_existing_items() -> None:
+def test_filters_combine_and_incremental_update_preserves_existing_group_item() -> None:
     app, window, _ = make_window(make_snapshot())
-    busy_name_item = next(
-        window._table.item(row, 0)
-        for row in range(window._table.rowCount())
-        if window._table.item(row, 0).text() == "busy.exe"
-    )
+    busy_item = find_top_level(window, "busy.exe")
 
     base = make_snapshot()
     updated = MonitorSnapshot(
@@ -210,23 +215,64 @@ def test_filters_combine_and_incremental_update_preserves_existing_items() -> No
         process_network_state=ProcessNetworkState(ProcessNetworkStatus.AVAILABLE),
     )
     window._on_snapshot(updated)
-    same_busy_item = next(
-        window._table.item(row, 0)
-        for row in range(window._table.rowCount())
-        if window._table.item(row, 0).text() == "busy.exe"
-    )
-    assert same_busy_item is busy_name_item
+    assert find_top_level(window, "busy.exe") is busy_item
 
     window._network_activity_only.setChecked(True)
     window._show_system_processes.setChecked(False)
     app.processEvents()
-    assert window._table.rowCount() == 1
-    assert window._table.item(0, 0).text() == "busy.exe"
+    assert window._tree.topLevelItemCount() == 1
+    assert window._tree.topLevelItem(0).text(0) == "busy.exe"
     window.close()
     app.processEvents()
 
 
-def test_large_snapshot_is_applied_without_losing_rows() -> None:
+def test_same_executable_processes_are_one_expandable_application() -> None:
+    processes = (
+        ProcessInfo(10, "chrome.exe", executable=r"C:\Program Files\Google\Chrome\chrome.exe", create_time=1.0),
+        ProcessInfo(20, "chrome.exe", executable=r"C:\Program Files\Google\Chrome\chrome.exe", create_time=2.0),
+    )
+    snapshot = MonitorSnapshot(
+        system=SystemNetworkStats(0, 0, 0.0, 0.0),
+        processes=processes,
+        process_network=(
+            ProcessNetworkStats(10, "chrome.exe", 1000, 2000, 100.0, 200.0),
+            ProcessNetworkStats(20, "chrome.exe", 3000, 4000, 300.0, 400.0),
+        ),
+        process_network_state=ProcessNetworkState(ProcessNetworkStatus.AVAILABLE),
+    )
+    app, window, _ = make_window(snapshot)
+
+    assert window._tree.topLevelItemCount() == 1
+    chrome = window._tree.topLevelItem(0)
+    assert chrome.text(0) == "chrome.exe"
+    assert chrome.text(1) == "2"
+    assert chrome.data(3, Qt.ItemDataRole.UserRole) == 400.0
+    assert chrome.data(2, Qt.ItemDataRole.UserRole) == 600.0
+    assert chrome.data(5, Qt.ItemDataRole.UserRole) == 4000
+    assert chrome.data(4, Qt.ItemDataRole.UserRole) == 6000
+    assert chrome.childCount() == 2
+    assert {chrome.child(index).text(1) for index in range(chrome.childCount())} == {"10", "20"}
+
+    chrome.setExpanded(True)
+    updated = MonitorSnapshot(
+        system=snapshot.system,
+        processes=processes,
+        process_network=(
+            ProcessNetworkStats(10, "chrome.exe", 2000, 3000, 200.0, 300.0),
+            ProcessNetworkStats(20, "chrome.exe", 4000, 5000, 400.0, 500.0),
+        ),
+        process_network_state=snapshot.process_network_state,
+    )
+    window._on_snapshot(updated)
+    same_chrome = window._tree.topLevelItem(0)
+    assert same_chrome is chrome
+    assert same_chrome.isExpanded() is True
+    assert same_chrome.data(3, Qt.ItemDataRole.UserRole) == 600.0
+    window.close()
+    app.processEvents()
+
+
+def test_large_snapshot_is_aggregated_without_losing_applications() -> None:
     processes = tuple(
         ProcessInfo(index, f"app-{index}.exe", executable=fr"D:\Apps\app-{index}.exe", create_time=float(index))
         for index in range(10, 310)
@@ -242,7 +288,7 @@ def test_large_snapshot_is_applied_without_losing_rows() -> None:
         process_network_state=ProcessNetworkState(ProcessNetworkStatus.AVAILABLE),
     )
     app, window, _ = make_window(snapshot)
-    assert window._table.rowCount() == 300
+    assert window._tree.topLevelItemCount() == 300
     assert window.last_visible_rows == 300
     assert window.last_apply_seconds >= 0.0
     window.close()
