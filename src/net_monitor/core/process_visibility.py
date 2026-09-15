@@ -62,22 +62,26 @@ class ProcessClassifier:
         if process.pid in _SYSTEM_PIDS:
             return ProcessCategory.SYSTEM
 
+        executable = process.executable
+        if executable:
+            # WindowsApps contains both Microsoft and third-party packaged apps. Do
+            # not hide it based on directory ownership alone.
+            if _looks_like_windows_apps(executable):
+                return ProcessCategory.UNKNOWN
+
+            if self._windows_directory and _is_within_directory(executable, self._windows_directory):
+                return ProcessCategory.SYSTEM
+
+            # An explicit executable outside the Windows OS directory wins over a
+            # familiar filename. This avoids hiding a third-party process merely
+            # because it happens to share a system-looking name.
+            return ProcessCategory.APPLICATION
+
+        # With no readable executable path, well-known kernel/service identities
+        # are used only as a fallback hint. Everything else remains visible.
         if process.name.casefold() in _SYSTEM_PROCESS_NAMES:
             return ProcessCategory.SYSTEM
-
-        executable = process.executable
-        if not executable:
-            return ProcessCategory.UNKNOWN
-
-        # WindowsApps contains both Microsoft and third-party packaged apps. Do not
-        # hide it merely because it lives under Program Files.
-        if _looks_like_windows_apps(executable):
-            return ProcessCategory.UNKNOWN
-
-        if self._windows_directory and _is_within_directory(executable, self._windows_directory):
-            return ProcessCategory.SYSTEM
-
-        return ProcessCategory.APPLICATION
+        return ProcessCategory.UNKNOWN
 
 
 def is_windows_system_process(
