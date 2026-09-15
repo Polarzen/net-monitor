@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import socket
 import subprocess
 import sys
@@ -12,6 +13,7 @@ from net_monitor.collectors.etw.network import NetworkAggregator
 from net_monitor.collectors.etw.session import EtwSession
 
 _PAYLOAD_SIZE = 512 * 1024
+_SESSION_NAME_ENV = "NET_MONITOR_ETW_SESSION_NAME"
 
 
 def _serve_once(listener: socket.socket) -> None:
@@ -26,14 +28,13 @@ def _serve_once(listener: socket.socket) -> None:
         conn.sendall(b"R" * _PAYLOAD_SIZE)
 
 
-def run_probe() -> dict[str, object]:
+def run_probe(*, session_name: str | None = None) -> dict[str, object]:
     aggregator = NetworkAggregator()
     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listener.settimeout(10.0)
     listener.bind(("127.0.0.1", 0))
     listener.listen(1)
     port = listener.getsockname()[1]
-    server = threading.Thread(target=_serve_once, args=(listener,), daemon=False)
-    server.start()
 
     child_code = (
         "import os,socket,sys;"
@@ -48,8 +49,11 @@ def run_probe() -> dict[str, object]:
         "s.close()"
     )
 
+    configured_name = session_name or os.environ.get(_SESSION_NAME_ENV)
     try:
-        with EtwSession(aggregator.record) as session:
+        with EtwSession(aggregator.record, session_name=configured_name) as session:
+            server = threading.Thread(target=_serve_once, args=(listener,), daemon=False)
+            server.start()
             time.sleep(0.5)
             child = subprocess.Popen(
                 [sys.executable, "-c", child_code, str(port)],
@@ -61,7 +65,7 @@ def run_probe() -> dict[str, object]:
             if child.returncode != 0:
                 raise RuntimeError(f"probe child failed: {stderr.strip()}")
             child_pid = int(stdout.strip().splitlines()[0])
-            server.join(timeout=5)
+            server.join(timeout=12)
             if server.is_alive():
                 raise RuntimeError("probe TCP server did not finish")
             time.sleep(1.5)
@@ -75,6 +79,8 @@ def run_probe() -> dict[str, object]:
         "session_name": session.session_name,
         "test_pid": child_pid,
         "pid_matched": totals is not None,
+        "send_events": totals.send_events if totals else 0,
+        "receive_events": totals.receive_events if totals else 0,
         "bytes_sent": totals.bytes_sent if totals else 0,
         "bytes_received": totals.bytes_received if totals else 0,
     }
@@ -86,9 +92,12 @@ def main() -> int:
     if not result["pid_matched"]:
         print("ETW probe did not observe the controlled child PID", file=sys.stderr)
         return 2
+    if int(result["send_events"]) <= 0 or int(result["receive_events"]) <= 0:
+        print("ETW probe did not observe both send and receive events", file=sys.stderr)
+        return 3
     if int(result["bytes_sent"]) <= 0 or int(result["bytes_received"]) <= 0:
         print("ETW probe did not observe both send and receive bytes", file=sys.stderr)
-        return 3
+        return 4
     return 0
 
 
