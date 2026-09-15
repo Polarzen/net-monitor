@@ -1,6 +1,26 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
+
+
+class ProcessNetworkStatus(str, Enum):
+    STARTING = "starting"
+    AVAILABLE = "available"
+    PERMISSION_DENIED = "permission_denied"
+    UNAVAILABLE = "unavailable"
+    STOPPED = "stopped"
+
+
+@dataclass(slots=True, frozen=True)
+class ProcessNetworkState:
+    status: ProcessNetworkStatus
+    message: str | None = None
+    error_code: int | None = None
+
+    @property
+    def available(self) -> bool:
+        return self.status is ProcessNetworkStatus.AVAILABLE
 
 
 @dataclass(slots=True, frozen=True)
@@ -41,3 +61,4 @@ class MonitorSnapshot:
     system: SystemNetworkStats
     processes: tuple[ProcessInfo, ...]
     process_network: tuple[ProcessNetworkStats, ...]
+    process_network_state: ProcessNetworkState = ProcessNetworkState(ProcessNetworkStatus.STARTING)
