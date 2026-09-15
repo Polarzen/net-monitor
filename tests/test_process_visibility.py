@@ -43,6 +43,9 @@ def test_user_facing_apps_are_application() -> None:
     assert classify(
         ProcessInfo(600, "game.exe", executable=r"D:\Games\Example\game.exe")
     ) is ProcessCategory.APPLICATION
+    assert classify(
+        ProcessInfo(601, "svchost.exe", executable=r"D:\Vendor\svchost.exe")
+    ) is ProcessCategory.APPLICATION
 
 
 def test_unknown_entries_remain_visible() -> None:
