@@ -57,7 +57,8 @@ def test_main_window_samples_off_ui_thread_and_stops_worker_cleanly() -> None:
 
     assert service.snapshot_thread_ids
     assert all(thread_id != main_thread_id for thread_id in service.snapshot_thread_ids)
-    assert window._table.rowCount() == 1
+    assert window._tree.topLevelItemCount() == 1
+    assert window._tree.topLevelItem(0).text(0) == "demo.exe"
 
     thread = window._sampling_thread
     window.close()
