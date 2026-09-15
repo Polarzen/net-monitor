@@ -1,0 +1,123 @@
+name: ETW Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/etw-network-poc
+    paths:
+      - ".github/workflows/etw-experiment.yml"
+      - "src/net_monitor/collectors/etw/**"
+      - "tests/test_etw_events.py"
+      - "tests/test_etw_session.py"
+      - "tests/test_network_aggregator.py"
+
+jobs:
+  etw-experiment:
+    name: ETW ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - windows-2025
+          - windows-11-arm
+    runs-on: ${{ matrix.image }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Show Windows and architecture
+        shell: pwsh
+        run: |
+          python --version
+          Write-Output "RUNNER_ARCH=$env:RUNNER_ARCH"
+          Write-Output "PROCESSOR_ARCHITECTURE=$env:PROCESSOR_ARCHITECTURE"
+          Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsName, OsVersion, OsArchitecture | Format-List
+
+      - name: Install ETW experiment dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+          python -m pip install -e . --no-deps
+
+      - name: Query Kernel Network ETW provider
+        shell: pwsh
+        run: |
+          $provider = logman query providers "Microsoft-Windows-Kernel-Network" 2>&1
+          $provider
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Microsoft-Windows-Kernel-Network provider was not found"
+            exit $LASTEXITCODE
+          }
+
+      - name: Show execution identity
+        shell: pwsh
+        run: |
+          whoami
+          $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+          $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+          $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+          Write-Output "IsAdministrator=$isAdmin"
+
+      - name: Run ETW unit tests
+        shell: pwsh
+        run: |
+          python -m pytest -v `
+            tests/test_etw_events.py `
+            tests/test_etw_session.py `
+            tests/test_network_aggregator.py
+
+      - name: Run live ETW loopback probe twice with same session name
+        shell: pwsh
+        run: |
+          $env:NET_MONITOR_ETW_SESSION_NAME = "NetMonitor-ETW-Experiment-${{ matrix.image }}"
+          python -m net_monitor.collectors.etw.probe
+          python -m net_monitor.collectors.etw.probe
+
+      - name: Characterize ETW permission as a standard local user
+        shell: pwsh
+        run: |
+          $userName = "NetMonitorEtwCI"
+          $plainPassword = "Nm!" + [Guid]::NewGuid().ToString("N") + "aA1"
+          $securePassword = ConvertTo-SecureString $plainPassword -AsPlainText -Force
+          $stdoutPath = Join-Path $env:RUNNER_TEMP "net-monitor-etw-standard-user.out"
+          $stderrPath = Join-Path $env:RUNNER_TEMP "net-monitor-etw-standard-user.err"
+          try {
+            if (Get-LocalUser -Name $userName -ErrorAction SilentlyContinue) {
+              Remove-LocalUser -Name $userName
+            }
+            New-LocalUser -Name $userName -Password $securePassword -AccountNeverExpires -PasswordNeverExpires | Out-Null
+            $credential = [PSCredential]::new("$env:COMPUTERNAME\$userName", $securePassword)
+            $process = Start-Process `
+              -FilePath (Get-Command python).Source `
+              -ArgumentList "-m", "net_monitor.collectors.etw.permission_probe" `
+              -WorkingDirectory $PWD `
+              -Credential $credential `
+              -Wait `
+              -PassThru `
+              -RedirectStandardOutput $stdoutPath `
+              -RedirectStandardError $stderrPath
+            Write-Output "StandardUserExitCode=$($process.ExitCode)"
+            if (Test-Path $stdoutPath) { Get-Content $stdoutPath }
+            if (Test-Path $stderrPath) { Get-Content $stderrPath }
+            if ($process.ExitCode -ne 0) {
+              Write-Error "Standard-user permission probe failed unexpectedly"
+              exit $process.ExitCode
+            }
+          }
+          finally {
+            if (Get-LocalUser -Name $userName -ErrorAction SilentlyContinue) {
+              Remove-LocalUser -Name $userName
+            }
+          }
+
+      - name: Show repository status
+        shell: pwsh
+        run: git status --short
