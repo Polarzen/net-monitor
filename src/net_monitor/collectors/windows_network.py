@@ -6,10 +6,16 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from net_monitor.collectors.base import ProcessNetworkCollector
+from net_monitor.collectors.etw.api import EtwPermissionError
 from net_monitor.collectors.etw.events import NetworkEvent, ProcessNetworkTotals
 from net_monitor.collectors.etw.network import NetworkAggregator
 from net_monitor.collectors.etw.session import EtwSession
-from net_monitor.core.models import ProcessInfo, ProcessNetworkStats
+from net_monitor.core.models import (
+    ProcessInfo,
+    ProcessNetworkState,
+    ProcessNetworkStats,
+    ProcessNetworkStatus,
+)
 
 
 class _SessionProtocol(Protocol):
@@ -31,12 +37,7 @@ class _ProcessState:
 
 
 class WindowsProcessNetworkCollector(ProcessNetworkCollector):
-    """Production per-process network collector backed by Windows ETW.
-
-    The ETW session starts lazily on the first collection. If Windows denies ETW
-    access, the collector keeps the application usable and reports unavailable
-    per-process values instead of inventing data.
-    """
+    """Production per-process network collector backed by Windows ETW."""
 
     def __init__(
         self,
@@ -54,6 +55,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         self._last_error: Exception | None = None
         self._start_attempted = False
         self._closed = False
+        self._state = ProcessNetworkState(ProcessNetworkStatus.STARTING)
 
     def collect(self, processes: tuple[ProcessInfo, ...]) -> tuple[ProcessNetworkStats, ...]:
         if self._closed or not self._ensure_started():
@@ -118,19 +120,40 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
             return False
 
         self._start_attempted = True
-        session = self._session_factory(self._aggregator.record)
+        self._state = ProcessNetworkState(ProcessNetworkStatus.STARTING)
         try:
+            session = self._session_factory(self._aggregator.record)
             session.start()
+        except EtwPermissionError as exc:
+            self._last_error = exc
+            self._state = ProcessNetworkState(
+                ProcessNetworkStatus.PERMISSION_DENIED,
+                "需要以管理员身份运行 Net Monitor 才能获取每个进程的网络流量。",
+                exc.error_code,
+            )
+            if "session" in locals():
+                try:
+                    session.stop()
+                except Exception:
+                    pass
+            return False
         except Exception as exc:
             self._last_error = exc
-            try:
-                session.stop()
-            except Exception:
-                pass
+            self._state = ProcessNetworkState(
+                ProcessNetworkStatus.UNAVAILABLE,
+                "进程网络监控当前不可用。",
+                getattr(exc, "error_code", None),
+            )
+            if "session" in locals():
+                try:
+                    session.stop()
+                except Exception:
+                    pass
             return False
 
         self._session = session
         self._last_error = None
+        self._state = ProcessNetworkState(ProcessNetworkStatus.AVAILABLE)
         return True
 
     @staticmethod
@@ -143,6 +166,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         self._closed = True
         session = self._session
         self._session = None
+        self._state = ProcessNetworkState(ProcessNetworkStatus.STOPPED)
         if session is None:
             return
         try:
@@ -151,8 +175,12 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
             self._last_error = exc
 
     @property
+    def state(self) -> ProcessNetworkState:
+        return self._state
+
+    @property
     def available(self) -> bool:
-        return self._session is not None and not self._closed
+        return self._state.available and self._session is not None and not self._closed
 
     @property
     def last_error(self) -> Exception | None:
