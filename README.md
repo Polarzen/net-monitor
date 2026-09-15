@@ -2,13 +2,15 @@
 
 Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Python 3.14、PySide6 和 psutil 构建；Windows 下的按进程网络流量通过 ETW + TDH + ctypes 获取。
 
+产品方向不是复制任务管理器，而是回答：**哪些非 Windows 系统应用正在联网、用了多少流量。**
+
 ## 版本状态
 
 ### v0.1.0
 
 基础桌面网络监视器已经完成并以 `v0.1.0` 标记：
 
-- 系统总上传/下载速度
+- 系统网络速度采样
 - 当前运行进程枚举
 - 基础 PySide6 GUI
 - `Collector -> Service -> Model -> UI` 分层
@@ -16,7 +18,7 @@ Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Pyth
 
 ### v0.2 开发中
 
-当前 `feat/etw-process-collector` 已完成 Stage 2A、2B、2C 的核心工作：
+当前 `feat/etw-process-collector` 已完成 Stage 2A、2B、2C 的核心工作，并开始收敛为“应用网络视图”：
 
 - Windows ETW 按进程网络事件采集
 - 真实 PID 级上传/下载 byte counters
@@ -26,11 +28,38 @@ Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Pyth
 - ETW Session 生命周期与退出清理
 - 权限感知降级，不伪造数据
 - GUI 显示进程网络采集状态
+- 默认隐藏 Windows OS 核心进程
+- 顶部汇总只计算可见非系统应用的 ETW 网络速率
 - `仅显示有网络活动的进程` 筛选
 - 网络速率/累计量按原始数值排序
 - 明确区分 `—`（不可用）与 `0 B/s`（采集正常但当前无流量）
 
 > psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数、系统总流量平均分配等方式伪造按进程流量。
+
+## 应用视图与系统进程过滤
+
+底层 Collector 仍然采集完整进程和网络数据；“隐藏系统进程”是 UI 展示策略，不会在采集层丢弃事件。
+
+当前将以下内容视为 Windows OS 核心进程并默认隐藏：
+
+- PID `0`、`4`
+- `System`、`System Idle Process`、`Registry`、`Memory Compression`、`Secure System`
+- `smss.exe`、`csrss.exe`、`wininit.exe`、`winlogon.exe`、`services.exe`、`lsass.exe`、`svchost.exe`、`fontdrvhost.exe`、`dwm.exe`、`sihost.exe`、`taskhostw.exe`
+- 可执行文件实际位于 `%SystemRoot%` / `%WINDIR%` 下的进程
+
+该规则的目标是“非 Windows 系统应用”，不是按软件厂商签名做严格的“非 Microsoft”判定。因此 Edge、OneDrive 等用户可见应用仍会展示，只要它们不是从 Windows OS 系统目录运行。
+
+如果进程因权限原因无法读取 executable，又不在明确的系统进程名单中，默认保留，避免误隐藏第三方程序。
+
+GUI 顶部现在显示：
+
+```text
+第三方应用总上传速度
+第三方应用总下载速度
+第三方进程数
+```
+
+这些汇总来自当前可见非系统进程的真实 ETW 数据，不再使用包含 Windows 后台流量的全系统 `psutil.net_io_counters()` 数字作为用户界面总量。
 
 ## ETW 实现
 
@@ -70,6 +99,8 @@ WindowsProcessNetworkCollector
         ↓
 MonitorService / MonitorSnapshot
         ↓
+应用视图过滤
+        ↓
 PySide6 UI
 ```
 
@@ -105,7 +136,7 @@ GUI 对应显示：
 进程网络监控：已停止
 ```
 
-权限不足不会让应用退出：系统总网络速度、进程列表等功能仍可继续使用。按进程网络字段显示 `—`，而不是伪造为 `0 B/s`。
+权限不足不会让应用退出；非系统应用列表仍可显示，但按进程网络字段和第三方应用总速率显示 `—`，而不是伪造为 `0 B/s`。
 
 当 ETW 正常运行但进程当前没有流量时，速度显示真实的 `0 B/s`；累计值保持实际计数。
 
@@ -190,6 +221,7 @@ download_bytes_per_second:  2095041.04
 - Windows 11 x64 物理机上的权限表现、长期运行和真实桌面 GUI 体验仍需最终本机验证。
 - 当前已测试环境中，标准本地用户启动该 ETW Session 会收到 error 5；不同机器上的安全策略可能不同。
 - ETW Provider 的 byte counters 表示所捕获网络事件中的字节计数；项目不会未经证据把它宣称为“应用层有效载荷的绝对精确字节数”。
+- 当前 GUI 每秒仍会重建表格；隐藏系统进程减少了可见行数，但窗口拖动卡顿需要后续性能阶段单独解决。
 
 ## 环境
 
@@ -209,7 +241,7 @@ python -m pytest
 python -m net_monitor
 ```
 
-在当前已测试环境中，需要具备 ETW Session 权限才能看到真实每进程上传/下载数据。权限不足时系统总流量和进程枚举仍保持可用。
+在当前已测试环境中，需要具备 ETW Session 权限才能看到真实每进程上传/下载数据。权限不足时应用列表仍可使用，但网络数字保持不可用状态。
 
 ## ETW 诊断入口
 
@@ -245,11 +277,13 @@ Collector -> Service -> Model -> UI
 
 ## CI
 
-主 CI 在 Windows Server 2025 x64 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、ETW module、GUI tests 与完整 pytest。Stage 2C 当前回归：
+主 CI 在 Windows Server 2025 x64 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、ETW module、GUI tests 与完整 pytest。当前应用视图回归为：
 
 ```text
-38 passed
+43 passed
 ```
+
+其中包含 Windows 系统进程过滤、用户应用保留、不可读 executable 的保守策略，以及系统流量不进入应用汇总的 GUI 回归测试。
 
 主 CI 还验证 `.venv` 未被 Git 跟踪或作为未忽略改动出现，并确认仓库工作区干净。
 
