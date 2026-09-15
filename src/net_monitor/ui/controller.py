@@ -39,6 +39,7 @@ class UiController(QObject):
             elevation_launcher=elevation_launcher or restart_as_administrator
         )
         self.compact_window.details_requested.connect(self.show_details)
+        self.compact_window.exit_requested.connect(self.exit_application)
         self.compact_window.always_on_top_changed.connect(self.set_always_on_top)
         self.snapshot_ready.connect(self.compact_window.apply_snapshot)
 
