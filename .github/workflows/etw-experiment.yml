@@ -6,6 +6,7 @@ on:
     branches:
       - feat/etw-network-poc
       - feat/etw-process-collector
+      - feat/stage-3b
     paths:
       - ".github/workflows/etw-experiment.yml"
       - "pyproject.toml"
@@ -16,6 +17,7 @@ on:
       - "src/net_monitor/core/models.py"
       - "src/net_monitor/core/process_visibility.py"
       - "src/net_monitor/core/application_aggregation.py"
+      - "src/net_monitor/core/application_session.py"
       - "src/net_monitor/services/monitor_service.py"
       - "src/net_monitor/ui/main_window.py"
       - "src/net_monitor/ui/compact_window.py"
@@ -25,6 +27,7 @@ on:
       - "src/net_monitor/ui/theme.py"
       - "src/net_monitor/ui/sampling_worker.py"
       - "tests/test_application_aggregation.py"
+      - "tests/test_application_session.py"
       - "tests/test_gui_smoke.py"
       - "tests/test_stage3a_ui.py"
       - "tests/test_sampling_worker.py"
