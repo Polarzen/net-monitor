@@ -12,6 +12,18 @@ class ProcessNetworkStatus(str, Enum):
     STOPPED = "stopped"
 
 
+class ProcessCategory(str, Enum):
+    """User-facing classification for process visibility.
+
+    UNKNOWN intentionally remains distinct from SYSTEM so uncertain processes are
+    shown rather than silently hidden.
+    """
+
+    SYSTEM = "system"
+    APPLICATION = "application"
+    UNKNOWN = "unknown"
+
+
 @dataclass(slots=True, frozen=True)
 class ProcessNetworkState:
     status: ProcessNetworkStatus
@@ -30,6 +42,10 @@ class ProcessInfo:
     executable: str | None = None
     status: str | None = None
     create_time: float | None = None
+
+    @property
+    def identity(self) -> tuple[int, float | None]:
+        return self.pid, self.create_time
 
 
 @dataclass(slots=True, frozen=True)
@@ -62,3 +78,12 @@ class MonitorSnapshot:
     processes: tuple[ProcessInfo, ...]
     process_network: tuple[ProcessNetworkStats, ...]
     process_network_state: ProcessNetworkState = ProcessNetworkState(ProcessNetworkStatus.STARTING)
+
+
+@dataclass(slots=True, frozen=True)
+class SnapshotPerformance:
+    """Development-facing timings from the latest service snapshot."""
+
+    total_seconds: float
+    process_enumeration_seconds: float | None
+    process_count: int
