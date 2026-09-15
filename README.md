@@ -1,46 +1,121 @@
 # Net Monitor
 
-Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Python 3.14、PySide6 和 psutil 构建。
+Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Python 3.14、PySide6 和 psutil 构建；Windows 下的按进程网络流量通过 ETW + TDH + ctypes 获取。
 
-## 当前目标
+## 版本状态
 
-- 实时显示系统总上传/下载速度
-- 枚举当前运行进程
-- 使用 Windows 原生 ETW 获取每个进程的真实网络流量
+### v0.1.0
 
-## 当前开发阶段
+基础桌面网络监视器已经完成并以 `v0.1.0` 标记：
 
-- 系统网络统计：已实现
-- 进程枚举：已实现
-- GUI：已实现基础版本
-- Windows ETW 按进程网络采集 PoC：已验证
-- 正式 `WindowsProcessNetworkCollector` ETW 接入：已在 `feat/etw-process-collector` 实现并通过 Actions 实验
-- Windows 11 x64 物理机权限与长期运行验证：尚待目标机器完成
+- 系统总上传/下载速度
+- 当前运行进程枚举
+- 基础 PySide6 GUI
+- `Collector -> Service -> Model -> UI` 分层
+- Windows CI / GUI smoke test
 
-> psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数或平均分配系统流量来伪造该数据。
+### v0.2 开发中
 
-## ETW Development Status
+当前 `feat/etw-process-collector` 已完成 Stage 2A、2B、2C 的核心工作：
 
-第二阶段 2A 使用 `Microsoft-Windows-Kernel-Network` Provider（GUID `{7DD42A49-5329-4832-8DFD-43D979153A88}`）验证按进程网络事件采集；第二阶段 2B 将已验证的 ETW 链路接入正式 `WindowsProcessNetworkCollector`。
+- Windows ETW 按进程网络事件采集
+- 真实 PID 级上传/下载 byte counters
+- 按真实采样时间计算上传/下载 B/s
+- `(pid, create_time)` 处理 PID reuse
+- 已退出 PID 的聚合数据清理
+- ETW Session 生命周期与退出清理
+- 权限感知降级，不伪造数据
+- GUI 显示进程网络采集状态
+- `仅显示有网络活动的进程` 筛选
+- 网络速率/累计量按原始数值排序
+- 明确区分 `—`（不可用）与 `0 B/s`（采集正常但当前无流量）
+
+> psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数、系统总流量平均分配等方式伪造按进程流量。
+
+## ETW 实现
+
+使用 Provider：
+
+- `Microsoft-Windows-Kernel-Network`
+- GUID `{7DD42A49-5329-4832-8DFD-43D979153A88}`
+- IPv4 keyword `0x10`
+- IPv6 keyword `0x20`
+- level 4 / Informational
 
 当前实现包括：
 
 - `ctypes` 封装 ETW Session 与实时 Consumer
 - TDH 按 schema 读取事件中的 `PID` 与 `size`
-- 区分 TCP/UDP 的 SEND / RECEIVE 事件
+- manifest-backed TCP/UDP SEND / RECEIVE 方向映射
 - 后台非 daemon 线程运行 `ProcessTrace`
-- PID 级发送/接收字节与事件次数累计
-- 正式 Collector 懒启动 ETW Session
-- 按真实采样时间计算每进程上传/下载 B/s
-- `ProcessInfo.create_time` 与 `(pid, create_time)` 基线，降低 PID 重用导致旧流量串入新进程的风险
-- 清理已退出 PID 的历史聚合数据，避免长期运行无限积累
-- ETW 权限不足时返回不可用值，而不是伪造数据或让 GUI 崩溃
+- `NetworkAggregator` 线程安全累计 PID 级发送/接收字节
+- 正式 `WindowsProcessNetworkCollector` 懒启动 ETW Session
+- `(pid, create_time)` 身份基线，降低 PID 重用污染风险
+- `retain_pids` 清理已退出进程的历史计数
 - `MonitorService.close()`、窗口关闭和应用退出时停止 ETW Session
-- 同一 Session 名连续启动两次的 cleanup / restart 验证
+- 正式 Collector 端到端 loopback probe
+
+数据链路：
+
+```text
+Microsoft-Windows-Kernel-Network
+        ↓
+EtwSession / TDH
+        ↓
+NetworkEvent
+        ↓
+NetworkAggregator
+        ↓
+WindowsProcessNetworkCollector
+        ↓
+MonitorService / MonitorSnapshot
+        ↓
+PySide6 UI
+```
+
+UI 不直接访问 ETW API 或 psutil 网络采集逻辑。
+
+## Stage 2C：采集状态与 GUI
+
+进程网络采集使用明确状态模型：
+
+```text
+STARTING
+AVAILABLE
+PERMISSION_DENIED
+UNAVAILABLE
+STOPPED
+```
+
+主要语义：
+
+- `STARTING`：Collector 尚未完成首次 ETW 启动尝试。
+- `AVAILABLE`：ETW Session 已成功启动，可提供真实按进程数据。
+- `PERMISSION_DENIED`：实际启动 ETW 时收到权限错误，例如 `StartTraceW` error 5。
+- `UNAVAILABLE`：非权限类 ETW 初始化/运行错误或采集器不可用。
+- `STOPPED`：Collector 已关闭。
+
+GUI 对应显示：
+
+```text
+进程网络监控：正在启动
+进程网络监控：运行中
+进程网络监控：不可用（需要管理员权限）
+进程网络监控：不可用
+进程网络监控：已停止
+```
+
+权限不足不会让应用退出：系统总网络速度、进程列表等功能仍可继续使用。按进程网络字段显示 `—`，而不是伪造为 `0 B/s`。
+
+当 ETW 正常运行但进程当前没有流量时，速度显示真实的 `0 B/s`；累计值保持实际计数。
+
+“仅显示有网络活动的进程”按本次 Collector Session 中累计上传或下载字节是否大于 0 判断，因此短暂停顿不会让已产生流量的进程立即从列表消失。
+
+网络速度和累计字节列保存原始数值用于排序，不使用格式化字符串的字典序。
 
 ## Windows 11 Actions 实验
 
-独立 workflow `.github/workflows/etw-experiment.yml` 使用矩阵同时验证：
+独立 workflow `.github/workflows/etw-experiment.yml` 当前验证矩阵：
 
 ```text
 windows-2025
@@ -54,69 +129,74 @@ Windows 11 Runner 实际环境：
 - ARM64
 - Python 3.14.7 ARM64
 
-### 2A 底层 ETW 验证
+2026-09-15 的 Stage 2C 最终 ETW Experiment 中：
 
-在 Windows 11 Enterprise ARM64 Runner 上，受控 loopback 子进程的 PID 可以被 ETW 正确匹配，并能获得真实 SEND / RECEIVE 字节；相同 Session 名连续启动两次均成功。
+- ETW / Collector 单元测试：`25 passed`
+- 底层 loopback probe 使用同一 Session 名连续运行两次：通过
+- 正式 `WindowsProcessNetworkCollector` probe 使用同一 Session 名连续运行两次：通过
+- 两次正式 probe 均获得 `524288` upload bytes 与 `524288` download bytes
+- `collector_available = true`
+- close 后 `collector_closed = true`
 
-### 2B 正式 Collector 验证
-
-`collector_probe.py` 不直接读取 `NetworkAggregator`，而是通过正式 `WindowsProcessNetworkCollector` 完成完整路径验证：
-
-```text
-受控子进程
-    ↓
-Microsoft-Windows-Kernel-Network
-    ↓
-EtwSession / TDH
-    ↓
-NetworkAggregator
-    ↓
-WindowsProcessNetworkCollector
-    ↓
-ProcessNetworkStats
-```
-
-Windows 11 ARM64 上连续两次使用同一 Session 名验证均通过。
-
-第一次：
+该实验中 Windows 11 ARM64 正式 Collector 两次测得：
 
 ```text
+run 1:
 upload_bytes:               524288
 download_bytes:             524288
-upload_bytes_per_second:    228387.89
-download_bytes_per_second:  228387.89
-collector_available:        true
-collector_closed:           true
-```
+upload_bytes_per_second:    2092071.61
+download_bytes_per_second:  2092071.61
 
-第二次：
-
-```text
+run 2:
 upload_bytes:               524288
 download_bytes:             524288
-upload_bytes_per_second:    228217.79
-download_bytes_per_second:  228217.79
-collector_available:        true
-collector_closed:           true
+upload_bytes_per_second:    2095041.04
+download_bytes_per_second:  2095041.04
 ```
 
-Windows Server 2025 x64 上相同的正式 Collector 双次探针也通过。
+正式 probe 对异步 ETW buffer delivery 使用有限轮询窗口，但验收条件没有放宽：必须实际观察到正的双向 bytes 和正的双向 B/s 才通过。
+
+## Windows Server 2025 实验
+
+当前 Runner：
+
+- Microsoft Windows Server 2025 Datacenter
+- OS 10.0.26100
+- x64
+- Python 3.14.7 x64
+
+同一轮 ETW Experiment 中：
+
+- ETW / Collector 单元测试：`25 passed`
+- 底层双次 loopback probe：通过
+- 正式 Collector 双次 probe：通过
+- 两次正式 probe 均得到 `524288` upload bytes 与 `524288` download bytes
+- Session cleanup / restart：通过
 
 ## 权限行为
 
-在 GitHub Actions 的 Windows Server 2025 和 Windows 11 Enterprise ARM64 Runner 上均实际验证：
+在 GitHub Actions 的 Windows Server 2025 与 Windows 11 Enterprise ARM64 Runner 上均实际验证：
 
-- `runneradmin` 管理员上下文：ETW Session 可以启动、消费并停止，正式 Collector 可以输出真实按进程流量。
-- 临时创建且未授予额外组权限的标准本地用户：`StartTraceW` 返回 Windows error `5`（Access Denied）。
+- 管理员 `runneradmin`：ETW Session 可启动、消费并停止，正式 Collector 可输出真实按进程流量。
+- 临时标准本地用户：`StartTraceW` 返回 Windows error `5`（Access Denied）。
 
-因此，在当前已测试环境中，真实 ETW 按进程统计需要相应权限。正式 Collector 在权限不足时会保持程序可用，并让进程网络字段显示为不可用，而不会生成估算值。
+正式 Collector 将该错误映射为 `PERMISSION_DENIED`，GUI 显示需要管理员权限；其他 ETW 初始化异常映射为 `UNAVAILABLE`。
 
-GitHub 托管 Windows 11 Runner 是 ARM64；项目最终主要目标仍是 Windows 11 x64 桌面环境，因此 x64 物理机的权限行为和长时间稳定性仍建议继续验证。
+最终是否可用以 ETW Session 的真实启动结果为准，而不是单纯根据“当前用户是否管理员”进行猜测。
+
+## 已知限制
+
+- 当前 GitHub 托管 Windows 11 实验环境是 ARM64，不是 Windows 11 x64 物理桌面机。
+- Windows 11 x64 物理机上的权限表现、长期运行和真实桌面 GUI 体验仍需最终本机验证。
+- 当前已测试环境中，标准本地用户启动该 ETW Session 会收到 error 5；不同机器上的安全策略可能不同。
+- ETW Provider 的 byte counters 表示所捕获网络事件中的字节计数；项目不会未经证据把它宣称为“应用层有效载荷的绝对精确字节数”。
 
 ## 环境
 
 - Windows 11（目标环境）
 - Python 3.14
+- PySide6
+- psutil
 
 ## 本地安装与启动
 
@@ -129,7 +209,7 @@ python -m pytest
 python -m net_monitor
 ```
 
-在当前已测试环境中，需要以具备 ETW Session 权限的终端运行，才能看到真实每进程上传/下载数据；权限不足时系统总流量和进程枚举仍可使用。
+在当前已测试环境中，需要具备 ETW Session 权限才能看到真实每进程上传/下载数据。权限不足时系统总流量和进程枚举仍保持可用。
 
 ## ETW 诊断入口
 
@@ -163,33 +243,15 @@ python -m net_monitor.collectors.etw.collector_probe
 Collector -> Service -> Model -> UI
 ```
 
-UI 不直接依赖 psutil 或 Windows API。正式 ETW Collector 接入后，现有表格无需重写即可显示真实上传速度、下载速度和累计流量。
-
-ETW 采集内部结构：
-
-```text
-Windows ETW API / TDH
-        ↓
-EtwSession
-        ↓
-NetworkEvent
-        ↓
-NetworkAggregator
-        ↓
-WindowsProcessNetworkCollector
-        ↓
-MonitorService
-        ↓
-UI
-```
-
 ## CI
 
-主 CI 在 `windows-latest` 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、GUI smoke test 与完整 pytest。当前 2B 回归为：
+主 CI 在 Windows Server 2025 x64 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、ETW module、GUI tests 与完整 pytest。Stage 2C 当前回归：
 
 ```text
-30 passed
+38 passed
 ```
+
+主 CI 还验证 `.venv` 未被 Git 跟踪或作为未忽略改动出现，并确认仓库工作区干净。
 
 独立 `ETW Experiment` workflow 在 `windows-2025` 与 `windows-11-arm` 上执行：
 
@@ -202,4 +264,4 @@ ETW / Collector 单元测试
 标准本地用户权限表征
 ```
 
-ETW Experiment 只安装该实验需要的最小 Python 依赖，避免 PySide6/psutil 的架构兼容性影响 ETW 结论。
+ETW Experiment 仅安装实验需要的最小 Python 依赖，避免 GUI 依赖影响 ETW 可行性结论。
