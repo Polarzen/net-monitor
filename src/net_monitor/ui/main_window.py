@@ -44,9 +44,17 @@ class NumericTreeWidgetItem(QTreeWidgetItem):
         column = tree.sortColumn() if tree is not None else 0
         left = self.data(column, Qt.ItemDataRole.UserRole)
         right = other.data(column, Qt.ItemDataRole.UserRole)
+
         if isinstance(left, (int, float)) and isinstance(right, (int, float)):
             return left < right
-        return super().__lt__(other)
+        if left is None and right is not None:
+            return False
+        if left is not None and right is None:
+            return True
+
+        # Do not call super().__lt__() here. PySide6 routes that virtual call
+        # back through this Python override and can recurse until stack overflow.
+        return self.text(column).casefold() < other.text(column).casefold()
 
 
 class MainWindow(QMainWindow):
@@ -362,14 +370,14 @@ class MainWindow(QMainWindow):
     ) -> tuple[float | None, float | None]:
         if not state.available:
             return None, None
-        upload_values = [group.upload_bytes_per_second for group in groups]
-        download_values = [group.download_bytes_per_second for group in groups]
-        if any(value is None for value in upload_values + download_values):
-            return None, None
-        return (
-            sum(float(value) for value in upload_values),
-            sum(float(value) for value in download_values),
-        )
+        upload = 0.0
+        download = 0.0
+        for group in groups:
+            if group.upload_bytes_per_second is None or group.download_bytes_per_second is None:
+                return None, None
+            upload += group.upload_bytes_per_second
+            download += group.download_bytes_per_second
+        return upload, download
 
     @staticmethod
     def _group_has_network_activity(group: ApplicationNetworkGroup) -> bool:
