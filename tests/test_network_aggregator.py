@@ -17,8 +17,20 @@ def test_aggregator_accumulates_send_and_receive_by_pid() -> None:
 
     assert snapshot[10].bytes_sent == 150
     assert snapshot[10].bytes_received == 75
+    assert snapshot[10].send_events == 2
+    assert snapshot[10].receive_events == 1
     assert snapshot[20].bytes_sent == 0
     assert snapshot[20].bytes_received == 25
+    assert snapshot[20].send_events == 0
+    assert snapshot[20].receive_events == 1
+
+
+def test_zero_byte_event_is_counted_without_changing_bytes() -> None:
+    aggregator = NetworkAggregator()
+    aggregator.record(NetworkEvent(1.0, 7, NetworkDirection.SEND, 0))
+    totals = aggregator.snapshot()[7]
+    assert totals.bytes_sent == 0
+    assert totals.send_events == 1
 
 
 def test_snapshot_does_not_expose_mutable_internal_state() -> None:
@@ -39,4 +51,6 @@ def test_aggregator_is_thread_safe_for_basic_updates() -> None:
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda _: add_many(), range(4)))
 
-    assert aggregator.snapshot()[99].bytes_sent == 4000
+    totals = aggregator.snapshot()[99]
+    assert totals.bytes_sent == 4000
+    assert totals.send_events == 1000
