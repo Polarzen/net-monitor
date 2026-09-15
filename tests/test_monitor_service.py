@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 from net_monitor.collectors.base import ProcessNetworkCollector
-from net_monitor.core.models import NetworkCounters, ProcessInfo, ProcessNetworkStats
+from net_monitor.core.models import (
+    NetworkCounters,
+    ProcessInfo,
+    ProcessNetworkState,
+    ProcessNetworkStats,
+    ProcessNetworkStatus,
+)
 from net_monitor.services.monitor_service import MonitorService
 
 
@@ -19,8 +25,15 @@ class FakeSystemCollector:
 
 
 class FakeProcessNetworkCollector(ProcessNetworkCollector):
+    def __init__(self, state: ProcessNetworkState | None = None) -> None:
+        self._state = state or ProcessNetworkState(ProcessNetworkStatus.AVAILABLE)
+
     def collect(self, processes: tuple[ProcessInfo, ...]) -> tuple[ProcessNetworkStats, ...]:
         return tuple(ProcessNetworkStats(pid=p.pid, name=p.name) for p in processes)
+
+    @property
+    def state(self) -> ProcessNetworkState:
+        return self._state
 
 
 class FakeClock:
@@ -31,11 +44,15 @@ class FakeClock:
         return next(self._values)
 
 
-def make_service(samples: list[NetworkCounters], times: list[float]) -> MonitorService:
+def make_service(
+    samples: list[NetworkCounters],
+    times: list[float],
+    process_network_collector: ProcessNetworkCollector | None = None,
+) -> MonitorService:
     return MonitorService(
         process_collector=FakeProcessCollector(),
         system_network_collector=FakeSystemCollector(samples),
-        process_network_collector=FakeProcessNetworkCollector(),
+        process_network_collector=process_network_collector or FakeProcessNetworkCollector(),
         clock=FakeClock(times),
     )
 
@@ -46,6 +63,21 @@ def test_first_sample_has_zero_rates() -> None:
     assert snapshot.system.upload_bytes_per_second == 0
     assert snapshot.system.download_bytes_per_second == 0
     assert len(snapshot.processes) == 1
+
+
+def test_snapshot_exposes_process_network_state() -> None:
+    state = ProcessNetworkState(
+        ProcessNetworkStatus.PERMISSION_DENIED,
+        "需要管理员权限",
+        5,
+    )
+    service = make_service(
+        [NetworkCounters(100, 200)],
+        [10.0],
+        FakeProcessNetworkCollector(state),
+    )
+    snapshot = service.snapshot()
+    assert snapshot.process_network_state == state
 
 
 def test_second_sample_uses_real_elapsed_time() -> None:
