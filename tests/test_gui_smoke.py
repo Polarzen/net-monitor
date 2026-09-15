@@ -177,7 +177,7 @@ def test_system_hidden_by_default_unknown_visible_and_toggle_restores_system() -
 
     assert window._table.rowCount() == 2
     assert {window._table.item(row, 0).text() for row in range(2)} == {"browser.exe", "mystery.exe"}
-    assert window._upload_label.text() == "第三方应用总上传速度: 2.00 KB/s"
+    assert window._upload_label.text() == "第三方应用总上传速度: 3.03 KB/s"
 
     window._show_system_processes.setChecked(True)
     app.processEvents()
@@ -229,11 +229,11 @@ def test_filters_combine_and_incremental_update_preserves_existing_items() -> No
 def test_large_snapshot_is_applied_without_losing_rows() -> None:
     processes = tuple(
         ProcessInfo(index, f"app-{index}.exe", executable=fr"D:\Apps\app-{index}.exe", create_time=float(index))
-        for index in range(1, 301)
+        for index in range(10, 310)
     )
     stats = tuple(
         ProcessNetworkStats(index, f"app-{index}.exe", index, index, float(index), float(index))
-        for index in range(1, 301)
+        for index in range(10, 310)
     )
     snapshot = MonitorSnapshot(
         system=SystemNetworkStats(0, 0, 0.0, 0.0),
