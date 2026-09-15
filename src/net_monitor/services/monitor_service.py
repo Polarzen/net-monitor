@@ -33,6 +33,11 @@ class MonitorService:
         process_network = self._process_network_collector.collect(processes)
         return MonitorSnapshot(system=system, processes=processes, process_network=process_network)
 
+    def close(self) -> None:
+        close = getattr(self._process_network_collector, "close", None)
+        if callable(close):
+            close()
+
     def _build_system_stats(self, counters: NetworkCounters, now: float) -> SystemNetworkStats:
         upload_rate = 0.0
         download_rate = 0.0

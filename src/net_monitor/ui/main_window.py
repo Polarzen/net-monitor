@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QTimer
+from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -69,6 +70,16 @@ class MainWindow(QMainWindow):
             for column, value in enumerate(values):
                 self._table.setItem(row, column, QTableWidgetItem(value))
         self._table.setSortingEnabled(True)
+
+    def shutdown(self) -> None:
+        self._timer.stop()
+        close = getattr(self._service, "close", None)
+        if callable(close):
+            close()
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        self.shutdown()
+        super().closeEvent(event)
 
     @staticmethod
     def _row_values(name: str, pid: int, network: ProcessNetworkStats | None) -> tuple[str, ...]:

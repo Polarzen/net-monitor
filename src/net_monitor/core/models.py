@@ -9,6 +9,7 @@ class ProcessInfo:
     name: str
     executable: str | None = None
     status: str | None = None
+    create_time: float | None = None
 
 
 @dataclass(slots=True, frozen=True)
