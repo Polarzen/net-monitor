@@ -131,6 +131,15 @@ def test_compact_permission_denied_is_not_rendered_as_zero() -> None:
     window.close()
 
 
+def test_compact_always_on_top_toggle_updates_state() -> None:
+    window = make_compact()
+    window.set_always_on_top(True)
+    assert window.always_on_top is True
+    window.set_always_on_top(False)
+    assert window.always_on_top is False
+    window.close()
+
+
 def test_controller_reuses_one_detail_instance_and_one_service() -> None:
     app = qapp()
     service = FakeService()
@@ -164,6 +173,17 @@ def test_compact_and_detail_consume_same_snapshot_object() -> None:
     controller.shutdown()
 
 
+def test_no_tray_compact_close_requests_full_shutdown() -> None:
+    app = qapp()
+    service = FakeService()
+    controller = UiController(service=service, start_worker=False)
+    controller.compact_window.set_tray_available(False)
+    controller.compact_window.close()
+    app.processEvents()
+    assert service.closed == 1
+    assert controller._shutdown_complete is True
+
+
 def test_tray_controller_smoke_when_platform_has_no_tray() -> None:
     qapp()
     calls: list[str] = []
@@ -178,9 +198,10 @@ def test_tray_controller_smoke_when_platform_has_no_tray() -> None:
     tray.hide()
 
 
-@pytest.mark.skipif(not QSystemTrayIcon.isSystemTrayAvailable(), reason="runner has no real system tray")
 def test_real_system_tray_can_be_created_when_supported() -> None:
     qapp()
+    if not QSystemTrayIcon.isSystemTrayAvailable():
+        pytest.skip("runner has no real system tray")
     tray = TrayController(
         show_compact=lambda: None,
         show_details=lambda: None,
