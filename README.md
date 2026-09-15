@@ -6,39 +6,46 @@ Net Monitor 是一个面向 Windows 11 的桌面网络监控工具，使用 Pyth
 
 - 实时显示系统总上传/下载速度
 - 枚举当前运行进程
-- 使用 Windows 原生机制获取每个进程的真实网络流量
+- 使用 Windows 原生 ETW 获取每个进程的真实网络流量
 
 ## 当前开发阶段
 
 - 系统网络统计：已实现
 - 进程枚举：已实现
 - GUI：已实现基础版本
-- Windows ETW 按进程网络采集 PoC：已在 GitHub Actions Windows Server 2025 与 Windows 11 Enterprise ARM64 上验证
-- 正式 `WindowsProcessNetworkCollector` ETW 接入：尚未实现
-- Windows 11 x64 物理机普通用户/管理员权限验证：尚待目标机器完成
+- Windows ETW 按进程网络采集 PoC：已验证
+- 正式 `WindowsProcessNetworkCollector` ETW 接入：已在 `feat/etw-process-collector` 实现并通过 Actions 实验
+- Windows 11 x64 物理机权限与长期运行验证：尚待目标机器完成
 
 > psutil 可以提供系统网络计数与进程信息，但不能直接、可靠地提供 Windows 下每个进程的实时收发字节数。本项目不会用连接数、随机数或平均分配系统流量来伪造该数据。
 
 ## ETW Development Status
 
-第二阶段 2A 使用 `Microsoft-Windows-Kernel-Network` Provider（GUID `{7DD42A49-5329-4832-8DFD-43D979153A88}`）验证按进程网络事件采集。
+第二阶段 2A 使用 `Microsoft-Windows-Kernel-Network` Provider（GUID `{7DD42A49-5329-4832-8DFD-43D979153A88}`）验证按进程网络事件采集；第二阶段 2B 将已验证的 ETW 链路接入正式 `WindowsProcessNetworkCollector`。
 
-当前 PoC 已实现：
+当前实现包括：
 
 - `ctypes` 封装 ETW Session 与实时 Consumer
 - TDH 按 schema 读取事件中的 `PID` 与 `size`
 - 区分 TCP/UDP 的 SEND / RECEIVE 事件
-- 后台线程运行 `ProcessTrace`
+- 后台非 daemon 线程运行 `ProcessTrace`
 - PID 级发送/接收字节与事件次数累计
-- Session stop / cleanup
-- 受控 loopback 子进程验证 PID 与双向字节
+- 正式 Collector 懒启动 ETW Session
+- 按真实采样时间计算每进程上传/下载 B/s
+- `ProcessInfo.create_time` 与 `(pid, create_time)` 基线，降低 PID 重用导致旧流量串入新进程的风险
+- 清理已退出 PID 的历史聚合数据，避免长期运行无限积累
+- ETW 权限不足时返回不可用值，而不是伪造数据或让 GUI 崩溃
+- `MonitorService.close()`、窗口关闭和应用退出时停止 ETW Session
 - 同一 Session 名连续启动两次的 cleanup / restart 验证
 
-GitHub Actions 的受控探针已确认测试子进程 PID 可以被匹配，并可获得真实的发送与接收事件及字节。使用同一个 Session 名连续执行两次探针均成功，说明正常 stop 后没有遗留同名 ETW Session。本阶段仍属于 PoC，尚未替换 GUI 当前使用的占位 `WindowsProcessNetworkCollector`。
+## Windows 11 Actions 实验
 
-### Windows 11 Actions 实验
+独立 workflow `.github/workflows/etw-experiment.yml` 使用矩阵同时验证：
 
-独立 workflow `.github/workflows/etw-experiment.yml` 使用矩阵同时验证 `windows-2025` 与 `windows-11-arm`。
+```text
+windows-2025
+windows-11-arm
+```
 
 Windows 11 Runner 实际环境：
 
@@ -47,27 +54,64 @@ Windows 11 Runner 实际环境：
 - ARM64
 - Python 3.14.7 ARM64
 
-在 Windows 11 Enterprise ARM64 Runner 上：
+### 2A 底层 ETW 验证
 
-- `Microsoft-Windows-Kernel-Network` Provider 查询成功
-- ETW 纯逻辑测试 `17 passed`
-- 管理员上下文可以启动、消费和停止 ETW Session
-- 第一次受控 loopback：PID 匹配，发送 524288 bytes，接收 524288 bytes，SEND 1 次，RECEIVE 5 次
-- 第二次使用同一 Session 名重新启动：PID 匹配，发送 524288 bytes，接收 524288 bytes，SEND 1 次，RECEIVE 6 次
-- 同名 Session 连续两次成功，正常 cleanup / restart 成立
+在 Windows 11 Enterprise ARM64 Runner 上，受控 loopback 子进程的 PID 可以被 ETW 正确匹配，并能获得真实 SEND / RECEIVE 字节；相同 Session 名连续启动两次均成功。
 
-这证明当前 Python 3.14 + ctypes + ETW + TDH 路线不仅在 Windows Server 2025 上成立，也在 GitHub 托管的 Windows 11 Enterprise ARM64 环境中成立。
+### 2B 正式 Collector 验证
 
-### 权限验证
+`collector_probe.py` 不直接读取 `NetworkAggregator`，而是通过正式 `WindowsProcessNetworkCollector` 完成完整路径验证：
+
+```text
+受控子进程
+    ↓
+Microsoft-Windows-Kernel-Network
+    ↓
+EtwSession / TDH
+    ↓
+NetworkAggregator
+    ↓
+WindowsProcessNetworkCollector
+    ↓
+ProcessNetworkStats
+```
+
+Windows 11 ARM64 上连续两次使用同一 Session 名验证均通过。
+
+第一次：
+
+```text
+upload_bytes:               524288
+download_bytes:             524288
+upload_bytes_per_second:    228387.89
+download_bytes_per_second:  228387.89
+collector_available:        true
+collector_closed:           true
+```
+
+第二次：
+
+```text
+upload_bytes:               524288
+download_bytes:             524288
+upload_bytes_per_second:    228217.79
+download_bytes_per_second:  228217.79
+collector_available:        true
+collector_closed:           true
+```
+
+Windows Server 2025 x64 上相同的正式 Collector 双次探针也通过。
+
+## 权限行为
 
 在 GitHub Actions 的 Windows Server 2025 和 Windows 11 Enterprise ARM64 Runner 上均实际验证：
 
-- `runneradmin` 管理员上下文：ETW Session 可以启动、消费并停止，真实 loopback 探针通过。
+- `runneradmin` 管理员上下文：ETW Session 可以启动、消费并停止，正式 Collector 可以输出真实按进程流量。
 - 临时创建且未授予额外组权限的标准本地用户：`StartTraceW` 返回 Windows error `5`（Access Denied）。
 
-因此，当前测试环境中启动该 ETW Session 需要相应权限。由于 GitHub 托管的 Windows 11 Runner 是 ARM64，而项目最终主要目标仍是 Windows 11 x64 桌面环境，x64 物理机权限与长期稳定性仍建议在进入生产化后继续验证；但 Windows 11 系统级 ETW 可行性已经在 Actions 中得到直接证据。
+因此，在当前已测试环境中，真实 ETW 按进程统计需要相应权限。正式 Collector 在权限不足时会保持程序可用，并让进程网络字段显示为不可用，而不会生成估算值。
 
-Windows PID 会被重用；2B 正式 Collector 应使用 `(pid, process_create_time)` 或等价方式管理长生命周期进程身份。
+GitHub 托管 Windows 11 Runner 是 ARM64；项目最终主要目标仍是 Windows 11 x64 桌面环境，因此 x64 物理机的权限行为和长时间稳定性仍建议继续验证。
 
 ## 环境
 
@@ -85,27 +129,33 @@ python -m pytest
 python -m net_monitor
 ```
 
-## ETW PoC
+在当前已测试环境中，需要以具备 ETW Session 权限的终端运行，才能看到真实每进程上传/下载数据；权限不足时系统总流量和进程枚举仍可使用。
 
-先确认 Provider：
+## ETW 诊断入口
+
+确认 Provider：
 
 ```powershell
 logman query providers "Microsoft-Windows-Kernel-Network"
 ```
 
-交互式 PoC：
+交互式 ETW PoC：
 
 ```powershell
 python -m net_monitor.collectors.etw
 ```
 
-受控 loopback 验证：
+底层受控 loopback 验证：
 
 ```powershell
 python -m net_monitor.collectors.etw.probe
 ```
 
-受控探针会启动独立 Python 子进程产生本地 TCP 双向流量，并要求 ETW 结果中出现该子进程 PID、SEND 事件、RECEIVE 事件以及正的双向累计字节数。
+正式 Collector 端到端验证：
+
+```powershell
+python -m net_monitor.collectors.etw.collector_probe
+```
 
 ## 架构
 
@@ -113,9 +163,9 @@ python -m net_monitor.collectors.etw.probe
 Collector -> Service -> Model -> UI
 ```
 
-UI 不直接依赖 psutil 或 Windows API，因此后续接入正式 ETW Collector 时无需重写界面层。
+UI 不直接依赖 psutil 或 Windows API。正式 ETW Collector 接入后，现有表格无需重写即可显示真实上传速度、下载速度和累计流量。
 
-ETW PoC 自身进一步拆分为：
+ETW 采集内部结构：
 
 ```text
 Windows ETW API / TDH
@@ -125,24 +175,31 @@ EtwSession
 NetworkEvent
         ↓
 NetworkAggregator
+        ↓
+WindowsProcessNetworkCollector
+        ↓
+MonitorService
+        ↓
+UI
 ```
 
 ## CI
 
-主 CI 在 `windows-latest` 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、GUI smoke test 与 pytest。
-
-`feat/etw-network-poc` 另外包含独立 `ETW Experiment` workflow：
+主 CI 在 `windows-latest` 上使用 Python 3.14 创建独立 `.venv`，执行安装、导入、psutil、PySide6、GUI smoke test 与完整 pytest。当前 2B 回归为：
 
 ```text
-windows-2025
-      +
-windows-11-arm
-      ↓
+30 passed
+```
+
+独立 `ETW Experiment` workflow 在 `windows-2025` 与 `windows-11-arm` 上执行：
+
+```text
 Provider 查询
-ETW 单元测试
-管理员真实 loopback 捕获
-同名 Session restart
+ETW / Collector 单元测试
+底层 ETW 真实 loopback 双次捕获
+正式 WindowsProcessNetworkCollector 双次端到端捕获
+同名 Session cleanup / restart
 标准本地用户权限表征
 ```
 
-该实验矩阵不会用 PySide6 或 psutil 的架构兼容性作为 ETW 实验前置条件，只安装 ETW PoC 所需的最小依赖。
+ETW Experiment 只安装该实验需要的最小 Python 依赖，避免 PySide6/psutil 的架构兼容性影响 ETW 结论。
