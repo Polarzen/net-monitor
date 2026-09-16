@@ -53,6 +53,20 @@ def test_retain_pids_discards_inactive_processes() -> None:
     assert snapshot[2].bytes_received == 20
 
 
+def test_retain_pids_returns_an_atomic_removed_snapshot() -> None:
+    aggregator = NetworkAggregator()
+    aggregator.record(NetworkEvent(1.0, 1, NetworkDirection.SEND, 100))
+    aggregator.record(NetworkEvent(1.0, 2, NetworkDirection.RECEIVE, 200))
+
+    removed = aggregator.retain_pids({2})
+    aggregator.record(NetworkEvent(2.0, 1, NetworkDirection.SEND, 50))
+
+    assert removed[1].bytes_sent == 100
+    assert removed[1].send_events == 1
+    assert aggregator.snapshot()[1].bytes_sent == 50
+    assert aggregator.snapshot()[2].bytes_received == 200
+
+
 def test_aggregator_is_thread_safe_for_basic_updates() -> None:
     aggregator = NetworkAggregator()
 

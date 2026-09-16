@@ -36,9 +36,11 @@ class ApplicationSessionTracker:
 
     Process identity is `(pid, create_time)`. The first trustworthy cumulative
     sample contributes its current value, and later samples contribute only
-    monotonic deltas. Once an identity is first attributed, its application key
-    remains fixed for the rest of the session; this avoids speculative merging
-    when executable metadata is temporarily unavailable.
+    deltas above a per-direction high-water mark. Counter rollback is retained
+    as an observed reset; it never creates a guessed epoch. Identities without
+    `create_time` are not persisted. Once an identity is first attributed, its
+    application key remains fixed for the rest of the session; this avoids
+    speculative merging when executable metadata is temporarily unavailable.
     """
 
     def __init__(self) -> None:
@@ -88,7 +90,12 @@ class ApplicationSessionTracker:
         return tuple(result)
 
     def _observe(self, process: ProcessInfo, row: ProcessNetworkStats) -> None:
-        if row.upload_bytes is None or row.download_bytes is None:
+        if (
+            process.create_time is None
+            or row.pid != process.pid
+            or row.upload_bytes is None
+            or row.download_bytes is None
+        ):
             return
 
         upload = max(0, int(row.upload_bytes))
@@ -118,8 +125,8 @@ class ApplicationSessionTracker:
         totals = self._applications[attribution.key]
         totals.upload_bytes += max(0, upload - attribution.last_upload_bytes)
         totals.download_bytes += max(0, download - attribution.last_download_bytes)
-        attribution.last_upload_bytes = upload
-        attribution.last_download_bytes = download
+        attribution.last_upload_bytes = max(attribution.last_upload_bytes, upload)
+        attribution.last_download_bytes = max(attribution.last_download_bytes, download)
 
 
 def _application_name(process: ProcessInfo) -> str:

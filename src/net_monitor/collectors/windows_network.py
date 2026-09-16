@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -38,6 +39,9 @@ class _ProcessState:
     baseline_received: int
     previous_sent: int = 0
     previous_received: int = 0
+    history: tuple[tuple[float, int, int], ...] = ()
+    last_total_sent: int | None = None
+    last_total_received: int | None = None
 
 
 class WindowsProcessNetworkCollector(ProcessNetworkCollector):
@@ -49,10 +53,14 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         aggregator: NetworkAggregator | None = None,
         session_factory: SessionFactory | None = None,
         clock: Callable[[], float] = time.monotonic,
+        rate_window_seconds: float = 0.0,
     ) -> None:
+        if not math.isfinite(rate_window_seconds) or rate_window_seconds < 0:
+            raise ValueError("rate_window_seconds must be finite and non-negative")
         self._aggregator = aggregator or NetworkAggregator()
         self._session_factory = session_factory or (lambda callback: EtwSession(callback))
         self._clock = clock
+        self._rate_window_seconds = float(rate_window_seconds)
         self._session: _SessionProtocol | None = None
         self._states: dict[ProcessIdentity, _ProcessState] = {}
         self._retired: list[RetiredProcessNetworkStats] = []
@@ -98,15 +106,55 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 observed_received = 0
                 upload_rate = 0.0
                 download_rate = 0.0
+                if self._rate_window_seconds > 0:
+                    state.history = ((now, observed_sent, observed_received),)
+                    state.last_total_sent = total.bytes_sent
+                    state.last_total_received = total.bytes_received
             else:
                 state.process = process
-                observed_sent, observed_received = self._observed_totals(state, total)
-                if elapsed is not None and elapsed > 0:
-                    upload_rate = max(0, observed_sent - state.previous_sent) / elapsed
-                    download_rate = max(0, observed_received - state.previous_received) / elapsed
+                if self._rate_window_seconds > 0:
+                    if (
+                        state.last_total_sent is not None
+                        and state.last_total_received is not None
+                        and (
+                            total.bytes_sent < state.last_total_sent
+                            or total.bytes_received < state.last_total_received
+                        )
+                    ):
+                        state.history = ()
+                    observed_sent = max(0, total.bytes_sent - state.baseline_sent)
+                    observed_received = max(0, total.bytes_received - state.baseline_received)
+                    state.last_total_sent = total.bytes_sent
+                    state.last_total_received = total.bytes_received
+                    if not state.history or now > state.history[-1][0]:
+                        history = (*state.history, (now, observed_sent, observed_received))
+                        cutoff = now - self._rate_window_seconds
+                        baseline_index = max(
+                            (index for index, sample in enumerate(history) if sample[0] <= cutoff),
+                            default=0,
+                        )
+                        state.history = history[baseline_index:]
+                        baseline = state.history[0]
+                        window_elapsed = now - baseline[0]
+                        if window_elapsed > 0:
+                            upload_rate = max(0, observed_sent - baseline[1]) / window_elapsed
+                            download_rate = max(0, observed_received - baseline[2]) / window_elapsed
+                        else:
+                            upload_rate = 0.0
+                            download_rate = 0.0
+                    else:
+                        state.history = ((now, observed_sent, observed_received),)
+                        upload_rate = 0.0
+                        download_rate = 0.0
                 else:
-                    upload_rate = 0.0
-                    download_rate = 0.0
+                    observed_sent = max(0, total.bytes_sent - state.baseline_sent)
+                    observed_received = max(0, total.bytes_received - state.baseline_received)
+                    if elapsed is not None and elapsed > 0:
+                        upload_rate = max(0, observed_sent - state.previous_sent) / elapsed
+                        download_rate = max(0, observed_received - state.previous_received) / elapsed
+                    else:
+                        upload_rate = 0.0
+                        download_rate = 0.0
 
             state.previous_sent = observed_sent
             state.previous_received = observed_received
@@ -121,11 +169,19 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 )
             )
 
-        self._capture_retired(totals, active_identities, active_pids)
+        # The aggregator's lock makes this the retirement cut: all events
+        # recorded before it are handed off in `removed`; later events cannot
+        # be guessed back onto a retired identity.
+        removed = self._aggregator.retain_pids(active_pids)
+        if removed is None:
+            # Keep test and third-party aggregators written against the old
+            # write-only retain_pids hook usable. The production aggregator
+            # always returns the atomically removed totals.
+            removed = {}
+        self._capture_retired(totals, removed, active_identities, active_pids)
         self._states = {
             identity: state for identity, state in self._states.items() if identity in active_identities
         }
-        self._aggregator.retain_pids(active_pids)
         self._previous_time = now
         return tuple(results)
 
@@ -149,6 +205,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
     def _capture_retired(
         self,
         totals: dict[int, ProcessNetworkTotals],
+        removed: dict[int, ProcessNetworkTotals],
         active_identities: set[ProcessIdentity],
         active_pids: set[int],
     ) -> None:
@@ -165,7 +222,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 observed_sent = state.previous_sent
                 observed_received = state.previous_received
             else:
-                total = totals.get(pid, ProcessNetworkTotals(pid=pid))
+                total = removed.get(pid, totals.get(pid, ProcessNetworkTotals(pid=pid)))
                 observed_sent, observed_received = self._observed_totals(state, total)
                 observed_sent = max(observed_sent, state.previous_sent)
                 observed_received = max(observed_received, state.previous_received)

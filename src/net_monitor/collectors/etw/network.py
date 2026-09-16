@@ -37,10 +37,12 @@ class NetworkAggregator:
         with self._lock:
             return dict(self._totals)
 
-    def retain_pids(self, pids: set[int]) -> None:
-        """Discard counters for processes that are no longer active."""
+    def retain_pids(self, pids: set[int]) -> dict[int, ProcessNetworkTotals]:
+        """Atomically return and discard counters for inactive process IDs."""
         with self._lock:
+            removed = {pid: total for pid, total in self._totals.items() if pid not in pids}
             self._totals = {pid: total for pid, total in self._totals.items() if pid in pids}
+            return removed
 
     def clear(self) -> None:
         with self._lock:

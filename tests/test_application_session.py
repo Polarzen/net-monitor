@@ -3,7 +3,12 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from net_monitor.collectors.base import ProcessNetworkCollector
-from net_monitor.collectors.etw.events import NetworkDirection, NetworkEvent
+from net_monitor.collectors.etw.events import (
+    NetworkDirection,
+    NetworkEvent,
+    ProcessNetworkTotals,
+)
+from net_monitor.collectors.etw.network import NetworkAggregator
 from net_monitor.collectors.windows_network import WindowsProcessNetworkCollector
 from net_monitor.core.application_session import ApplicationSessionTracker
 from net_monitor.core.models import (
@@ -57,6 +62,142 @@ def test_session_tracker_counts_cumulative_deltas_only_once() -> None:
     assert repeated.upload_bytes == 150
     assert repeated.download_bytes == 260
     assert repeated.active_process_count == 1
+
+
+def test_session_tracker_uses_directional_high_water_after_counter_rollback() -> None:
+    tracker = ApplicationSessionTracker()
+    process = app_process()
+
+    snapshots = [
+        tracker.update((process,), (stats(10, upload, download),))[0]
+        for upload, download in ((150, 100), (120, 90), (130, 110), (170, 80))
+    ]
+
+    assert snapshots[-1].upload_bytes == 170
+    assert snapshots[-1].download_bytes == 110
+
+    second_tracker = ApplicationSessionTracker()
+    second_process = app_process(pid=11, create_time=2.0)
+    second_snapshots = [
+        second_tracker.update((second_process,), (stats(11, upload, 0),))[0]
+        for upload in (100, 0, 20, 101)
+    ]
+    assert second_snapshots[-1].upload_bytes == 101
+
+
+def test_session_tracker_counts_unknown_ctime_as_active_for_existing_account() -> None:
+    tracker = ApplicationSessionTracker()
+    trusted = app_process()
+    tracker.update((trusted,), (stats(10, 100, 200),))
+
+    unknown = ProcessInfo(
+        pid=trusted.pid,
+        name=trusted.name,
+        executable=trusted.executable,
+        create_time=None,
+    )
+    groups = tracker.update((unknown,), ())
+
+    assert len(groups) == 1
+    assert groups[0].upload_bytes == 100
+    assert groups[0].download_bytes == 200
+    assert groups[0].active_process_count == 1
+
+
+def test_session_tracker_skips_untrusted_or_mismatched_samples() -> None:
+    tracker = ApplicationSessionTracker()
+    unknown = ProcessInfo(pid=10, name="demo.exe", executable=r"D:\Apps\demo.exe")
+
+    assert tracker.update((unknown,), (stats(10, 100, 200),)) == ()
+
+    process = app_process()
+    tracker.update((process,), (stats(10, 100, 200),))
+    tracker.update(
+        (process,),
+        (
+            ProcessNetworkStats(
+                pid=999,
+                name=process.name,
+                upload_bytes=1_000,
+                download_bytes=1_000,
+            ),
+        ),
+    )
+    result = tracker.update((process,), (stats(10, -5, -7),))[0]
+
+    assert result.upload_bytes == 100
+    assert result.download_bytes == 200
+
+
+def test_session_tracker_skips_mismatched_retired_network_pid() -> None:
+    tracker = ApplicationSessionTracker()
+    process = app_process()
+    tracker.update((process,), (stats(10, 150, 200),))
+
+    mismatched = RetiredProcessNetworkStats(
+        process=process,
+        network=stats(999, 1_000, 1_000),
+    )
+    groups = tracker.update((), (), (mismatched,))
+
+    assert len(groups) == 1
+    assert groups[0].upload_bytes == 150
+    assert groups[0].download_bytes == 200
+
+
+def test_session_tracker_skips_unknown_ctime_retired_sample() -> None:
+    tracker = ApplicationSessionTracker()
+    unknown = ProcessInfo(
+        pid=10,
+        name="demo.exe",
+        executable=r"D:\Apps\demo.exe",
+        create_time=None,
+    )
+    retired = RetiredProcessNetworkStats(
+        process=unknown,
+        network=stats(10, 100, 200),
+    )
+
+    assert tracker.update((), (), (retired,)) == ()
+
+
+def test_session_tracker_applies_high_water_to_repeated_retired_samples() -> None:
+    tracker = ApplicationSessionTracker()
+    process = app_process()
+    tracker.update((process,), (stats(10, 150, 150),))
+
+    groups = ()
+    for value in (120, 130, 170, 170):
+        retired = RetiredProcessNetworkStats(
+            process=process,
+            network=stats(10, value, value),
+        )
+        groups = tracker.update((), (), (retired,))
+
+    assert len(groups) == 1
+    assert groups[0].upload_bytes == 170
+    assert groups[0].download_bytes == 170
+
+
+def test_session_tracker_keeps_metadata_recovery_in_one_account() -> None:
+    tracker = ApplicationSessionTracker()
+    missing = ProcessInfo(pid=30, name="demo.exe", create_time=3.0)
+    restored = ProcessInfo(
+        pid=30,
+        name="demo.exe",
+        executable=r"D:\Apps\demo.exe",
+        create_time=3.0,
+    )
+
+    tracker.update((missing,), (stats(30, 100, 200),))
+    tracker.update((restored,), (stats(30, 150, 260),))
+    tracker.update((missing,), (stats(30, 140, 250),))
+    groups = tracker.update((restored,), (stats(30, 160, 270),))
+
+    assert len(groups) == 1
+    assert groups[0].upload_bytes == 160
+    assert groups[0].download_bytes == 270
+    assert groups[0].executable is None
 
 
 def test_session_tracker_keeps_retired_bytes_and_combines_later_same_app() -> None:
@@ -182,6 +323,76 @@ def test_collector_does_not_charge_reused_pid_bytes_to_old_identity() -> None:
     assert retired[0].network.upload_bytes == 100
 
 
+def test_pid_reuse_baselines_against_mixed_bucket_at_atomic_cut() -> None:
+    sessions: list[FakeSession] = []
+
+    def factory(callback: Callable[[NetworkEvent], None]) -> FakeSession:
+        session = FakeSession(callback)
+        sessions.append(session)
+        return session
+
+    aggregator = NetworkAggregator()
+    collector = WindowsProcessNetworkCollector(
+        aggregator=aggregator,
+        session_factory=factory,
+        clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
+    )
+    old = app_process(create_time=1.0)
+    new = app_process(create_time=2.0)
+
+    collector.collect((old,))
+    sessions[0].emit(10, NetworkDirection.SEND, 100)
+    collector.collect((old,))
+    aggregator.record(NetworkEvent(0.0, 10, NetworkDirection.SEND, 50))
+
+    first_new = collector.collect((new,))[0]
+    retired = collector.drain_retired()
+    assert first_new.upload_bytes == 0
+    assert retired[0].network.upload_bytes == 100
+
+    sessions[0].emit(10, NetworkDirection.SEND, 80)
+    second_new = collector.collect((new,))[0]
+    assert second_new.upload_bytes == 80
+
+
+def test_collector_atomically_hands_off_totals_at_retirement_cut() -> None:
+    sessions: list[FakeSession] = []
+
+    def factory(callback: Callable[[NetworkEvent], None]) -> FakeSession:
+        session = FakeSession(callback)
+        sessions.append(session)
+        return session
+
+    class InjectingAggregator(NetworkAggregator):
+        inject_after_snapshot = False
+
+        def snapshot(self) -> dict[int, ProcessNetworkTotals]:
+            result = super().snapshot()
+            if self.inject_after_snapshot:
+                self.inject_after_snapshot = False
+                self.record(NetworkEvent(0.0, 10, NetworkDirection.SEND, 50))
+            return result
+
+    aggregator = InjectingAggregator()
+    collector = WindowsProcessNetworkCollector(
+        aggregator=aggregator,
+        session_factory=factory,
+        clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
+    )
+    process = app_process()
+
+    collector.collect((process,))
+    sessions[0].emit(10, NetworkDirection.SEND, 100)
+    collector.collect((process,))
+    aggregator.inject_after_snapshot = True
+    collector.collect(())
+
+    retired = collector.drain_retired()
+    assert len(retired) == 1
+    assert retired[0].network.upload_bytes == 150
+    assert collector.drain_retired() == ()
+
+
 class SequenceProcessCollector:
     def __init__(self, samples: list[tuple[ProcessInfo, ...]]) -> None:
         self._samples = iter(samples)
@@ -235,7 +446,9 @@ def test_monitor_service_exposes_session_totals_after_process_exit() -> None:
             [NetworkCounters(0, 0), NetworkCounters(0, 0)]
         ),
         process_network_collector=RetiringNetworkCollector(process),
-        clock=FakeClock([1.0, 2.0]),
+        # MonitorService samples the system clock once before process refresh
+        # and again after counter collection for the system rate timestamp.
+        clock=FakeClock([1.0, 1.5, 2.0, 2.5]),
         process_refresh_interval=0.0,
     )
 

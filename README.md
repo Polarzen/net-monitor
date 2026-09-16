@@ -2,7 +2,7 @@
 
 Net Monitor 是一个面向 Windows 11 的轻量第三方应用网络活动监视器。它的核心问题不是“做另一个任务管理器”，而是让用户随时看一眼：**现在谁在联网、谁正在下载、谁正在上传、哪个应用最活跃。**
 
-当前版本：**v0.2 / Stage 3A — Compact Widget UI**。
+当前版本：**v0.2 / Stage 3A UI + Stage 3B session integration**。
 
 ## 产品形态
 
@@ -22,13 +22,13 @@ activity_score = download_bytes_per_second + upload_bytes_per_second
 
 不会按 `"1 MB/s"`、`"900 KB/s"` 等格式化字符串排序。网络数据不可用时保持 `—`，不会把未知值当作 0。
 
-“当前联网”仍严格表示：
+“当前联网”仍严格表示 GUI 约 2 秒测量窗口内有流量：
 
 ```text
 upload rate > 0 OR download rate > 0
 ```
 
-不是“本次 Session 曾经联网”。
+短 burst 在窗口内按真实采样时间计算平均速率，不是“本次 Session 曾经联网”，也不是伪造实时值。
 
 ## 架构
 
@@ -78,6 +78,12 @@ UNKNOWN     默认显示
 
 第三方应用按相同 executable 路径进行保守聚合。PID 子项仍保留 `(pid, create_time)` 身份，避免 PID reuse 回归。
 
+### Stage 3B 当前会话累计
+
+应用会话累计只在当前 Net Monitor 进程生命周期内保留，不写 SQLite，也不跨重启恢复。可信身份是 `(pid, create_time)`；首次可信累计样本全额计入，之后每个方向只计入超过该方向高水位的增量。计数器回退或乱序不会被猜成新的 epoch，因此同一身份在重新超过旧高水位前可能漏计。`create_time` 缺失、网络行任一累计字段缺失或退休行 PID 与进程 PID 不一致时，整行不进入会话累计。
+
+进程退出时，ETW PID 桶在同一锁内原子取出并从活动桶删除，退休样本交给会话 tracker 后只消费一次。PID reuse 的旧身份只交接最后确认值，新身份从混合 PID 桶建立隔离基线；原子切点后的迟到事件不回猜给旧身份。身份和去重状态贯穿整个应用会话，内存增长来自已见身份与累计账户的有意保留。
+
 ## 启动方式
 
 ### 开发运行
@@ -122,6 +128,7 @@ Stage 2D/2E 的性能原则保持不变：
 - Compact 的 Top 行在创建窗口时一次性构造，后续 snapshot 只更新文本和显隐，不在每次刷新重建 QWidget hierarchy。
 - 不在刷新周期重载 stylesheet、重新创建托盘图标或做无必要 metadata 扫描。
 - 采样频率继续约 500 ms，不改成 30/60 FPS UI timer。
+- GUI 进程速率使用约 2 秒窗口：窗口内有流量时，“当前联网”表示近期测量窗口观察到流量；短 burst 在窗口内按真实采样时间计算平均速率，不伪造实时值。默认 `WindowsProcessNetworkCollector` 的窗口为 `0.0`，保留原有速率行为；GUI 使用 `2.0`，累计 bytes、PID/`create_time` 身份和进程刷新周期不变。
 
 ## 自动验证
 
@@ -184,6 +191,14 @@ GitHub Actions 不能替代真实桌面体验。Stage 3A 自动验证完成后�
 - 长时间驻留的 CPU、拖动和可用性
 
 这些项目必须以实机体验为最终结论。
+
+本轮（2026-09-16）验收记录见 [Stage 3A 本轮验收记录](docs/stage3a-acceptance-2026-09-16.md)。
+
+### CPU 修复后的验收状态
+
+已修复 GUI 进程采集不请求 `status` 带来的 CPU 开销，以及 ETW 批次在半秒刷新下造成的交替零速率。默认 collector/service 的公开行为兼容；GUI 采用用户接受的约 2 秒窗口，UI 约 500 ms 刷新、进程 2 秒刷新、PID/`create_time` 身份和累计 bytes 保持不变。Stage 3A 的精确验证结果记录在验收文档；Stage 3B 本地合并的测试结果和未验证边界记录在 [Stage 3B 集成记录](docs/stage3b-integration-2026-09-17.md)。
+
+正式观察于 `2026-09-16 20:49:57–21:19:58+08` 完成 `1800.0012464s`、31 个连续样本；2 秒 collector probe 停流后约 `2.25s` 严格归零，GUI 观察中启动期外未再复现规律性双零，用户确认窗口、数据和托盘正常。该观察属于已验证的 Stage 3A 精确提交；当前 Stage 3B 集成本地工作树尚未产生最终提交，未来 CI/ETW 运行待集成后由 Root 安排。
 
 ## Stage 3A 范围边界
 

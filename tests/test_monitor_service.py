@@ -48,6 +48,42 @@ class FakeClock:
         return next(self._values)
 
 
+class MutableClock:
+    def __init__(self, value: float = 0.0) -> None:
+        self.value = value
+
+    def __call__(self) -> float:
+        return self.value
+
+    def advance(self, seconds: float) -> None:
+        self.value += seconds
+
+
+class AdvancingProcessCollector(FakeProcessCollector):
+    def __init__(self, clock: MutableClock, durations: list[float]) -> None:
+        super().__init__()
+        self._clock = clock
+        self._durations = iter(durations)
+
+    def collect(self) -> tuple[ProcessInfo, ...]:
+        processes = super().collect()
+        self._clock.advance(next(self._durations))
+        return processes
+
+
+class ConstantRateSystemCollector:
+    def __init__(self, clock: MutableClock, upload_rate: int, download_rate: int) -> None:
+        self._clock = clock
+        self._upload_rate = upload_rate
+        self._download_rate = download_rate
+
+    def collect(self) -> NetworkCounters:
+        return NetworkCounters(
+            int(self._clock.value * self._upload_rate),
+            int(self._clock.value * self._download_rate),
+        )
+
+
 def make_service(
     samples: list[NetworkCounters],
     times: list[float],
@@ -66,7 +102,7 @@ def make_service(
 
 
 def test_first_sample_has_zero_rates() -> None:
-    service = make_service([NetworkCounters(100, 200)], [10.0])
+    service = make_service([NetworkCounters(100, 200)], [10.0, 10.0])
     snapshot = service.snapshot()
     assert snapshot.system.upload_bytes_per_second == 0
     assert snapshot.system.download_bytes_per_second == 0
@@ -81,7 +117,7 @@ def test_snapshot_exposes_process_network_state() -> None:
     )
     service = make_service(
         [NetworkCounters(100, 200)],
-        [10.0],
+        [10.0, 10.0],
         FakeProcessNetworkCollector(state),
     )
     snapshot = service.snapshot()
@@ -91,7 +127,7 @@ def test_snapshot_exposes_process_network_state() -> None:
 def test_second_sample_uses_real_elapsed_time() -> None:
     service = make_service(
         [NetworkCounters(100, 200), NetworkCounters(300, 700)],
-        [10.0, 12.0],
+        [10.0, 10.0, 12.0, 12.0],
     )
     service.snapshot()
     snapshot = service.snapshot()
@@ -102,7 +138,7 @@ def test_second_sample_uses_real_elapsed_time() -> None:
 def test_counter_rollback_never_creates_negative_rate() -> None:
     service = make_service(
         [NetworkCounters(500, 900), NetworkCounters(100, 200)],
-        [1.0, 2.0],
+        [1.0, 1.0, 2.0, 2.0],
     )
     service.snapshot()
     snapshot = service.snapshot()
@@ -113,7 +149,7 @@ def test_counter_rollback_never_creates_negative_rate() -> None:
 def test_zero_elapsed_time_has_zero_rates() -> None:
     service = make_service(
         [NetworkCounters(100, 200), NetworkCounters(300, 600)],
-        [5.0, 5.0],
+        [5.0, 5.0, 5.0, 5.0],
     )
     service.snapshot()
     snapshot = service.snapshot()
@@ -124,7 +160,7 @@ def test_zero_elapsed_time_has_zero_rates() -> None:
 def test_no_network_change_has_zero_rates() -> None:
     service = make_service(
         [NetworkCounters(100, 200), NetworkCounters(100, 200)],
-        [1.0, 3.0],
+        [1.0, 1.0, 3.0, 3.0],
     )
     service.snapshot()
     snapshot = service.snapshot()
@@ -136,7 +172,7 @@ def test_process_enumeration_is_cached_between_fast_network_snapshots() -> None:
     process_collector = FakeProcessCollector()
     service = make_service(
         [NetworkCounters(1, 1), NetworkCounters(2, 2), NetworkCounters(3, 3)],
-        [10.0, 10.5, 12.1],
+        [10.0, 10.0, 10.5, 10.5, 12.1, 12.1],
         process_collector=process_collector,
     )
 
@@ -152,3 +188,19 @@ def test_process_enumeration_is_cached_between_fast_network_snapshots() -> None:
     assert cached_metrics.process_enumeration_seconds is None
     assert refreshed_metrics.process_enumeration_seconds is not None
     assert refreshed_metrics.process_count == 1
+
+
+def test_system_rate_uses_time_after_process_enumeration() -> None:
+    clock = MutableClock()
+    service = MonitorService(
+        process_collector=AdvancingProcessCollector(clock, [3.0, 1.0]),
+        system_network_collector=ConstantRateSystemCollector(clock, 100, 200),
+        process_network_collector=FakeProcessNetworkCollector(),
+        clock=clock,
+    )
+
+    service.snapshot()
+    snapshot = service.snapshot()
+
+    assert snapshot.system.upload_bytes_per_second == 100
+    assert snapshot.system.download_bytes_per_second == 200

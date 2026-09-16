@@ -5,6 +5,8 @@ from collections.abc import Callable
 from PySide6.QtCore import QMetaObject, QObject, QThread, Qt, Signal
 from PySide6.QtWidgets import QApplication
 
+from net_monitor.collectors.process import ProcessCollector
+from net_monitor.collectors.windows_network import WindowsProcessNetworkCollector
 from net_monitor.core.elevation import restart_as_administrator
 from net_monitor.core.models import MonitorSnapshot
 from net_monitor.services.monitor_service import MonitorService
@@ -27,7 +29,10 @@ class UiController(QObject):
         start_worker: bool = True,
     ) -> None:
         super().__init__()
-        self._service = service or MonitorService()
+        self._service = service or MonitorService(
+            process_collector=ProcessCollector(include_status=False),
+            process_network_collector=WindowsProcessNetworkCollector(rate_window_seconds=2.0),
+        )
         self._sampling_interval_ms = sampling_interval_ms
         self._thread: QThread | None = None
         self._worker: SamplingWorker | None = None
