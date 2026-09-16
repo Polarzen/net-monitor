@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+import pytest
+
 from net_monitor.collectors.etw.api import EtwPermissionError
-from net_monitor.collectors.etw.events import NetworkDirection, NetworkEvent
+from net_monitor.collectors.etw.events import NetworkDirection, NetworkEvent, ProcessNetworkTotals
 from net_monitor.collectors.windows_network import WindowsProcessNetworkCollector
 from net_monitor.core.models import ProcessInfo, ProcessNetworkStatus
 
@@ -54,6 +56,21 @@ class FakeSession:
         self.on_event(NetworkEvent(timestamp=0.0, pid=pid, direction=direction, size=size))
 
 
+class SequenceAggregator:
+    def __init__(self, values: list[tuple[int, int]]) -> None:
+        self._values = iter(values)
+
+    def snapshot(self) -> dict[int, ProcessNetworkTotals]:
+        sent, received = next(self._values)
+        return {10: ProcessNetworkTotals(pid=10, bytes_sent=sent, bytes_received=received)}
+
+    def record(self, event: NetworkEvent) -> None:
+        pass
+
+    def retain_pids(self, pids: set[int]) -> None:
+        pass
+
+
 def setup_function() -> None:
     FakeSession.instances.clear()
     FakeSession.start_error = None
@@ -94,6 +111,104 @@ def test_collector_starts_lazily_and_computes_rates() -> None:
     assert second.download_bytes == 600
     assert second.upload_bytes_per_second == 100
     assert second.download_bytes_per_second == 300
+
+
+def test_windowed_rates_use_real_elapsed_time_and_hold_until_window_expires() -> None:
+    collector = WindowsProcessNetworkCollector(
+        session_factory=FakeSession,
+        clock=FakeClock([0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]),
+        rate_window_seconds=2.0,
+    )
+
+    assert collector.collect((process(),))[0].upload_bytes_per_second == 0
+    session = FakeSession.instances[0]
+    session.emit(10, NetworkDirection.SEND, 100)
+    rates = [collector.collect((process(),))[0].upload_bytes_per_second]
+    session.emit(10, NetworkDirection.SEND, 100)
+    rates.extend(collector.collect((process(),))[0].upload_bytes_per_second for _ in range(1))
+    rates.append(collector.collect((process(),))[0].upload_bytes_per_second)
+    session.emit(10, NetworkDirection.SEND, 100)
+    rates.extend(
+        collector.collect((process(),))[0].upload_bytes_per_second for _ in range(4)
+    )
+    rates.append(collector.collect((process(),))[0].upload_bytes_per_second)
+
+    assert rates[:5] == pytest.approx([200.0, 200.0, 133.33333333333333, 150.0, 100.0])
+    assert all(rate > 0 for rate in rates[:7])
+    assert rates[-1] == 0
+
+
+def test_windowed_rate_uses_jittered_sample_elapsed_time() -> None:
+    collector = WindowsProcessNetworkCollector(
+        session_factory=FakeSession,
+        clock=FakeClock([10.0, 10.7]),
+        rate_window_seconds=2.0,
+    )
+    collector.collect((process(),))
+    FakeSession.instances[0].emit(10, NetworkDirection.SEND, 100)
+
+    stats = collector.collect((process(),))[0]
+
+    assert stats.upload_bytes == 100
+    assert stats.upload_bytes_per_second == pytest.approx(100 / 0.7)
+
+
+def test_windowed_rate_isolated_on_pid_reuse_and_counter_rollback() -> None:
+    collector = WindowsProcessNetworkCollector(
+        session_factory=FakeSession,
+        clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
+        rate_window_seconds=2.0,
+    )
+    old = process(create_time=100.0)
+    reused = process(create_time=200.0)
+    collector.collect((old,))
+    session = FakeSession.instances[0]
+    session.emit(10, NetworkDirection.SEND, 100)
+    assert collector.collect((old,))[0].upload_bytes == 100
+    session.emit(10, NetworkDirection.SEND, 50)
+    assert collector.collect((reused,))[0].upload_bytes == 0
+    session.emit(10, NetworkDirection.SEND, 80)
+    assert collector.collect((reused,))[0].upload_bytes == 80
+    assert (10, 100.0) not in collector._states
+
+    rollback = WindowsProcessNetworkCollector(
+        aggregator=SequenceAggregator([(0, 0), (100, 200), (20, 300), (30, 350)]),
+        session_factory=FakeSession,
+        clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
+        rate_window_seconds=2.0,
+    )
+    assert rollback.collect((process(),))[0].upload_bytes_per_second == 0
+    assert rollback.collect((process(),))[0].upload_bytes_per_second == 100
+    reset = rollback.collect((process(),))[0]
+    assert reset.upload_bytes == 20
+    assert reset.download_bytes == 300
+    assert reset.upload_bytes_per_second == 0
+    assert reset.download_bytes_per_second == 0
+    resumed = rollback.collect((process(),))[0]
+    assert resumed.upload_bytes == 30
+    assert resumed.download_bytes == 350
+    assert resumed.upload_bytes_per_second == 10
+    assert resumed.download_bytes_per_second == 50
+
+
+def test_windowed_rate_reanchors_after_clock_rollback() -> None:
+    collector = WindowsProcessNetworkCollector(
+        aggregator=SequenceAggregator([(0, 0), (100, 0), (110, 0), (120, 0)]),
+        session_factory=FakeSession,
+        clock=FakeClock([100.0, 101.0, 10.0, 11.0]),
+        rate_window_seconds=2.0,
+    )
+
+    assert collector.collect((process(),))[0].upload_bytes_per_second == 0
+    assert collector.collect((process(),))[0].upload_bytes_per_second == 100
+    assert collector.collect((process(),))[0].upload_bytes_per_second == 0
+    assert collector.collect((process(),))[0].upload_bytes_per_second == 10
+
+
+def test_window_rate_requires_finite_nonnegative_duration() -> None:
+    for value in (-1.0, float("inf"), float("nan")):
+        with pytest.raises(ValueError):
+            WindowsProcessNetworkCollector(rate_window_seconds=value)
 
 
 def test_collector_reports_asynchronous_session_failure_before_snapshot() -> None:

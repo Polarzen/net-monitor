@@ -22,13 +22,13 @@ activity_score = download_bytes_per_second + upload_bytes_per_second
 
 不会按 `"1 MB/s"`、`"900 KB/s"` 等格式化字符串排序。网络数据不可用时保持 `—`，不会把未知值当作 0。
 
-“当前联网”仍严格表示：
+“当前联网”仍严格表示 GUI 约 2 秒测量窗口内有流量：
 
 ```text
 upload rate > 0 OR download rate > 0
 ```
 
-不是“本次 Session 曾经联网”。
+短 burst 在窗口内按真实采样时间计算平均速率，不是“本次 Session 曾经联网”，也不是伪造实时值。
 
 ## 架构
 
@@ -122,6 +122,7 @@ Stage 2D/2E 的性能原则保持不变：
 - Compact 的 Top 行在创建窗口时一次性构造，后续 snapshot 只更新文本和显隐，不在每次刷新重建 QWidget hierarchy。
 - 不在刷新周期重载 stylesheet、重新创建托盘图标或做无必要 metadata 扫描。
 - 采样频率继续约 500 ms，不改成 30/60 FPS UI timer。
+- GUI 进程速率使用约 2 秒窗口：窗口内有流量时，“当前联网”表示近期测量窗口观察到流量；短 burst 在窗口内按真实采样时间计算平均速率，不伪造实时值。默认 `WindowsProcessNetworkCollector` 的窗口为 `0.0`，保留原有速率行为；GUI 使用 `2.0`，累计 bytes、PID/`create_time` 身份和进程刷新周期不变。
 
 ## 自动验证
 
@@ -185,7 +186,13 @@ GitHub Actions 不能替代真实桌面体验。Stage 3A 自动验证完成后�
 
 这些项目必须以实机体验为最终结论。
 
-本轮（2026-09-16）验收记录见 [Stage 3A 本轮验收记录](docs/stage3a-acceptance-2026-09-16.md)。本轮验收与修复已执行：本地自动测试、真实 ETW、主要桌面项及最终正常退出已有实际记录，修复版运行时长超过 30 分钟；Stage 3A 保留自动监测记录缺口、CPU 性能风险及最终本地提交未运行 CI 等未完事项，尚未宣告无保留全部完成。记录中的 workflow 链接属于既有 exact HEAD 历史运行；后续最终提交产生的新 HEAD 需要单独运行 CI，不能用这些历史结果替代。
+本轮（2026-09-16）验收记录见 [Stage 3A 本轮验收记录](docs/stage3a-acceptance-2026-09-16.md)。
+
+### CPU 修复后的验收状态
+
+已修复 GUI 进程采集不请求 `status` 带来的 CPU 开销，以及 ETW 批次在半秒刷新下造成的交替零速率。默认 collector/service 的公开行为兼容；GUI 采用用户接受的约 2 秒窗口，UI 约 500 ms 刷新、进程 2 秒刷新、PID/`create_time` 身份和累计 bytes 保持不变。自动测试为 `100 passed`、`0 failed`、`1 skipped`，真实 2 秒 collector probe 在停流后约 `2.25s` 呈现严格零速率。
+
+正式观察于 `2026-09-16 20:49:57–21:19:58+08` 完成 `1800.0012464s`、31 个连续样本；2 秒 collector probe 停流后约 `2.25s` 严格归零，GUI 观察中启动期外未再复现规律性双零，用户确认窗口、数据和托盘正常。当前本地新 HEAD 尚未运行 CI；旧 `d9752d3b85a131417029f12bc556fbe785bef986` 的成功结果不覆盖新 HEAD，也未 push。
 
 ## Stage 3A 范围边界
 

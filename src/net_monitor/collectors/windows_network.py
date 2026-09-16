@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -36,6 +37,9 @@ class _ProcessState:
     baseline_received: int
     previous_sent: int = 0
     previous_received: int = 0
+    history: tuple[tuple[float, int, int], ...] = ()
+    last_total_sent: int | None = None
+    last_total_received: int | None = None
 
 
 class WindowsProcessNetworkCollector(ProcessNetworkCollector):
@@ -47,10 +51,14 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         aggregator: NetworkAggregator | None = None,
         session_factory: SessionFactory | None = None,
         clock: Callable[[], float] = time.monotonic,
+        rate_window_seconds: float = 0.0,
     ) -> None:
+        if not math.isfinite(rate_window_seconds) or rate_window_seconds < 0:
+            raise ValueError("rate_window_seconds must be finite and non-negative")
         self._aggregator = aggregator or NetworkAggregator()
         self._session_factory = session_factory or (lambda callback: EtwSession(callback))
         self._clock = clock
+        self._rate_window_seconds = float(rate_window_seconds)
         self._session: _SessionProtocol | None = None
         self._states: dict[ProcessIdentity, _ProcessState] = {}
         self._previous_time: float | None = None
@@ -93,15 +101,54 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                 observed_received = 0
                 upload_rate = 0.0
                 download_rate = 0.0
+                if self._rate_window_seconds > 0:
+                    state.history = ((now, observed_sent, observed_received),)
+                    state.last_total_sent = total.bytes_sent
+                    state.last_total_received = total.bytes_received
             else:
-                observed_sent = max(0, total.bytes_sent - state.baseline_sent)
-                observed_received = max(0, total.bytes_received - state.baseline_received)
-                if elapsed is not None and elapsed > 0:
-                    upload_rate = max(0, observed_sent - state.previous_sent) / elapsed
-                    download_rate = max(0, observed_received - state.previous_received) / elapsed
+                if self._rate_window_seconds > 0:
+                    if (
+                        state.last_total_sent is not None
+                        and state.last_total_received is not None
+                        and (
+                            total.bytes_sent < state.last_total_sent
+                            or total.bytes_received < state.last_total_received
+                        )
+                    ):
+                        state.history = ()
+                    observed_sent = max(0, total.bytes_sent - state.baseline_sent)
+                    observed_received = max(0, total.bytes_received - state.baseline_received)
+                    state.last_total_sent = total.bytes_sent
+                    state.last_total_received = total.bytes_received
+                    if not state.history or now > state.history[-1][0]:
+                        history = (*state.history, (now, observed_sent, observed_received))
+                        cutoff = now - self._rate_window_seconds
+                        baseline_index = max(
+                            (index for index, sample in enumerate(history) if sample[0] <= cutoff),
+                            default=0,
+                        )
+                        state.history = history[baseline_index:]
+                        baseline = state.history[0]
+                        window_elapsed = now - baseline[0]
+                        if window_elapsed > 0:
+                            upload_rate = max(0, observed_sent - baseline[1]) / window_elapsed
+                            download_rate = max(0, observed_received - baseline[2]) / window_elapsed
+                        else:
+                            upload_rate = 0.0
+                            download_rate = 0.0
+                    else:
+                        state.history = ((now, observed_sent, observed_received),)
+                        upload_rate = 0.0
+                        download_rate = 0.0
                 else:
-                    upload_rate = 0.0
-                    download_rate = 0.0
+                    observed_sent = max(0, total.bytes_sent - state.baseline_sent)
+                    observed_received = max(0, total.bytes_received - state.baseline_received)
+                    if elapsed is not None and elapsed > 0:
+                        upload_rate = max(0, observed_sent - state.previous_sent) / elapsed
+                        download_rate = max(0, observed_received - state.previous_received) / elapsed
+                    else:
+                        upload_rate = 0.0
+                        download_rate = 0.0
 
             state.previous_sent = observed_sent
             state.previous_received = observed_received

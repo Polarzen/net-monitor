@@ -18,6 +18,7 @@ from net_monitor.core.models import (
     SystemNetworkStats,
 )
 from net_monitor.core.process_visibility import ProcessClassifier
+import net_monitor.ui.controller as controller_module
 from net_monitor.ui.compact_window import CompactWindow
 from net_monitor.ui.controller import UiController
 from net_monitor.ui.tray import TrayController
@@ -160,6 +161,69 @@ def test_controller_reuses_one_detail_instance_and_one_service() -> None:
     controller.shutdown()
     controller.shutdown()
     assert service.closed == 1
+
+
+def test_controller_default_service_uses_status_free_process_collector(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    qapp()
+    collectors: list[object] = []
+    network_collectors: list[object] = []
+    services: list[dict[str, object]] = []
+
+    class SpyProcessCollector:
+        def __init__(self, *, include_status: bool) -> None:
+            collectors.append(self)
+            assert include_status is False
+
+    class SpyNetworkCollector:
+        def __init__(self, *, rate_window_seconds: float) -> None:
+            network_collectors.append(self)
+            assert rate_window_seconds == 2.0
+
+    class SpyMonitorService(FakeService):
+        def __init__(self, **kwargs: object) -> None:
+            super().__init__()
+            services.append(kwargs)
+
+    monkeypatch.setattr(controller_module, "ProcessCollector", SpyProcessCollector)
+    monkeypatch.setattr(controller_module, "WindowsProcessNetworkCollector", SpyNetworkCollector)
+    monkeypatch.setattr(controller_module, "MonitorService", SpyMonitorService)
+
+    controller = UiController(start_worker=False)
+
+    assert len(collectors) == 1
+    assert len(network_collectors) == 1
+    assert services == [
+        {
+            "process_collector": collectors[0],
+            "process_network_collector": network_collectors[0],
+        }
+    ]
+    assert controller.service is not None
+    controller.shutdown()
+
+
+def test_controller_explicit_service_does_not_create_process_collector(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    qapp()
+
+    class RaisingProcessCollector:
+        def __init__(self, *, include_status: bool) -> None:
+            raise AssertionError("explicit services must be reused")
+
+    class RaisingNetworkCollector:
+        def __init__(self, *, rate_window_seconds: float) -> None:
+            raise AssertionError("explicit services must be reused")
+
+    monkeypatch.setattr(controller_module, "ProcessCollector", RaisingProcessCollector)
+    monkeypatch.setattr(controller_module, "WindowsProcessNetworkCollector", RaisingNetworkCollector)
+    service = FakeService()
+    controller = UiController(service=service, start_worker=False)
+
+    assert controller.service is service
+    controller.shutdown()
 
 
 def test_compact_and_detail_consume_same_snapshot_object() -> None:
