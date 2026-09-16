@@ -1,6 +1,6 @@
 # Stage 3A 本轮验收记录（2026-09-16）
 
-状态：**正式 GUI 观察已完成并正常退出；核心本地测试、真实 ETW、窗口行为和资源释放均有证据。point 28 有一次按精确会话名执行的 `logman` 查询 warning，原始错误已保留，不能称作 logman 全部通过。当前新 HEAD 尚未运行 CI，因此尚未宣告无保留全部完成。**
+状态：**正式 GUI 观察已完成并正常退出；核心本地测试、真实 ETW、窗口行为和资源释放均有证据。point 28 有一次按精确会话名执行的 `logman` 查询 warning，原始错误已保留，不能称作 logman 全部通过。已发布 HEAD `95232da817281de6e615f3eea42c09fbae063572` 的旧远端 ETW 运行在 production collector probe 步骤失败；日志 API 返回 403 且无 traceback，不能据此断言唯一运行异常。现已补齐 workflow 的 `psutil` 安装，修复后的新运行尚未执行，因此尚未宣告无保留全部完成。**
 
 ## 环境与基线
 
@@ -18,9 +18,13 @@ Windows 11 家庭中文版 `10.0.26200`（build 26200），Python `3.14.7`，net
 
 现有最新代码验证证据为指定测试 `43 passed`、`0 failed`、`1 skipped`，全量测试 `100 passed`、`0 failed`、`1 skipped`；唯一 skip 是 runner 无真实系统托盘。本次文档修改后的最终全量 pytest 作为交付验证另行报告。
 
-历史 baseline `d9752d3b85a131417029f12bc556fbe785bef986` 的 workflow 结果为 success：[CI #34979881270](https://github.com/Polarzen/net-monitor/actions/runs/34979881270)、[ETW Experiment #34973522989](https://github.com/Polarzen/net-monitor/actions/runs/34973522989)、[CI #34973522976](https://github.com/Polarzen/net-monitor/actions/runs/34973522976)。`gh` 查询 `fe5bb35103cb749a5e906b3f8a55aa37d321b435` 成功并返回空列表 `[]`；当前新 HEAD 未运行 CI、未 push，历史 success 不覆盖新 HEAD。
+历史 baseline `d9752d3b85a131417029f12bc556fbe785bef986` 的 workflow 结果为 success：[CI #34979881270](https://github.com/Polarzen/net-monitor/actions/runs/34979881270)、[ETW Experiment #34973522989](https://github.com/Polarzen/net-monitor/actions/runs/34973522989)、[CI #34973522976](https://github.com/Polarzen/net-monitor/actions/runs/34973522976)。`gh` 查询 `fe5bb35103cb749a5e906b3f8a55aa37d321b435` 成功并返回空列表 `[]`；这些历史 success 不覆盖已发布 HEAD。
+
+已发布 HEAD `95232da817281de6e615f3eea42c09fbae063572` 的远端验证为：[CI #35111080385](https://github.com/Polarzen/net-monitor/actions/runs/35111080385) 在两个 Windows 矩阵平台均 success；[ETW Experiment #35111080247](https://github.com/Polarzen/net-monitor/actions/runs/35111080247) 在两个平台均完成 raw loopback probe 两次并成功，但 production collector probe 步骤均立即以 exit code `1` 失败，后续 standard-user permission 步骤均跳过。日志 API 返回 `403`，两平台 failure annotation 均只有 `Process completed with exit code 1`，无 traceback；因此不能断言 `psutil` 缺失是唯一运行异常。该运行暴露 workflow 需要显式安装项目已声明的 `psutil`，本次已补齐安装步骤；修复后的新运行尚未执行。
 
 ## 管理员 ETW 与 collector probe
+
+本轮远端闭环另受推送权限阻塞：补齐 `psutil` 的普通 push 被 GitHub 拒绝，提示当前 Personal Access Token 缺少更新 workflow 所需的 `workflow` scope；远端仍为 `95232da817281de6e615f3eea42c09fbae063572`。修复保留于本地，尚未触发新的 CI/ETW；未更换身份或绕过权限限制。Stage 3B 仅完成只读审计，尚未合并，须在 Stage 3A 精确目标提交的双平台验证及日志核对完成后继续。
 
 本轮 raw probe 两次、collector probe 两次均退出码 `0`，每次双向各 `524288` bytes。raw probe 证明 `pid_matched`；collector probe 另外确认完整的 name/exe/`create_time` identity，退出后四次精确 session 查询均为 `4201`。collector probe 通过 `python -c` 导入原 `collector_probe`，用 `functools.partial` 将既有 `WindowsProcessNetworkCollector` 配置为 `rate_window_seconds=2.0`，再调用原 `main()`；没有另造采集器或改变 probe 判据。
 
