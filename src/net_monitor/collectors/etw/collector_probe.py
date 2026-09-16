@@ -10,6 +10,8 @@ import threading
 import time
 from typing import Any, TextIO
 
+import psutil
+
 from net_monitor.collectors.etw.session import EtwSession
 from net_monitor.collectors.windows_network import WindowsProcessNetworkCollector
 from net_monitor.core.models import ProcessInfo, ProcessNetworkStats
@@ -124,17 +126,34 @@ def _read_child_pid(
 def _baseline_then_signal(
     collector: WindowsProcessNetworkCollector,
     child: subprocess.Popen[str],
-    child_pid: int,
+    process: ProcessInfo,
 ) -> ProcessInfo:
     """Baseline the actual child PID before allowing it to create traffic."""
 
-    process = ProcessInfo(pid=child_pid, name="net-monitor-probe-child")
     collector.collect((process,))
     if child.stdin is None:
         raise RuntimeError("collector probe child stdin is unavailable")
     child.stdin.write("start\n")
     child.stdin.flush()
     child.stdin.close()
+    return process
+
+
+def _get_child_process_info(child_pid: int) -> ProcessInfo:
+    """Read the controlled child identity while its owned process is alive."""
+
+    try:
+        child_process = psutil.Process(child_pid)
+        process = ProcessInfo(
+            pid=child_pid,
+            name=child_process.name(),
+            executable=child_process.exe(),
+            create_time=child_process.create_time(),
+        )
+    except (OSError, psutil.Error) as exc:
+        raise RuntimeError(f"collector probe child identity could not be read: {exc}") from exc
+    if not process.name or not process.executable or process.create_time is None or process.create_time <= 0:
+        raise RuntimeError("collector probe child identity was incomplete")
     return process
 
 
@@ -203,6 +222,52 @@ def _wait_for_bidirectional_stats(
     return latest
 
 
+def _wait_for_idle_stats(
+    collector: WindowsProcessNetworkCollector,
+    process: ProcessInfo,
+    active_stats: ProcessNetworkStats,
+) -> tuple[ProcessNetworkStats, float, bool, bool]:
+    """Verify non-decreasing totals and two consecutive exact-zero idle samples."""
+
+    started = time.monotonic()
+    deadline = started + _RESULT_TIMEOUT_SECONDS
+    if active_stats.upload_bytes is None or active_stats.download_bytes is None:
+        return active_stats, 0.0, False, False
+
+    previous = active_stats
+    stable_zero_samples = 0
+    latest: ProcessNetworkStats | None = None
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            if latest is None:
+                latest = collector.collect((process,))[0]
+            return latest, time.monotonic() - started, stable_zero_samples >= 2, False
+        time.sleep(min(_RESULT_POLL_INTERVAL_SECONDS, remaining))
+        latest = collector.collect((process,))[0]
+        if latest.upload_bytes is None or latest.download_bytes is None:
+            return latest, time.monotonic() - started, False, False
+        if latest.upload_bytes < previous.upload_bytes or latest.download_bytes < previous.download_bytes:
+            return latest, time.monotonic() - started, False, False
+        totals_stable = (
+            latest.upload_bytes == previous.upload_bytes
+            and latest.download_bytes == previous.download_bytes
+        )
+        rates_zero = (
+            latest.upload_bytes_per_second == 0
+            and latest.download_bytes_per_second == 0
+        )
+        if totals_stable and rates_zero:
+            stable_zero_samples += 1
+        else:
+            stable_zero_samples = 0
+        if stable_zero_samples >= 2:
+            return latest, time.monotonic() - started, True, True
+        previous = latest
+        if time.monotonic() >= deadline:
+            return latest, time.monotonic() - started, stable_zero_samples >= 2, False
+
+
 def run_probe(*, session_name: str | None = None) -> dict[str, object]:
     configured_name = session_name or os.environ.get(_SESSION_NAME_ENV)
     collector = WindowsProcessNetworkCollector(
@@ -262,7 +327,8 @@ def run_probe(*, session_name: str | None = None) -> dict[str, object]:
             raise RuntimeError("collector probe child output pipes are unavailable")
         stderr_reader, stderr_lines = _start_stream_reader(child.stderr)
         child_pid, stdout_reader, stdout_lines = _read_child_pid(child.stdout)
-        process = _baseline_then_signal(collector, child, child_pid)
+        process = _get_child_process_info(child_pid)
+        process = _baseline_then_signal(collector, child, process)
 
         try:
             child.wait(timeout=_CHILD_WAIT_TIMEOUT_SECONDS)
@@ -283,12 +349,31 @@ def run_probe(*, session_name: str | None = None) -> dict[str, object]:
             raise RuntimeError(f"collector probe TCP server failed: {server_errors[0]}")
 
         stats = _wait_for_bidirectional_stats(collector, process)
+        idle_stats, idle_window_seconds, idle_totals_stable, rates_recovered = _wait_for_idle_stats(
+            collector,
+            process,
+            stats,
+        )
         result = {
             "test_pid": child_pid,
+            "identity": {
+                "pid": process.pid,
+                "name": process.name,
+                "executable": process.executable,
+                "create_time": process.create_time,
+            },
+            "identity_verified": True,
             "upload_bytes": stats.upload_bytes or 0,
             "download_bytes": stats.download_bytes or 0,
             "upload_bytes_per_second": stats.upload_bytes_per_second or 0.0,
             "download_bytes_per_second": stats.download_bytes_per_second or 0.0,
+            "idle_upload_bytes": idle_stats.upload_bytes,
+            "idle_download_bytes": idle_stats.download_bytes,
+            "idle_upload_bytes_per_second": idle_stats.upload_bytes_per_second,
+            "idle_download_bytes_per_second": idle_stats.download_bytes_per_second,
+            "idle_window_seconds": idle_window_seconds,
+            "idle_totals_stable": idle_totals_stable,
+            "rates_recovered": rates_recovered,
             "collector_available": collector.available,
         }
     finally:
@@ -335,6 +420,12 @@ def main() -> int:
     if not bool(result["collector_closed"]):
         print("production collector did not close its ETW session", file=sys.stderr)
         return 4
+    if not bool(result.get("identity_verified", False)):
+        print("production collector probe did not verify child identity", file=sys.stderr)
+        return 5
+    if not bool(result.get("rates_recovered", False)):
+        print("production collector did not report zero idle rates", file=sys.stderr)
+        return 6
     return 0
 
 

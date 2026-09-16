@@ -185,6 +185,8 @@ GitHub Actions 不能替代真实桌面体验。Stage 3A 自动验证完成后�
 
 这些项目必须以实机体验为最终结论。
 
+本轮（2026-09-16）验收记录见 [Stage 3A 本轮验收记录](docs/stage3a-acceptance-2026-09-16.md)。本轮验收与修复已执行：本地自动测试、真实 ETW、主要桌面项及最终正常退出已有实际记录，修复版运行时长超过 30 分钟；Stage 3A 保留自动监测记录缺口、CPU 性能风险及最终本地提交未运行 CI 等未完事项，尚未宣告无保留全部完成。记录中的 workflow 链接属于既有 exact HEAD 历史运行；后续最终提交产生的新 HEAD 需要单独运行 CI，不能用这些历史结果替代。
+
 ## Stage 3A 范围边界
 
 本阶段不实现 SQLite、历史数据库、时间线、图表、sparkline、AI 分析、域名/IP/GeoIP、限速、防火墙、Npcap、WinDivert、WFP、驱动、开机启动、自动更新、installer、账号或云同步。

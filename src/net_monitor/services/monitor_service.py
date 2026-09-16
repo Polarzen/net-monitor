@@ -51,7 +51,8 @@ class MonitorService:
             self._last_process_refresh = now
 
         counters = self._system_network_collector.collect()
-        system = self._build_system_stats(counters, now)
+        sample_time = self._clock()
+        system = self._build_system_stats(counters, sample_time)
         process_network = self._process_network_collector.collect(self._processes)
         snapshot = MonitorSnapshot(
             system=system,
