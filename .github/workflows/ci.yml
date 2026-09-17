@@ -103,6 +103,20 @@ jobs:
           git diff --exit-code 09ff140dfa5c299840189fe02ede1b1cb95fd9cb HEAD -- src/net_monitor/core src/net_monitor/collectors src/net_monitor/services src/net_monitor/ui/sampling_worker.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Archive exact tracked source for reproducible review
+        shell: pwsh
+        run: |
+          git archive --format=zip --output="$env:RUNNER_TEMP/stage3c-source.zip" HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Prepare pinned font for offscreen Chinese layout evidence
+        shell: pwsh
+        run: |
+          .\.venv\Scripts\python.exe tools/layout_fonts.py --prepare "$env:RUNNER_TEMP/stage3c-fonts"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "NET_MONITOR_LAYOUT_FONT=$env:RUNNER_TEMP/stage3c-fonts/NotoSansCJKsc-Regular.otf" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "QT_QPA_FONTDIR=$env:RUNNER_TEMP/stage3c-fonts" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Render fake snapshot layouts at 100 125 and 150 percent
         shell: pwsh
         run: |
@@ -127,6 +141,7 @@ jobs:
           path: |
             ${{ runner.temp }}/stage3c-tests.xml
             ${{ runner.temp }}/stage3c-layouts/
+            ${{ runner.temp }}/stage3c-source.zip
           if-no-files-found: warn
 
       - name: Verify virtual environment is ignored

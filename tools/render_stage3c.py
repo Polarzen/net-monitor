@@ -13,6 +13,7 @@ import tempfile
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import PySide6
+from layout_fonts import configure_application
 from PySide6.QtWidgets import QApplication
 
 import net_monitor.ui.controller as controller_module
@@ -59,11 +60,12 @@ def main() -> int:
     assert Path(controller_module.__file__).resolve() == expected, "Wrong editable install/source loaded"
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     app = QApplication.instance() or QApplication([])
+    font_evidence = configure_application(app)
     app.setStyleSheet(DARK_STYLESHEET)
     metadata = {"fake_snapshot": True, "physical_desktop": False, "real_etw": False,
                 "sha": head, "controller_path": str(expected), "platform": platform.platform(),
                 "python": platform.python_version(), "pyside": PySide6.__version__,
-                "qt_scale_factor": scale, "renders": [], "label_metrics": []}
+                "qt_scale_factor": scale, "font": font_evidence, "renders": [], "label_metrics": []}
     clock_value = [0.0]
     service = FakeService()
     with tempfile.TemporaryDirectory(prefix="net-monitor-fake-layout-") as temporary:
