@@ -6,6 +6,12 @@ QWidget {
     color: #e8edf2;
     font-size: 10pt;
 }
+/* Fixed logical-pixel typography: Qt applies device scaling exactly once.
+   14 logical px is not a content-dependent font reduction. */
+QFrame#microWindow QLabel {
+    font-size: 14px;
+    background-color: transparent;
+}
 QMainWindow { background-color: #171a1f; }
 QLabel#titleLabel { font-size: 15pt; font-weight: 600; color: #f4f7fa; }
 QLabel#metricValue { font-size: 17pt; font-weight: 650; color: #f4f7fa; }
