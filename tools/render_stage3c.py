@@ -124,7 +124,9 @@ def main() -> int:
             (output / "fake-layout-manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
         assert service.closed == 1 and c.icon_worker_stopped
         assert c._worker is None
-    print(json.dumps(metadata, ensure_ascii=False))
+    # Keep console diagnostics portable to redirected Windows cp1252 streams.
+    # The on-disk manifest above remains UTF-8, without escaped Chinese text.
+    print(json.dumps(metadata, ensure_ascii=True))
     return 0
 
 
