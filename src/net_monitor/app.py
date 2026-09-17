@@ -13,6 +13,5 @@ def main() -> int:
     app.setApplicationName("Net Monitor")
     app.setStyleSheet(DARK_STYLESHEET)
     controller = UiController()
-    app.aboutToQuit.connect(controller.shutdown)
-    controller.show_compact()
+    controller.show_primary(activate=False)
     return app.exec()

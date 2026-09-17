@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.14
         uses: actions/setup-python@v6
@@ -32,7 +34,9 @@ jobs:
         shell: pwsh
         run: |
           python --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Write-Output "RUNNER_ARCH=$env:RUNNER_ARCH"
           Write-Output "PROCESSOR_ARCHITECTURE=$env:PROCESSOR_ARCHITECTURE"
           Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsName, OsVersion, OsArchitecture | Format-List
@@ -41,14 +45,20 @@ jobs:
         shell: pwsh
         run: |
           python -m venv .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .\.venv\Scripts\python.exe --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .\.venv\Scripts\python.exe -m pip --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Install project in virtual environment
+        id: install
         shell: pwsh
         run: |
           .\.venv\Scripts\python.exe -m pip install --upgrade pip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Import package
         shell: pwsh
@@ -80,14 +90,44 @@ jobs:
         shell: pwsh
         run: |
           whoami
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
           $principal = [Security.Principal.WindowsPrincipal]::new($identity)
           $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
           Write-Output "IsAdministrator=$isAdmin"
 
-      - name: Run complete test suite
+      - name: Verify Stage 3C frozen kernel
+        if: github.ref_name == 'feat/stage-3c-micro-widget' || github.head_ref == 'feat/stage-3c-micro-widget'
         shell: pwsh
-        run: .\.venv\Scripts\python.exe -m pytest -v
+        run: |
+          git diff --exit-code 09ff140dfa5c299840189fe02ede1b1cb95fd9cb HEAD -- src/net_monitor/core src/net_monitor/collectors src/net_monitor/services src/net_monitor/ui/sampling_worker.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Render fake snapshot layouts at 100 125 and 150 percent
+        shell: pwsh
+        run: |
+          foreach ($scale in @("1", "1.25", "1.5")) {
+            $env:QT_SCALE_FACTOR = $scale
+            .\.venv\Scripts\python.exe tools/render_stage3c.py --output "$env:RUNNER_TEMP/stage3c-layouts" --platform "${{ matrix.image }}"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          Remove-Item Env:QT_SCALE_FACTOR
+
+      - name: Run complete test suite
+        if: success() || (failure() && steps.install.outcome == 'success')
+        shell: pwsh
+        run: .\.venv\Scripts\python.exe -m pytest -v -ra --junitxml="$env:RUNNER_TEMP/stage3c-tests.xml"
+
+      - name: Upload tests and fake snapshot layouts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage3c-${{ matrix.image }}-${{ github.sha }}
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/stage3c-tests.xml
+            ${{ runner.temp }}/stage3c-layouts/
+          if-no-files-found: warn
 
       - name: Verify virtual environment is ignored
         shell: pwsh

@@ -7,6 +7,7 @@ on:
       - feat/etw-network-poc
       - feat/etw-process-collector
       - feat/stage-3b
+      - feat/stage-3c-micro-widget
     paths:
       - ".github/workflows/etw-experiment.yml"
       - "pyproject.toml"
@@ -35,6 +36,12 @@ on:
       - "tests/test_etw_session.py"
       - "tests/test_network_aggregator.py"
       - "tests/test_windows_network.py"
+      - "src/net_monitor/ui/**"
+      - "tests/test_stage3c*.py"
+      - "tools/render_stage3c.py"
+      - ".github/workflows/ci.yml"
+      - "README.md"
+      - "docs/stage3c*.md"
 
 jobs:
   etw-experiment:
@@ -46,6 +53,7 @@ jobs:
           - windows-2025
           - windows-11-arm
     runs-on: ${{ matrix.image }}
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -60,6 +68,7 @@ jobs:
         shell: pwsh
         run: |
           python --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Write-Output "RUNNER_ARCH=$env:RUNNER_ARCH"
           Write-Output "PROCESSOR_ARCHITECTURE=$env:PROCESSOR_ARCHITECTURE"
           Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsName, OsVersion, OsArchitecture | Format-List
@@ -68,9 +77,13 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install pytest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install psutil
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip install -e . --no-deps
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Query Kernel Network ETW provider
         shell: pwsh
@@ -86,6 +99,7 @@ jobs:
         shell: pwsh
         run: |
           whoami
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
           $principal = [Security.Principal.WindowsPrincipal]::new($identity)
           $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -94,25 +108,34 @@ jobs:
       - name: Run ETW unit tests
         shell: pwsh
         run: |
-          python -m pytest -v `
+          python -m pytest -v --junitxml="$env:RUNNER_TEMP/etw-tests.xml" `
             tests/test_etw_events.py `
             tests/test_etw_session.py `
             tests/test_network_aggregator.py `
             tests/test_windows_network.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run live ETW loopback probe twice with same session name
         shell: pwsh
         run: |
           $env:NET_MONITOR_ETW_SESSION_NAME = "NetMonitor-ETW-Experiment-${{ matrix.image }}"
           python -m net_monitor.collectors.etw.probe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Output "RawProbe1ExitCode=0"
           python -m net_monitor.collectors.etw.probe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Output "RawProbe2ExitCode=0"
 
       - name: Run production collector probe twice with same session name
         shell: pwsh
         run: |
           $env:NET_MONITOR_ETW_SESSION_NAME = "NetMonitor-Collector-Experiment-${{ matrix.image }}"
           python -m net_monitor.collectors.etw.collector_probe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Output "ProductionProbe1ExitCode=0"
           python -m net_monitor.collectors.etw.collector_probe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Output "ProductionProbe2ExitCode=0"
 
       - name: Characterize ETW permission as a standard local user
         shell: pwsh
@@ -150,6 +173,15 @@ jobs:
               Remove-LocalUser -Name $userName
             }
           }
+
+      - name: Upload ETW test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: etw-${{ matrix.image }}-${{ github.sha }}
+          path: ${{ runner.temp }}/etw-tests.xml
+          retention-days: 7
+          if-no-files-found: warn
 
       - name: Show repository status
         shell: pwsh
