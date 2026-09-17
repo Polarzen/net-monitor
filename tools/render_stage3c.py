@@ -103,6 +103,20 @@ def main() -> int:
             capture(c.card, "card-active")
             detail = c.show_details()
             capture(detail, "detail-live")
+            retired = ApplicationSessionStats("process:777:123.0", "已退出应用.exe", None,
+                                               2**64 + 17, 1024**3, 0)
+            data = replace(data, application_session=(*data.application_session, retired))
+            c._on_snapshot(data)
+            detail.tabs.setCurrentWidget(detail.session_view)
+            capture(detail, "detail-session")
+            assert retired.key in detail.session_view._items
+            c.follow(retired.key)
+            check_micro("micro-not-running")
+            capture(c.card, "card-retired-total")
+            assert str(f"{retired.upload_bytes:,}") in c.card.session_totals.values.text()
+            c.card.scroll.verticalScrollBar().setValue(c.card.scroll.verticalScrollBar().maximum())
+            capture(c.card, "card-retired-controls")
+            c.card.scroll.verticalScrollBar().setValue(0)
             c.follow(application_key(data.processes[3]))
             check_micro("micro-focused-idle")
             capture(c.card, "card-focused-idle")
@@ -114,6 +128,8 @@ def main() -> int:
             c._refresh_views()
             check_micro("micro-stale")
             capture(c.card, "card-stale")
+            capture(detail, "detail-session-stale")
+            assert all(item.text(3) == "—" for item in detail.session_view._items.values())
         finally:
             c.shutdown()
             app.processEvents()
@@ -124,8 +140,7 @@ def main() -> int:
             (output / "fake-layout-manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
         assert service.closed == 1 and c.icon_worker_stopped
         assert c._worker is None
-    # Keep console diagnostics portable to redirected Windows cp1252 streams.
-    # The on-disk manifest above remains UTF-8, without escaped Chinese text.
+    # stdout may be cp1252 on Windows runners; disk evidence remains UTF-8.
     print(json.dumps(metadata, ensure_ascii=True))
     return 0
 

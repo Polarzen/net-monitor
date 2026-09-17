@@ -121,7 +121,7 @@ class CompactWindow(QMainWindow):
         metrics.addWidget(download_card, 0, 0)
         metrics.addWidget(upload_card, 0, 1)
 
-        self._active_count = QLabel("0 个应用正在联网")
+        self._active_count = QLabel("当前联网应用数未知")
         self._active_count.setObjectName("secondaryLabel")
 
         self._permission_frame = QFrame()
@@ -144,6 +144,7 @@ class CompactWindow(QMainWindow):
         self._empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._empty_label.setObjectName("secondaryLabel")
         empty_layout.addWidget(self._empty_label)
+        self._empty_frame.hide()
 
         self._rows = [CompactAppRow() for _ in range(self._top_count)]
         rows_layout = QVBoxLayout()
@@ -206,7 +207,15 @@ class CompactWindow(QMainWindow):
 
         active = [] if not state.available else [group for group in groups if self._is_active(group)]
         active.sort(key=self._activity_score, reverse=True)
-        self._active_count.setText(f"{len(active)} 个应用正在联网")
+        partial_unknown = any(g.upload_bytes_per_second is None or g.download_bytes_per_second is None
+                              for g in groups)
+        count_text = ("当前联网应用数未知" if not state.available else
+                      f"至少 {len(active)} 个应用正在联网；另有数据未知" if partial_unknown else
+                      f"{len(active)} 个应用正在联网")
+        self._active_count.setText(count_text)
+        self._empty_label.setText("部分可见应用数据未知，不能判断全部空闲。" if partial_unknown else
+                                  "暂无可见应用数据；不代表整机没有网络活动。" if not groups else
+                                  "当前没有第三方应用正在使用网络（默认可见范围）。")
         self._empty_frame.setVisible(state.available and not active)
 
         for index, row in enumerate(self._rows):
@@ -237,9 +246,11 @@ class CompactWindow(QMainWindow):
         self._permission_frame.setVisible(permission_denied)
         self._restart_button.setVisible(permission_denied)
         self._status_label.setText(self._status_text(state))
-        self._status_label.setObjectName(self._status_object_name(state))
-        self._status_label.style().unpolish(self._status_label)
-        self._status_label.style().polish(self._status_label)
+        object_name = self._status_object_name(state)
+        if self._status_label.objectName() != object_name:
+            self._status_label.setObjectName(object_name)
+            self._status_label.style().unpolish(self._status_label)
+            self._status_label.style().polish(self._status_label)
         self._status_label.setToolTip(state.message or "")
 
     def _restart_with_elevation(self) -> None:

@@ -39,6 +39,8 @@ on:
       - "src/net_monitor/ui/**"
       - "tests/test_stage3c*.py"
       - "tools/render_stage3c.py"
+      - "tools/layout_fonts.py"
+      - "tests/conftest.py"
       - ".github/workflows/ci.yml"
       - "README.md"
       - "docs/stage3c*.md"

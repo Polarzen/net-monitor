@@ -14,6 +14,7 @@ from net_monitor.core.models import (
     ApplicationSessionStats, MonitorSnapshot, ProcessNetworkState, ProcessNetworkStatus,
 )
 from net_monitor.core.process_visibility import ProcessClassifier, visible_processes
+from net_monitor.ui.session_model import observed_process_count
 
 CHALLENGER_SECONDS = 2.0
 STALE_SECONDS = 4.0
@@ -221,7 +222,9 @@ class MicroProjection:
         if status in (ProcessNetworkStatus.UNAVAILABLE, ProcessNetworkStatus.STOPPED):
             return DisplayState.UNAVAILABLE
         if status is ProcessNetworkStatus.STARTING:
-            return DisplayState.STARTING
+            anchor = self._received_at if self._received_at is not None else self._created_at
+            return (DisplayState.STALE if self.clock() - anchor >= self.stale_seconds
+                    else DisplayState.STARTING)
         if self.last_valid_at is None or self.clock() - self.last_valid_at >= self.stale_seconds:
             return DisplayState.STALE
         return DisplayState.ACTIVE
@@ -276,7 +279,8 @@ class MicroProjection:
                     state, message = DisplayState.UNKNOWN, "当前速率可见，但身份不稳定；不能跨刷新固定关注或关联累计"
             elif self._focus is not None:
                 # A missing row alone is never evidence of exit.
-                if account is not None and account.active_process_count == 0:
+                if (account is not None and self.snapshot is not None
+                        and observed_process_count(account, self.snapshot) == 0):
                     state, message = DisplayState.NOT_RUNNING, "按当前可信账户与进程枚举：未运行"
                     upload = download = 0.0
                 else:

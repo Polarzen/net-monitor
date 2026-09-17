@@ -106,7 +106,7 @@ jobs:
       - name: Archive exact tracked source for reproducible review
         shell: pwsh
         run: |
-          git archive --format=zip --output="$env:RUNNER_TEMP/stage3c-source.zip" HEAD
+          git -c core.autocrlf=false archive --format=zip --output="$env:RUNNER_TEMP/stage3c-source.zip" HEAD
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Prepare pinned font for offscreen Chinese layout evidence

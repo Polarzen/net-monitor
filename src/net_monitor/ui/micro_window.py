@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from net_monitor.ui.micro_model import MICRO_SIZE, AppChoice, WidgetFrame, format_rate
+from net_monitor.ui.session_view import SessionTotals
 
 
 def set_text(label: QLabel, text: str) -> None:
@@ -117,7 +118,7 @@ class MicroWindow(QFrame):
             name, Qt.TextElideMode.ElideRight, max(1, self.name_label.width()))
         set_text(self.name_label, display_name)
         self.name_label.setToolTip(name)
-        set_text(self.badge_label, "●" if frame.focused else "·" if frame.source_usable else "!")
+        set_text(self.badge_label, "!" if not frame.source_usable else "●" if frame.focused else "·")
         self.badge_label.setToolTip(("固定关注；" if frame.focused else "自动显示；") + frame.state.value)
         set_text(self.download_label, "↓ " + format_rate(frame.download, compact=True))
         set_text(self.upload_label, "↑ " + format_rate(frame.upload, compact=True))
@@ -236,6 +237,7 @@ class ApplicationCard(QFrame):
             row.key_activated.connect(self.follow_requested.emit)
             row.hide()
         self.top_caption = plain_label("当前可见应用 Top 3（按当前速率）")
+        self.session_totals = SessionTotals()
 
         header = QHBoxLayout()
         header.addWidget(self.icon_label)
@@ -258,6 +260,7 @@ class ApplicationCard(QFrame):
         self.body_layout.addWidget(self.mode_label)
         self.body_layout.addWidget(self.rates_label)
         self.body_layout.addLayout(attention)
+        self.body_layout.addWidget(self.session_totals)
         self.body_layout.addWidget(self.top_caption)
         for row in self._top_rows:
             self.body_layout.addWidget(row)
@@ -294,6 +297,7 @@ class ApplicationCard(QFrame):
         set_text(self.mode_label, "固定关注" if frame.focused else "自动显示（对象切换有防抖）")
         set_text(self.rates_label, "↓ 下载 " + format_rate(frame.download)
                  + "\n↑ 上传 " + format_rate(frame.upload))
+        self.session_totals.apply_frame(frame)
         self.focus_button.bind(choice.key if choice else "", "固定关注",
                                enabled=bool(choice and choice.can_follow and not frame.focused))
         self.unfocus_button.setVisible(frame.focused)
