@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QPoint, Qt, Signal
-from PySide6.QtGui import QCloseEvent, QIcon, QKeySequence, QMouseEvent, QShortcut
+from PySide6.QtGui import QCloseEvent, QIcon, QKeyEvent, QKeySequence, QMouseEvent, QShortcut
 from PySide6.QtWidgets import (
-    QApplication, QFrame, QHBoxLayout, QLabel, QMenu, QPushButton,
+    QApplication, QFrame, QHBoxLayout, QLabel, QPushButton,
     QScrollArea, QSizePolicy, QVBoxLayout, QWidget,
 )
 
@@ -60,6 +60,123 @@ class KeyButton(QPushButton):
             self.setText(text)
         if self.isEnabled() != enabled:
             self.setEnabled(enabled)
+
+
+class ApplicationChooser(QFrame):
+    """Bounded popup for browsing every application choice."""
+
+    closed = Signal()
+    choice_selected = Signal(str)
+
+    WIDTH = 372
+    HEIGHT = 460
+
+    def __init__(self, choices: tuple[AppChoice, ...], parent: QWidget | None = None) -> None:
+        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        self.setObjectName("applicationChooser")
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setStyleSheet(
+            "QFrame#applicationChooser { background:#20242b; border:1px solid #465260; "
+            "border-radius:10px; }"
+        )
+        self.setFixedSize(self.WIDTH, self.HEIGHT)
+        self._closed_emitted = False
+
+        title = plain_label("选择应用")
+        title.setStyleSheet("font-weight:600; padding:4px 6px 2px 6px;")
+
+        body = QWidget()
+        body_layout = QVBoxLayout(body)
+        body_layout.setContentsMargins(4, 4, 4, 4)
+        body_layout.setSpacing(4)
+        self._buttons: list[QPushButton] = []
+        for choice in choices:
+            # Keep the visible row compact even when the executable path is very
+            # long; the full identity remains available in the tooltip and key
+            # binding below.
+            button = QPushButton(choice.name.replace("&", "&&"))
+            button.setEnabled(choice.can_follow)
+            button.setMinimumHeight(40)
+            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            button.setToolTip(
+                f"{choice.name}\n{choice.executable or choice.key}\n"
+                + ("固定关注此 application key" if choice.can_follow
+                   else "身份不稳定，不能固定关注")
+            )
+            button.clicked.connect(
+                lambda checked=False, key=choice.key: self._select(key)
+            )
+            body_layout.addWidget(button)
+            self._buttons.append(button)
+        if not choices:
+            empty = plain_label("暂无可选择的应用")
+            empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            body_layout.addWidget(empty)
+        body_layout.addStretch()
+
+        self.scroll = QScrollArea()
+        self.scroll.setObjectName("applicationChooserScroll")
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll.setWidget(body)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(2)
+        layout.addWidget(title)
+        layout.addWidget(self.scroll, 1)
+
+    def show_at(self, anchor: QPoint, reference: QWidget) -> None:
+        """Place below the trigger when possible, clamped to screen work area."""
+
+        screen = QApplication.screenAt(anchor) or reference.screen() or QApplication.primaryScreen()
+        if screen is None:
+            self.show()
+            return
+        area = screen.availableGeometry()
+        width = min(self.WIDTH, max(1, area.width()))
+        height = min(self.HEIGHT, max(1, area.height()))
+        self.setFixedSize(width, height)
+        right = area.right() - width + 1
+        bottom = area.bottom() - height + 1
+        x = min(max(anchor.x(), area.left()), right)
+        y = anchor.y()
+        if y > bottom:
+            reference_top = reference.mapToGlobal(QPoint(0, 0)).y()
+            y = reference_top - height
+        y = min(max(y, area.top()), bottom)
+        self.move(x, y)
+        self.show()
+        self.raise_()
+
+    def _select(self, key: str) -> None:
+        self.close()
+        self.choice_selected.emit(key)
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key.Key_Escape:
+            event.accept()
+            self.close()
+            return
+        super().keyPressEvent(event)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        self._notify_closed()
+        super().closeEvent(event)
+
+    def hideEvent(self, event) -> None:
+        # Qt.Popup can dismiss itself by hiding on an outside click. Keep the
+        # card's lifecycle state in sync for both hide and close paths.
+        self._notify_closed()
+        super().hideEvent(event)
+
+    def _notify_closed(self) -> None:
+        if not self._closed_emitted:
+            self._closed_emitted = True
+            self.closed.emit()
 
 
 class MicroWindow(QFrame):
@@ -233,7 +350,7 @@ class ApplicationCard(QFrame):
         self.setStyleSheet("QFrame#applicationCard { border:1px solid #465260; border-radius:10px; }")
         self.resize(372, 460)
         self._frame: WidgetFrame | None = None
-        self._chooser: QMenu | None = None
+        self._chooser: ApplicationChooser | None = None
         self._menu_open = False
         self.icon_label = QLabel()
         self.icon_label.setFixedSize(24, 24)
@@ -352,24 +469,31 @@ class ApplicationCard(QFrame):
         self.interacted.emit()
         if self._frame is None:
             return
-        # Freeze this menu's key bindings until it closes. Never update it on tick.
-        menu = QMenu(self)
-        for choice in self._frame.choices:
-            label = f"{choice.name} — {choice.executable or choice.key}".replace("&", "&&")
-            action = menu.addAction(label)
-            action.setEnabled(choice.can_follow)
-            action.setToolTip("固定关注此 application key" if choice.can_follow else "身份不稳定，不能固定关注")
-            action.triggered.connect(lambda checked=False, key=choice.key: self.follow_requested.emit(key))
-        if not self._frame.choices:
-            menu.addAction("暂无可选择的应用").setEnabled(False)
-        self._chooser = menu
+        if self._chooser is not None and self._chooser.isVisible():
+            self._chooser.raise_()
+            return
+        # Freeze this popup's key bindings until it closes. Never update it on tick.
+        chooser = ApplicationChooser(self._frame.choices, self)
+        chooser.choice_selected.connect(self.follow_requested.emit)
+        chooser.closed.connect(lambda chooser=chooser: self._chooser_closed(chooser))
+        self._chooser = chooser
         self._menu_open = True
-        try:
-            menu.exec(self.choose_button.mapToGlobal(self.choose_button.rect().bottomLeft()))
-        finally:
-            self._menu_open = False
-            self._chooser = None
-            menu.deleteLater()
+        chooser.show_at(
+            self.choose_button.mapToGlobal(self.choose_button.rect().bottomLeft()),
+            self.choose_button,
+        )
+
+    def _chooser_closed(self, chooser: ApplicationChooser) -> None:
+        if self._chooser is not chooser:
+            return
+        self._menu_open = False
+        self._chooser = None
+        chooser.deleteLater()
+
+    def hideEvent(self, event) -> None:
+        if self._chooser is not None:
+            self._chooser.close()
+        super().hideEvent(event)
 
     def enterEvent(self, event) -> None:
         self.entered.emit()
