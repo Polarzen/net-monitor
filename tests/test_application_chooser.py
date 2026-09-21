@@ -92,4 +92,3 @@ def test_application_chooser_escape_and_hide_clear_card_state_and_reopen(make_co
     QTest.keyClick(second, Qt.Key.Key_Escape)
     app.processEvents()
     assert card._chooser is None and not card._menu_open
-
