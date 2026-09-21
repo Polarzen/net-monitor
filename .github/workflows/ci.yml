@@ -97,7 +97,7 @@ jobs:
           Write-Output "IsAdministrator=$isAdmin"
 
       - name: Verify Stage 3C frozen kernel
-        if: github.ref_name == 'feat/stage-3c-micro-widget' || github.head_ref == 'feat/stage-3c-micro-widget'
+        if: github.ref_name == 'feat/stage-3c-micro-widget' || github.head_ref == 'feat/stage-3c-micro-widget' || github.ref_name == 'feat/stage-3d-micro-presence' || github.head_ref == 'feat/stage-3d-micro-presence'
         shell: pwsh
         run: |
           git diff --exit-code 09ff140dfa5c299840189fe02ede1b1cb95fd9cb HEAD -- src/net_monitor/core src/net_monitor/collectors src/net_monitor/services src/net_monitor/ui/sampling_worker.py

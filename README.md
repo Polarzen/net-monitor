@@ -2,19 +2,20 @@
 
 Net Monitor 是一个面向 Windows 11 的轻量第三方应用网络活动监视器。它的核心问题不是“做另一个任务管理器”，而是让用户随时看一眼：**现在谁在联网、谁正在下载、谁正在上传、哪个应用最活跃。**
 
-当前版本：**v0.2 / Stage 3C 微型应用状态窗与会话累计展示**。
+当前版本：**v0.3 / Stage 3D Micro Presence**。
 
-实现、验证范围和指定桌面待验收项目见 [Stage 3C 记录](docs/stage3c-micro-widget.md)。
+实现、验证范围和指定桌面待验收项目见 [Stage 3D 记录](docs/stage3d-micro-presence.md)。Stage 3D 在 Stage 3C 的采集、聚合、会话累计和多层窗口能力上做增量升级。
 
 ## 产品形态
 
 新用户默认启动 **微型模式**；显示偏好可恢复上次选择的主模式。
 
-- 微型窗：固定 **112×72 Qt 逻辑像素**，小圆角矩形，显示本地应用图标、短名称和上下行；长名称省略，完整信息在卡片。B 是字节，KiB/MiB 为 1024 进位，不是 bit/s。数字变化不改变窗体尺寸。
+- 微型窗：固定 **220×112 Qt 逻辑像素**（不超过 240×140 上限），显示一个当前主导应用、上传/下载实时速率和前台/后台/状态未知；没有可信正速率时显示 quiet state。固定关注时保留关注对象，即使当前为 0 B/s。长名称省略，完整名称在 Tooltip 和卡片中提供。B 是字节，KiB/MiB 为 1024 进位，不是 bit/s。数字变化不改变窗体尺寸。
 - 展开卡片：悬停约 350 ms 预览，跨入卡片不立即收起；离开联合区域延迟收起。点击后保持，Esc 收起。显示完整名称、可读路径、当前上下行、Top 3、固定关注及本次监控累计。`选择应用…` 不限于排行榜；从卡片点开菜单再选应用，共两次点击。
 - Compact：原约 380 px 宽 Top 5 视图保留。微型窗右键菜单、卡片菜单或托盘可切回原 Compact；同一时刻只有一个主入口。
 - Detailed：同一详细窗口保留 `application → PID` 树、原始数值排序和实时筛选；新增 **本次监控累计** 页签，已退出账户仍可查看，实时页筛选不删除累计账户。
 - 固定关注绑定可信 application key，不绑定显示名称、PID 或排序位置。其他应用更快也不抢走对象；取消后恢复自动。本轮仅在当前运行期间保留关注。
+- Micro Presence 的前台状态来自 Win32 当前前台窗口的 HWND/PID 查询；它不新增进程扫描。foreground PID 只有在当前快照中与 `create_time != None` 的可信成员匹配时才显示“前台”；无法可靠关联时显示“状态未知”，不会伪装成“后台”。
 - 窗口置顶和固定关注是不同操作。置顶默认关闭，微型窗置顶不会强制 Detailed 置顶。自动刷新、自动选择与悬停预览不主动激活窗口；实际焦点行为仍需物理桌面验收。
 
 自动选择按原始上下行之和排序，稳定处理并列。首次有效数据立即选择；当前对象仍有流量时，挑战者持续领先约 2 秒后切换，当前归零则可立即换到有效候选。防抖只改变显示对象，不平滑速率或延长旧正速率；卡片 Top 3 始终按当前原始数值排序。
@@ -39,7 +40,7 @@ upload rate > 0 OR download rate > 0
 
 ## 架构
 
-Stage 3C 冻结已验收 Stage 3B 内核，不为多个窗口各开一套采集器。运行时保持单数据源：
+Stage 3D 保留 Stage 3C 冻结的 Stage 3B 内核，不为多个窗口各开一套采集器。运行时保持单数据源：
 
 ```text
 ETW thread
@@ -62,6 +63,8 @@ UiController / shared MonitorSnapshot
 - 一个 ETW Session
 
 Detailed View 只消费 controller 已有的 snapshot，不创建第二个采集生命周期。
+
+Micro Presence 是 UI 投影：`UiController` 在既有约 500 ms heartbeat 中最多读取一次当前 foreground PID，再与 `MicroProjection` 已有 selected application 成员比较。查询包装器通过依赖注入测试；它不是线程、service、timer 或 collector。网络速率、application session、自动选择和固定关注都与前后台状态分离。
 
 ## 网络采集
 
@@ -178,7 +181,7 @@ python -m pytest -v
 - `[project.gui-scripts]` 配置
 - Windows 安装后的 `net-monitor.exe` PE Subsystem 必须为 `IMAGE_SUBSYSTEM_WINDOWS_GUI`
 
-Stage 3C 另增可控单调时钟的选择/防抖/过期、精确 key 关注、未知状态、卡片与详细窗口单实例、模式切换与单 Worker、悬停联合区域、拖动、设置损坏、负坐标恢复、异步图标缓存、累计账户保留与大整数原始排序等测试。隐藏累计页签只接收引用，不重绘树；重复快照不增加流量。
+Stage 3C 另增可控单调时钟的选择/防抖/过期、精确 key 关注、未知状态、卡片与详细窗口单实例、模式切换与单 Worker、悬停联合区域、拖动、设置损坏、负坐标恢复、异步图标缓存、累计账户保留与大整数原始排序等测试。Stage 3D 增加 Presence 的 foreground/background/unknown 纯逻辑测试、220×112 默认尺寸与 240×140 上限、长名称 elide/Tooltip、quiet/固定关注 idle、状态文本和每次 heartbeat 至多一次 foreground 查询的约束测试。隐藏累计页签只接收引用，不重绘树；重复快照不增加流量。
 
 CI 使用 real widgets + **fake snapshot** 生成 100% / 125% / 150% 渲染，并检查字体字形、微型尺寸、速率宽度/高度；失败先保存 PNG 和诊断。测试专用 Noto CJK 字体锁定上游提交和 Git blob、校验字节，不打包或上传字体。JUnit、布局、环境/完整 SHA 和精确源码归档作为短期产物。它们不是真实桌面截图或 ETW 流量证据。
 
@@ -198,13 +201,13 @@ ETW Experiment 继续在双平台执行：
 - same-session restart cleanup
 - standard local user permission behavior
 
-Stage 3C 分支、UI/测试/辅助工具和工作流文件均纳入 branch/path triggers。每次 raw/production probe 独立传播原生命令退出码，不以第二次成功掩盖第一次失败；保留两平台、psutil 与真实子进程 PID 握手。CI 还比较冻结内核与精确 Stage 3B 基线的 diff。
+Stage 3C 和 Stage 3D 分支、UI/测试/辅助工具和工作流文件均纳入 branch/path triggers。每次 raw/production probe 独立传播原生命令退出码，不以第二次成功掩盖第一次失败；保留两平台、psutil 与真实子进程 PID 握手。CI 还比较冻结内核与精确 Stage 3B 基线的 diff。
 
 ## Windows 11 x64 物理机仍需验收
 
-GitHub Actions 不替代真实桌面体验。**新微型窗仍待** Windows 11 物理桌面确认 100% / 125% / 150% 可读性、悬停/刷新不抢焦点、拖动无误触、卡片不闪烁越界、多显示器负坐标与拔插恢复、托盘按当前模式恢复、UAC 接受/取消、实际无控制台启动和退出清理。旧 GUI 与旧 150% 缩放结论不能直接算作新 UI 通过。
+GitHub Actions 不替代真实桌面体验。**Stage 3D Micro Presence 仍待** Windows 11 物理桌面确认 100% / 125% / 150% 可读性、前台/后台切换、状态未知边界、悬停/刷新不抢焦点、拖动无误触、卡片不闪烁越界、多显示器负坐标与拔插恢复、托盘按当前模式恢复、UAC 接受/取消、实际无控制台启动和退出清理。CI 的 fake snapshot 和布局证据不代表物理桌面行为已经通过。
 
-本机验证仅针对上述桌面差异，先核对实际加载源码路径和精确 SHA；不默认要求重跑全量 pytest/ETW 或 30 分钟驻留。当前开发环境不是用户 Windows 本机，未启动其 GUI、ETW 或 Codex。小窗口不意味着更低内存或 CPU；无新的同机性能证据，不作 CPU/内存降低或长期无泄漏保证。
+本机验证应针对上述桌面差异，先核对实际加载源码路径和精确 SHA；验证结论以本阶段记录和实际观测为准，不把历史记录或 CI fake snapshot 当作当前物理结果。小窗口不意味着更低内存或 CPU；无新的同机性能证据，不作 CPU/内存降低或长期无泄漏保证。
 
 2026-09-16 的历史验收记录见 [Stage 3A 历史验收记录](docs/stage3a-acceptance-2026-09-16.md)。
 
@@ -214,6 +217,6 @@ GitHub Actions 不替代真实桌面体验。**新微型窗仍待** Windows 11 �
 
 正式观察于 `2026-09-16 20:49:57–21:19:58+08` 完成 `1800.0012464s`、31 个连续样本；2 秒 collector probe 停流后约 `2.25s` 严格归零，GUI 观察中启动期外未再复现规律性双零，用户确认窗口、数据和托盘正常。该观察属于已验证的 Stage 3A 精确提交；该历史记录中的“待集成”不是当前状态：本轮基于远端 Stage 3B `09ff140dfa5c299840189fe02ede1b1cb95fd9cb` 续接 Stage 3C，当前验证以对应功能分支精确 SHA 的交付报告为准。
 
-## Stage 3C 范围边界
+## Stage 3D 范围边界
 
-本阶段不提供网络加速、任务完成识别、动画宠物、流量控制，也不实现 SQLite、历史数据库、时间线、图表、sparkline、AI 分析、域名/IP/GeoIP、限速、防火墙、Npcap、WinDivert、WFP、驱动、开机启动、自动更新、installer、账号或云同步。
+本阶段不提供网络加速、任务完成识别、动画宠物、流量控制，也不实现 SQLite、历史数据库、时间线、图表、sparkline、AI 分析、域名/IP/GeoIP、限速、防火墙、Npcap、WinDivert、WFP、驱动、开机启动、自动更新、installer、账号或云同步。速率历史属于后续阶段；Micro Presence 只投影当前选中应用及其当前网络和前后台状态。

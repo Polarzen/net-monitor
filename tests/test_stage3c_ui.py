@@ -108,7 +108,7 @@ def test_micro_default_fixed_dimensions_name_elision_and_plain_text(make_control
         assert window.rect().contains(label.geometry())
     c._on_snapshot(snapshot(idle=True))
     assert (window.width(), window.height()) == MICRO_SIZE
-    assert window.upload_label.text() == "↑ 0 B/s"
+    assert window.upload_label.text() == "↑ 上传 0 B/s"
 
 
 def test_preview_and_updates_do_not_activate_windows(make_controller, monkeypatch):

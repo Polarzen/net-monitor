@@ -8,6 +8,7 @@ on:
       - feat/etw-process-collector
       - feat/stage-3b
       - feat/stage-3c-micro-widget
+      - feat/stage-3d-micro-presence
     paths:
       - ".github/workflows/etw-experiment.yml"
       - "pyproject.toml"

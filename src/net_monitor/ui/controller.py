@@ -15,13 +15,17 @@ from net_monitor.services.monitor_service import MonitorService
 from net_monitor.ui.compact_window import CompactWindow
 from net_monitor.ui.detail_window import DetailWindow
 from net_monitor.ui.icon_cache import IconCache
-from net_monitor.ui.micro_model import COLLAPSE_MS, HOVER_MS, UI_TICK_MS, DisplayState, MicroProjection
+from net_monitor.ui.micro_model import (
+    COLLAPSE_MS, HOVER_MS, UI_TICK_MS, DisplayState, MicroProjection,
+    PresenceState, resolve_presence,
+)
 from net_monitor.ui.micro_window import ApplicationCard, MicroWindow
 from net_monitor.ui.preferences import PreferencesStore, UiPreferences
 from net_monitor.ui.sampling_worker import SamplingWorker
 from net_monitor.ui.tray import TrayController
 from net_monitor.ui.window_geometry import Rect, fit_rect, place_card
 from net_monitor.ui.windows_icons import read_local_icon
+from net_monitor.ui.windows_foreground import read_foreground_pid
 
 
 class UiController(QObject):
@@ -34,6 +38,7 @@ class UiController(QObject):
         clock: Callable[[], float] = time.monotonic,
         preferences_store: PreferencesStore | None = None,
         icon_reader: Callable | None = None,
+        foreground_pid_reader: Callable[[], int | None] | None = None,
     ) -> None:
         super().__init__()
         self._app = QApplication.instance()
@@ -56,6 +61,7 @@ class UiController(QObject):
         self._main_menu_open = False
         self._screens: list = []
         self.projection = MicroProjection(clock=clock)
+        self._foreground_pid_reader = foreground_pid_reader or read_foreground_pid
         self.preferences_store = preferences_store or PreferencesStore()
         preferences = self.preferences_store.load()
         self._last_saved = preferences
@@ -95,7 +101,7 @@ class UiController(QObject):
         self._collapse_timer.timeout.connect(self._collapse_if_outside)
         self._heartbeat = QTimer(self)
         self._heartbeat.setInterval(UI_TICK_MS)
-        self._heartbeat.timeout.connect(self._refresh_views)
+        self._heartbeat.timeout.connect(self._heartbeat_refresh)
         self._heartbeat.start()
 
         self.micro_window.entered.connect(self._enter_micro)
@@ -417,11 +423,34 @@ class UiController(QObject):
             if self._detail_window is not None:
                 self._detail_window._network_status_label.setText(source.value)
 
-    def _refresh_views(self) -> None:
+    def _heartbeat_refresh(self) -> None:
+        """Poll foreground once for this 500 ms UI tick, then repaint views."""
+
+        self._refresh_views(poll_foreground=True)
+
+    def _refresh_views(self, *, poll_foreground: bool = False) -> None:
         if self._shutdown_complete:
             return
         if self._published_state != self.projection.source_state():
             self._publish_snapshot()
+        # Foreground is UI presence evidence, not collection data. Keep the
+        # existing heartbeat as the only polling site. A
+        # snapshot signal, menu, card repaint, or frame read reuses the last
+        # poll only while its selected cached identity context is unchanged.
+        if (poll_foreground and self.mode == "micro"
+                and (self.micro_window.isVisible() or self.card.isVisible())):
+            try:
+                foreground_pid = self._foreground_pid_reader()
+            except Exception:
+                foreground_pid = None
+            context = self.projection.presence_context()
+            self.projection.set_presence_state(
+                resolve_presence(context, foreground_pid), context)
+        elif self.mode == "micro" and (self.micro_window.isVisible() or self.card.isVisible()):
+            self.projection.set_presence_state(self.projection.cached_presence_state(),
+                                               self.projection.presence_context())
+        else:
+            self.projection.set_presence_state(PresenceState.UNKNOWN, None)
         frame = self.projection.frame()
         # The tiny window is cheap; hidden cards receive no painting/text/icon work.
         self.micro_window.apply_frame(frame)

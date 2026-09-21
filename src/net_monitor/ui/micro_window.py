@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QScrollArea, QSizePolicy, QVBoxLayout, QWidget,
 )
 
-from net_monitor.ui.micro_model import MICRO_SIZE, AppChoice, WidgetFrame, format_rate
+from net_monitor.ui.micro_model import MICRO_SIZE, AppChoice, DisplayState, WidgetFrame, format_rate
 from net_monitor.ui.session_view import SessionTotals
 
 
@@ -90,7 +90,8 @@ class MicroWindow(QFrame):
         self.name_label = plain_label("启动中")
         self.name_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self.badge_label = plain_label("·")
-        self.badge_label.setFixedWidth(12)
+        self.badge_label.setMinimumWidth(48)
+        self.badge_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         header = QHBoxLayout()
         header.setSpacing(3)
         header.addWidget(self.icon_label)
@@ -100,12 +101,15 @@ class MicroWindow(QFrame):
         self.upload_label = plain_label("↑ —")
         for label in (self.download_label, self.upload_label):
             label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self.state_label = plain_label("启动中", wrap=True)
+        self.state_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(6, 5, 6, 5)
+        layout.setContentsMargins(6, 4, 6, 4)
         layout.setSpacing(0)
         layout.addLayout(header)
         layout.addWidget(self.download_label)
         layout.addWidget(self.upload_label)
+        layout.addWidget(self.state_label)
         for label in self.findChildren(QLabel):
             label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
@@ -113,16 +117,40 @@ class MicroWindow(QFrame):
         if frame == self._frame:
             return
         self._frame = frame
-        name = frame.selected.name if frame.selected else frame.state.value
+        name = frame.selected.name if frame.selected else "Net Monitor"
         display_name = self.name_label.fontMetrics().elidedText(
             name, Qt.TextElideMode.ElideRight, max(1, self.name_label.width()))
         set_text(self.name_label, display_name)
         self.name_label.setToolTip(name)
-        set_text(self.badge_label, "!" if not frame.source_usable else "●" if frame.focused else "·")
-        self.badge_label.setToolTip(("固定关注；" if frame.focused else "自动显示；") + frame.state.value)
-        set_text(self.download_label, "↓ " + format_rate(frame.download, compact=True))
-        set_text(self.upload_label, "↑ " + format_rate(frame.upload, compact=True))
-        self.setToolTip(f"{name}\n{frame.state.value}\n{frame.message}\n"
+        if not frame.source_usable:
+            badge = "!"
+        else:
+            badge = frame.presence.value
+        set_text(self.badge_label, badge)
+        mode = "固定关注" if frame.focused else "自动显示"
+        self.badge_label.setToolTip(mode + "；" + frame.presence.value)
+        set_text(self.download_label, "↓ 下载 " + format_rate(frame.download, compact=True))
+        set_text(self.upload_label, "↑ 上传 " + format_rate(frame.upload, compact=True))
+        if frame.selected is None and frame.source_usable:
+            activity = f"当前安静 · {mode}\n暂无明显网络活动"
+        elif frame.state is DisplayState.ACTIVE:
+            activity = f"当前有流量 · {mode}"
+        elif frame.state is DisplayState.IDLE:
+            activity = f"当前无流量 · {mode}"
+        elif frame.source_state is DisplayState.STALE:
+            activity = f"{frame.presence.value} · 数据已过期"
+        elif frame.source_state is DisplayState.FAILED:
+            activity = f"{frame.presence.value} · 采样失败"
+        elif frame.source_state is DisplayState.PERMISSION:
+            activity = f"{frame.presence.value} · 需要管理员权限"
+        elif frame.source_state is DisplayState.UNAVAILABLE:
+            activity = f"采集不可用 · {mode}"
+        elif frame.state is DisplayState.NOT_RUNNING:
+            activity = f"当前未运行 · {mode}"
+        else:
+            activity = f"状态未知 · {mode}"
+        set_text(self.state_label, activity)
+        self.setToolTip(f"{name}\n{frame.presence.value}\n{activity}\n{frame.message}\n"
                         "↓ 下载 / ↑ 上传；B 是字节，KiB=1024 B。点击展开，右键菜单。")
 
     def set_icon(self, icon: QIcon) -> None:

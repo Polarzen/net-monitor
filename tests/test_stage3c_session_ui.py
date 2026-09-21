@@ -191,7 +191,7 @@ def test_themed_micro_rate_glyphs_and_fixed_layout(make_controller, app, rate):
         c.follow(application_key(data.processes[0]))
         c.show_primary(activate=False)
         app.processEvents()
-        assert (c.micro_window.width(), c.micro_window.height()) == (112, 72)
+        assert (c.micro_window.width(), c.micro_window.height()) == (220, 112)
         for widget in (c.micro_window.upload_label, c.micro_window.download_label):
             assert widget.fontMetrics().horizontalAdvance(widget.text()) <= widget.contentsRect().width()
             assert widget.fontMetrics().height() <= widget.contentsRect().height()

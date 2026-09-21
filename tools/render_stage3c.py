@@ -81,8 +81,10 @@ def main() -> int:
         def check_micro(name):
             # Always save visual evidence before an assertion can terminate the run.
             capture(c.micro_window, name)
-            assert (c.micro_window.width(), c.micro_window.height()) == (112, 72)
-            for label in (c.micro_window.name_label, c.micro_window.upload_label, c.micro_window.download_label):
+            assert (c.micro_window.width(), c.micro_window.height()) == (220, 112)
+            for label in (c.micro_window.name_label, c.micro_window.badge_label,
+                          c.micro_window.upload_label, c.micro_window.download_label,
+                          c.micro_window.state_label):
                 metrics = {"scene": name, "text": label.text(), "width": label.width(),
                            "height": label.height(), "contents_width": label.contentsRect().width(),
                            "advance": label.fontMetrics().horizontalAdvance(label.text()),
@@ -91,14 +93,24 @@ def main() -> int:
                            "logical_dpi": label.logicalDpiX()}
                 metadata["label_metrics"].append(metrics)
                 assert c.micro_window.rect().contains(label.geometry()), f"Label outside micro: {metrics}"
-                if label is not c.micro_window.name_label:
+                if label not in (c.micro_window.name_label, c.micro_window.badge_label,
+                                 c.micro_window.state_label):
                     assert metrics["advance"] <= metrics["contents_width"], f"Rate clipped: {metrics}"
                     assert metrics["font_height"] <= label.contentsRect().height(), f"Rate height clipped: {metrics}"
+                if label is c.micro_window.state_label:
+                    assert label.sizeHint().height() <= label.contentsRect().height(), f"State clipped: {metrics}"
         try:
             c.show_primary(activate=False)
             data = fake_snapshot()
             c._on_snapshot(data)
             check_micro("micro-active")
+            quiet_rows = tuple(replace(row, upload_bytes_per_second=0.0,
+                                       download_bytes_per_second=0.0)
+                               for row in data.process_network)
+            c._on_snapshot(replace(data, process_network=quiet_rows))
+            c.unfollow()
+            check_micro("micro-quiet")
+            c._on_snapshot(data)
             c.show_card(interactive=False)
             capture(c.card, "card-active")
             detail = c.show_details()

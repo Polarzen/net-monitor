@@ -21,7 +21,8 @@ STALE_SECONDS = 4.0
 HOVER_MS = 350
 COLLAPSE_MS = 300
 UI_TICK_MS = 500
-MICRO_SIZE = (112, 72)
+MICRO_SIZE = (220, 112)
+MICRO_MAX_SIZE = (240, 140)
 SESSION_CAPTION = "本次监控累计"
 SESSION_EXPLANATION = (
     "仅为当前 Net Monitor 进程运行期间已确认的数据；不是关注以来、应用全部历史或运营商账单。"
@@ -40,6 +41,48 @@ class DisplayState(str, Enum):
     NOT_RUNNING = "未运行"
     UNKNOWN = "数据或身份未知"
     EMPTY = "暂无可见应用数据"
+
+
+class PresenceState(str, Enum):
+    """Conservative foreground state for the currently selected application."""
+
+    FOREGROUND = "前台"
+    BACKGROUND = "后台"
+    UNKNOWN = "状态未知"
+
+
+@dataclass(frozen=True, slots=True)
+class PresenceContext:
+    """Identity evidence copied from one already-cached application group."""
+
+    selected_key: str | None
+    trusted_member_pids: frozenset[int]
+    identity_complete: bool
+    member_identities: frozenset[tuple[int, float | None]] = frozenset()
+
+    @property
+    def trusted_pids(self) -> frozenset[int]:
+        """Short alias for callers that only need the trusted PID set."""
+
+        return self.trusted_member_pids
+
+
+def resolve_presence(context: PresenceContext, foreground_pid: int | None) -> PresenceState:
+    """Resolve foreground/background without treating an unknown PID as safe."""
+
+    if (context.selected_key is None or not isinstance(foreground_pid, int)
+            or foreground_pid <= 0):
+        return PresenceState.UNKNOWN
+    if foreground_pid in context.trusted_member_pids:
+        return PresenceState.FOREGROUND
+    if context.identity_complete:
+        return PresenceState.BACKGROUND
+    return PresenceState.UNKNOWN
+
+
+# Descriptive aliases keep the pure rule easy to discover for callers/tests.
+classify_presence = resolve_presence
+evaluate_presence = resolve_presence
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,6 +113,7 @@ class WidgetFrame:
     focused: bool
     account: ApplicationSessionStats | None
     partial_unknown: bool = False
+    presence: PresenceState = PresenceState.UNKNOWN
 
     @property
     def source_usable(self) -> bool:
@@ -161,6 +205,8 @@ class MicroProjection:
         self._challenger: str | None = None
         self._challenger_since = 0.0
         self._focus: AppChoice | None = None
+        self._presence = PresenceState.UNKNOWN
+        self._presence_context: PresenceContext | None = None
 
     def receive(self, snapshot: MonitorSnapshot) -> None:
         now = self.clock()
@@ -208,6 +254,32 @@ class MicroProjection:
         self._challenger = None
         if self.snapshot is not None and self.source_state() is DisplayState.ACTIVE:
             self._select_auto(self.clock())
+
+    def presence_context(self) -> PresenceContext:
+        """Return identity evidence from the selected cached application group."""
+
+        key = self._focus.key if self._focus else self._auto_key
+        group = self._groups.get(key or "")
+        if group is None or not group.processes:
+            return PresenceContext(key if group is not None else None, frozenset(), False)
+        trusted = frozenset(process.pid for process in group.processes
+                             if process.create_time is not None)
+        return PresenceContext(group.key, trusted,
+                               all(process.create_time is not None for process in group.processes),
+                               frozenset(process.identity for process in group.processes))
+
+    def set_presence_state(self, state: PresenceState,
+                           context: PresenceContext | None = None) -> None:
+        self._presence = state
+        self._presence_context = context if context is not None else self.presence_context()
+
+    def cached_presence_state(self) -> PresenceState:
+        """Reuse a poll only while its selected identity context is unchanged."""
+
+        if self._presence_context != self.presence_context():
+            self._presence = PresenceState.UNKNOWN
+            self._presence_context = None
+        return self._presence
 
     def source_state(self) -> DisplayState:
         if self._failure is not None:
@@ -299,7 +371,8 @@ class MicroProjection:
         elif self.snapshot is not None:
             message = self.snapshot.process_network_state.message or source.value
         return WidgetFrame(selected, state, source, message, upload, download,
-                           ranked, self.choices(), self._focus is not None, account, partial)
+                           ranked, self.choices(), self._focus is not None, account, partial,
+                           self.cached_presence_state())
 
     def display_snapshot(self) -> MonitorSnapshot | None:
         """Fresh snapshots keep identity. Failure/staleness produces a UI-only copy."""
