@@ -23,9 +23,11 @@ _SPARKLINE_HEIGHT = 20
 class Sparkline(QWidget):
     """Tiny two-line chart: upload (green) and download (blue).
 
-    The widget is fixed at 60x20 logical pixels. Y-axis is auto-scaled to the
-    maximum absolute value across both series so that the dominant line always
+    The widget is fixed at 60x20 logical pixels when visible. Y-axis is auto-scaled
+    to the maximum absolute value across both series so that the dominant line always
     uses the full vertical range. None values create gaps in the line.
+
+    The widget starts hidden and only becomes visible when data is provided.
     """
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -33,17 +35,31 @@ class Sparkline(QWidget):
         self.setFixedSize(_SPARKLINE_WIDTH, _SPARKLINE_HEIGHT)
         self._upload: list[float | None] = []
         self._download: list[float | None] = []
+        # Start hidden - only show when we have data
+        self.hide()
 
     def set_data(self, samples: tuple[RateSample, ...]) -> None:
-        """Replace the displayed data with a new sample sequence (oldest first)."""
+        """Replace the displayed data with a new sample sequence (oldest first).
+
+        Shows the widget if there's data, hides it if empty.
+        """
         self._upload = [s.upload_bytes_per_second for s in samples]
         self._download = [s.download_bytes_per_second for s in samples]
+
+        # Only show if we have actual data to display
+        has_data = bool(self._upload or self._download)
+        if has_data and not self.isVisible():
+            self.show()
+        elif not has_data and self.isVisible():
+            self.hide()
+
         self.update()
 
     def clear(self) -> None:
-        """Remove all data and repaint."""
+        """Remove all data and hide the widget."""
         self._upload.clear()
         self._download.clear()
+        self.hide()
         self.update()
 
     def paintEvent(self, event) -> None:  # noqa: N802 (Qt naming convention)
