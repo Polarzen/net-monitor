@@ -1,7 +1,7 @@
 # Stage 3E: Rate History / Sparkline
 
 **Baseline:** Stage 3D at commit 5ee642a  
-**Implementation SHA:** (to be updated after commit)  
+**Implementation SHA:** 20f8db1  
 **Branch:** feat/stage-3e-rate-history
 
 ## Architecture
@@ -157,5 +157,5 @@ No changes required to .github/workflows/ci.yml or .github/workflows/etw-experim
 
 - Branch: feat/stage-3e-rate-history
 - Baseline: 5ee642a (Stage 3D)
-- Implementation SHA: (to be updated after commit)
-- Remote: (to be updated after push)
+- Implementation SHA: 20f8db1
+- Remote: origin/feat/stage-3e-rate-history
