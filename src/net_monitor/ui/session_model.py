@@ -37,6 +37,9 @@ def session_rows(snapshot: MonitorSnapshot) -> tuple[SessionRow, ...]:
     available = snapshot.process_network_state.available
     rows = []
     for account in accounts.values():
+        # Filter out zero-traffic accounts: only show accounts with confirmed traffic
+        if account.download_bytes <= 0 and account.upload_bytes <= 0:
+            continue
         count = _count(account, available, identity_missing)
         presence = "进程状态未知" if count is None else "未运行" if count == 0 else "最近枚举有进程"
         rows.append(SessionRow(account, count, presence))

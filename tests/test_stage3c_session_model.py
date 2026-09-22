@@ -76,12 +76,17 @@ def test_zero_count_with_missing_identity_remains_inconclusive():
 
 
 def test_process_count_is_not_current_network_activity():
+    # Zero-traffic accounts should be filtered out even if they have active processes
     item = account(active=3, upload=0, download=0)
-    row = session_rows(snapshot((item,)))[0]
-    assert row.process_count == 3
-    assert row.presence == "最近枚举有进程"
-    assert "联网" not in row.presence
-    assert row.account.upload_bytes == row.account.download_bytes == 0
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 0  # Zero-traffic account should not be shown
+    
+    # But if the account has traffic, it should be shown
+    item_with_traffic = account(active=3, upload=100, download=0)
+    rows = session_rows(snapshot((item_with_traffic,)))
+    assert len(rows) == 1
+    assert rows[0].process_count == 3
+    assert rows[0].presence == "最近枚举有进程"
 
 
 def test_unknown_historical_category_account_is_preserved():
@@ -123,3 +128,85 @@ def test_zero_account_with_unknown_process_identity_cannot_certify_exit():
     assert model.frame().state is DisplayState.UNKNOWN
     assert model.frame().account.upload_bytes == account.upload_bytes
     assert model.frame().upload is None
+
+
+def test_zero_traffic_account_not_shown():
+    """A. 双零不显示: download=0, upload=0 should not be shown"""
+    item = account(active=1, upload=0, download=0)
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 0
+
+
+def test_download_only_traffic_shown():
+    """B. 仅下载有流量: download=100, upload=0 should be shown"""
+    item = account(active=1, upload=0, download=100)
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 1
+    assert rows[0].account.download_bytes == 100
+    assert rows[0].account.upload_bytes == 0
+
+
+def test_upload_only_traffic_shown():
+    """C. 仅上传有流量: download=0, upload=100 should be shown"""
+    item = account(active=1, upload=100, download=0)
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 1
+    assert rows[0].account.upload_bytes == 100
+    assert rows[0].account.download_bytes == 0
+
+
+def test_both_directions_traffic_shown():
+    """D. 双向有流量: download>0, upload>0 should be shown"""
+    item = account(active=1, upload=50, download=100)
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 1
+    assert rows[0].account.upload_bytes == 50
+    assert rows[0].account.download_bytes == 100
+
+
+def test_retired_account_with_traffic_still_shown():
+    """E. 已退出账户: active_process_count=0, download>0 should still be shown"""
+    item = account(active=0, upload=0, download=1000)
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 1
+    assert rows[0].process_count == 0
+    assert rows[0].presence == "未运行"
+    assert rows[0].account.download_bytes == 1000
+
+
+def test_running_account_with_zero_traffic_not_shown():
+    """F. 当前运行但零流量: active_process_count>0, download=0, upload=0 should not be shown"""
+    item = account(active=5, upload=0, download=0)
+    rows = session_rows(snapshot((item,)))
+    assert len(rows) == 0
+
+
+def test_unknown_identity_with_traffic_still_shown():
+    """G. identity incomplete / process count unknown: if traffic > 0, still shown"""
+    item = account(active=0, upload=0, download=500)
+    unknown = ProcessInfo(400, "unknown.exe", create_time=None)
+    data = snapshot((item,), processes=(unknown,))
+    rows = session_rows(data)
+    assert len(rows) == 1
+    assert rows[0].process_count is None  # Unknown due to missing identity
+    assert rows[0].presence == "进程状态未知"
+    assert rows[0].account.download_bytes == 500
+
+
+def test_summary_count_excludes_zero_traffic():
+    """H. summary count: 3 accounts, only 2 with traffic should show count=2"""
+    a = account("exe:a.exe", name="A.exe", active=1, upload=0, download=0)
+    b = account("exe:b.exe", name="B.exe", active=1, upload=100, download=0)
+    c = account("exe:c.exe", name="C.exe", active=1, upload=0, download=200)
+    rows = session_rows(snapshot((a, b, c)))
+    assert len(rows) == 2
+    assert rows[0].account.key == "exe:b.exe"
+    assert rows[1].account.key == "exe:c.exe"
+
+
+def test_all_zero_traffic_shows_empty():
+    """I. 所有账户均为 0: list should be empty"""
+    a = account("exe:a.exe", name="A.exe", active=1, upload=0, download=0)
+    b = account("exe:b.exe", name="B.exe", active=1, upload=0, download=0)
+    rows = session_rows(snapshot((a, b)))
+    assert len(rows) == 0

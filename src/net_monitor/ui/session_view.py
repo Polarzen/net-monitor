@@ -134,7 +134,10 @@ class SessionView(QWidget):
         token = (rows, snapshot.process_network_state)
         if token == self._rendered:
             return
-        set_text(self.summary, f"{len(rows)} 个累计账户（含已退出账户；不套用实时筛选）")
+        if len(rows) == 0:
+            set_text(self.summary, "本次监控尚无已确认流量")
+        else:
+            set_text(self.summary, f"{len(rows)} 个有流量累计账户（含已退出账户；不套用实时筛选）")
         set_text(self.source_label, "进程状态来自最近一次枚举；累计大于 0 不代表当前联网。"
                  if snapshot.process_network_state.available else
                  (snapshot.process_network_state.message or "当前采集数据不可用；保留已确认累计，进程状态未知。"))
