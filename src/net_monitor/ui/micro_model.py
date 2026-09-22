@@ -15,6 +15,7 @@ from net_monitor.core.models import (
 )
 from net_monitor.core.process_visibility import ProcessClassifier, visible_processes
 from net_monitor.ui.session_model import observed_process_count
+from net_monitor.ui.rate_history import RateSample
 
 CHALLENGER_SECONDS = 2.0
 STALE_SECONDS = 4.0
@@ -114,6 +115,7 @@ class WidgetFrame:
     account: ApplicationSessionStats | None
     partial_unknown: bool = False
     presence: PresenceState = PresenceState.UNKNOWN
+    rate_history: tuple[RateSample, ...] = ()
 
     @property
     def source_usable(self) -> bool:
@@ -207,6 +209,11 @@ class MicroProjection:
         self._focus: AppChoice | None = None
         self._presence = PresenceState.UNKNOWN
         self._presence_context: PresenceContext | None = None
+        self._rate_history_store = None
+
+    def set_rate_history_store(self, store) -> None:
+        """Attach a RateHistoryStore so frame() can populate rate_history."""
+        self._rate_history_store = store
 
     def receive(self, snapshot: MonitorSnapshot) -> None:
         now = self.clock()
@@ -370,9 +377,12 @@ class MicroProjection:
             message = "数据更新已停止；旧速率不作为实时值。已确认累计仍保留。"
         elif self.snapshot is not None:
             message = self.snapshot.process_network_state.message or source.value
+        history: tuple[RateSample, ...] = ()
+        if selected is not None and self._rate_history_store is not None:
+            history = self._rate_history_store.get_series(selected.key)
         return WidgetFrame(selected, state, source, message, upload, download,
                            ranked, self.choices(), self._focus is not None, account, partial,
-                           self.cached_presence_state())
+                           self.cached_presence_state(), history)
 
     def display_snapshot(self) -> MonitorSnapshot | None:
         """Fresh snapshots keep identity. Failure/staleness produces a UI-only copy."""

@@ -15,6 +15,7 @@ from net_monitor.services.monitor_service import MonitorService
 from net_monitor.ui.compact_window import CompactWindow
 from net_monitor.ui.detail_window import DetailWindow
 from net_monitor.ui.icon_cache import IconCache
+from net_monitor.ui.rate_history import RateHistoryStore
 from net_monitor.ui.micro_model import (
     COLLAPSE_MS, HOVER_MS, UI_TICK_MS, DisplayState, MicroProjection,
     PresenceState, resolve_presence,
@@ -61,6 +62,8 @@ class UiController(QObject):
         self._main_menu_open = False
         self._screens: list = []
         self.projection = MicroProjection(clock=clock)
+        self._rate_history = RateHistoryStore()
+        self.projection.set_rate_history_store(self._rate_history)
         self._foreground_pid_reader = foreground_pid_reader or read_foreground_pid
         self.preferences_store = preferences_store or PreferencesStore()
         preferences = self.preferences_store.load()
@@ -402,6 +405,21 @@ class UiController(QObject):
             return
         self._latest_snapshot = snapshot
         self.projection.receive(snapshot)
+        
+        # Record rates for each application group
+        from net_monitor.core.application_aggregation import aggregate_application_network
+        from net_monitor.core.process_visibility import visible_processes
+        groups = aggregate_application_network(
+            visible_processes(snapshot.processes, classifier=self.projection.classifier),
+            snapshot.process_network
+        )
+        for group in groups:
+            self._rate_history.record(
+                group.key,
+                group.upload_bytes_per_second,
+                group.download_bytes_per_second,
+            )
+        
         self._publish_snapshot()
         self._refresh_views()
 

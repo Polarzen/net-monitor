@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from net_monitor.ui.micro_model import MICRO_SIZE, AppChoice, DisplayState, WidgetFrame, format_rate
+from net_monitor.ui.sparkline import Sparkline
 from net_monitor.ui.session_view import SessionTotals
 
 
@@ -220,6 +221,7 @@ class MicroWindow(QFrame):
             label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self.state_label = plain_label("启动中", wrap=True)
         self.state_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self._sparkline = Sparkline()
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 4, 6, 4)
         layout.setSpacing(0)
@@ -227,6 +229,7 @@ class MicroWindow(QFrame):
         layout.addWidget(self.download_label)
         layout.addWidget(self.upload_label)
         layout.addWidget(self.state_label)
+        layout.addWidget(self._sparkline)
         for label in self.findChildren(QLabel):
             label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
@@ -269,6 +272,8 @@ class MicroWindow(QFrame):
         set_text(self.state_label, activity)
         self.setToolTip(f"{name}\n{frame.presence.value}\n{activity}\n{frame.message}\n"
                         "↓ 下载 / ↑ 上传；B 是字节，KiB=1024 B。点击展开，右键菜单。")
+        if hasattr(frame, 'rate_history'):
+            self._sparkline.set_data(frame.rate_history)
 
     def set_icon(self, icon: QIcon) -> None:
         self.icon_label.setPixmap(icon.pixmap(16, 16))
@@ -409,6 +414,8 @@ class ApplicationCard(QFrame):
         self.body_layout.addWidget(self.top_caption)
         for row in self._top_rows:
             self.body_layout.addWidget(row)
+        self._sparkline = Sparkline()
+        self.body_layout.addWidget(self._sparkline)
         self.body_layout.addWidget(self.restart_button)
         self.body_layout.addLayout(footer)
         self.body_layout.addStretch()
@@ -461,6 +468,8 @@ class ApplicationCard(QFrame):
             row.bind(app.choice.key, text, enabled=app.choice.can_follow)
             row.setToolTip(f"{app.choice.name}\n{app.choice.executable or app.choice.key}\n点击固定关注")
             row.show()
+        if hasattr(frame, 'rate_history'):
+            self._sparkline.set_data(frame.rate_history)
 
     def set_icon(self, icon: QIcon) -> None:
         self.icon_label.setPixmap(icon.pixmap(24, 24))
