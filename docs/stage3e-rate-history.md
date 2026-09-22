@@ -1,7 +1,7 @@
 # Stage 3E: Rate History / Sparkline
 
 **Baseline:** Stage 3D at commit 5ee642a  
-**Final SHA:** (to be filled after commit)  
+**Final SHA:** c7632d3  
 **Branch:** feat/stage-3e-rate-history
 
 ## Architecture
