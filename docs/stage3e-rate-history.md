@@ -1,7 +1,7 @@
 # Stage 3E: Rate History / Sparkline
 
 **Baseline:** Stage 3D at commit 5ee642a  
-**Final SHA:** c7632d3  
+**Implementation SHA:** (to be updated after commit)  
 **Branch:** feat/stage-3e-rate-history
 
 ## Architecture
@@ -12,17 +12,17 @@ Stage 3E adds bounded short-term rate history and sparkline visualization withou
 
 `
 MonitorSnapshot
-    |
+    ↓
 UiController._on_snapshot_ready()
-    |
+    ↓
 aggregate_application_network()
-    |
+    ↓
 RateHistoryStore.record(key, upload_bps, download_bps)
-    |
+    ↓
 MicroProjection.frame() fetches history
-    |
+    ↓
 WidgetFrame.rate_history
-    |
+    ↓
 Sparkline widget renders upload/download lines
 `
 
@@ -39,28 +39,52 @@ Sparkline widget renders upload/download lines
 |-----------|---------|-------------|
 | duration_seconds | 60.0 | Target history window |
 | expected_interval_seconds | 0.5 | Nominal sampling interval (500ms heartbeat) |
-| max_samples | 120 | Derived: duration / interval |
+| max_samples | 120 | Hard limit per application (derived from duration / interval) |
 | max_applications | 32 | Hard cap on tracked applications |
 | eviction_policy | LRU | Least-recently-seen evicted first |
+
+## Rate Semantics
+
+### None vs 0.0
+
+- **None** = unknown/unavailable rate (UNKNOWN != 0, STALE != 0, FAILED != 0)
+- **0.0** = confirmed measured zero rate
+
+None values are preserved in the history and displayed as gaps in the sparkline, not as zero values.
+
+### Time-Based Pruning
+
+- Samples older than duration_seconds are pruned on read
+- Uses monotonic timestamps (no wall clock dependency)
+- get_series(key, now=current_time) performs lazy pruning
+- Application keys persist until LRU eviction, but their history becomes empty after expiry
+
+### Timestamp Ordering
+
+- Out-of-order timestamps are rejected to maintain monotonic time axis
+- Duplicate timestamps are accepted
+- Ensures deterministic, testable behavior
 
 ## History Ownership
 
 History is keyed by **application key** (same as existing aggregation):
-- exe:<normalized_path> for trusted executables
+- xe:<normalized_path> for trusted executables
 - process:<pid>:<create_time> for UNKNOWN processes
 
 PID changes within the same trusted application key do not create a new series.
 
 ## UNKNOWN and STALE Handling
 
-- **UNKNOWN**: Processes without executable paths get distinct keys like process:123:1234567890.0. Each is isolated, never merged.
-- **STALE**: Series persist until evicted by capacity. No automatic timeout-based removal.
+- **UNKNOWN application identity**: Processes without executable paths get distinct keys. Each is isolated, never merged.
+- **UNKNOWN rate value**: Represented as None, displayed as gap in sparkline
+- **STALE**: Application keys persist until LRU eviction, but their sample history is pruned by time window
 
 ## Sparkline Rendering
 
 - **Size**: 60x20 logical pixels (fixed)
 - **Colors**: Upload #7dd3a8 (green), Download #6ba4d9 (blue)
 - **Scaling**: Y-axis auto-scales to peak value across both series
+- **None handling**: Creates gaps in the line (not drawn as zero)
 - **No axes, no labels**: Just the two lines
 - **Performance**: QPainter.drawLine, antialiased, no external dependencies
 
@@ -70,7 +94,7 @@ PID changes within the same trusted application key do not create a new series.
 - **No new collectors**: Uses existing MonitorSnapshot
 - **No new ETW sessions**: Reuses existing session
 - **No new timers**: Sparkline repaints on frame update only
-- **Memory**: Bounded by max_samples (120) x max_applications (32) = 3840 RateSample objects max
+- **Memory**: Bounded by max_samples (120) × max_applications (32) = 3840 RateSample objects max
 
 ## Architecture Impact
 
@@ -82,34 +106,36 @@ PID changes within the same trusted application key do not create a new series.
 **New files:**
 - src/net_monitor/ui/rate_history.py: RateSample, RateSeries, RateHistoryStore
 - src/net_monitor/ui/sparkline.py: Sparkline QWidget
-- tests/test_rate_history.py: 15 tests covering bounded semantics
+- tests/test_rate_history.py: 13 tests covering bounded semantics
 
 **NOT modified (frozen architecture):**
-- src/net_monitor/collectors/ -- no changes
-- src/net_monitor/services/monitor_service.py -- no changes
-- src/net_monitor/ui/sampling_worker.py -- no changes
-- ETW session lifecycle -- no changes
+- src/net_monitor/collectors/ — no changes
+- src/net_monitor/services/monitor_service.py — no changes
+- src/net_monitor/ui/sampling_worker.py — no changes
+- ETW session lifecycle — no changes
 
 ## Test Results
 
 `
 $ python -m pytest tests/test_rate_history.py -v
-15 passed in 0.05s
+13 passed
 `
 
-All 15 tests pass:
-- Bounded samples (max_samples=120)
+All 13 tests pass:
+- None rates preserved as None (UNKNOWN != 0)
+- 0.0 distinct from None
+- Time-based pruning (60s window)
+- max_samples=120 hard limit
+- Timestamp ordering (rejects out-of-order)
 - Application key isolation
-- None rates become 0.0
-- Eviction policy (LRU)
-- Monotonic timestamps
-- UNKNOWN key distinct
-- STALE series persists
-- get_series returns () for unknown
-- tracked_keys returns all active
+- LRU eviction
+- LRU refresh on access
+- get_series with explicit now parameter
+- Unknown key returns empty tuple
 - clear() removes all history
+- Mixed None and real rates
 
-**Full test suite:** 246 passed, 2 pre-existing failures (font/environment, not Stage 3E)
+**Full test suite:** 256 passed, 2 pre-existing failures (font/environment, not Stage 3E)
 
 **compileall:** All modified files compile successfully
 
@@ -131,5 +157,5 @@ No changes required to .github/workflows/ci.yml or .github/workflows/etw-experim
 
 - Branch: feat/stage-3e-rate-history
 - Baseline: 5ee642a (Stage 3D)
-- Final SHA: (to be filled after commit)
-- Remote: (to be filled after push)
+- Implementation SHA: (to be updated after commit)
+- Remote: (to be updated after push)

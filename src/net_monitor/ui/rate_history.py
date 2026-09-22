@@ -13,34 +13,51 @@ import time
 
 @dataclass(frozen=True, slots=True)
 class RateSample:
-    """One instantaneous rate observation for an application."""
+    """One instantaneous rate observation for an application.
+
+    upload_bytes_per_second and download_bytes_per_second can be None to
+    indicate unknown/unavailable rate (UNKNOWN != 0). Only actual measured
+    zero rates should be stored as 0.0.
+    """
 
     timestamp: float
-    upload_bytes_per_second: float
-    download_bytes_per_second: float
+    upload_bytes_per_second: float | None
+    download_bytes_per_second: float | None
 
 
 @dataclass(slots=True)
 class RateSeries:
     """Bounded time series for one application key.
 
-    The deque maxlen enforces a hard cap on samples. With a 500 ms heartbeat
-    and 60 s duration, maxlen=120 provides ~60 s of history.
+    Maintains both time-based expiry (duration_seconds) and sample count
+    limit (maxlen). Samples older than duration_seconds are pruned on access.
     """
 
     application_key: str
     samples: deque[RateSample]
+    duration_seconds: float
 
-    def __init__(self, application_key: str, maxlen: int) -> None:
+    def __init__(self, application_key: str, maxlen: int, duration_seconds: float) -> None:
         self.application_key = application_key
         self.samples = deque(maxlen=maxlen)
+        self.duration_seconds = duration_seconds
 
-    def record(self, timestamp: float, upload_bps: float, download_bps: float) -> None:
-        """Append one sample. Oldest samples are automatically dropped."""
+    def record(self, timestamp: float, upload_bps: float | None, download_bps: float | None) -> None:
+        """Append one sample. Validates timestamp ordering."""
+        if self.samples and timestamp < self.samples[-1].timestamp:
+            # Reject out-of-order timestamps to maintain monotonic time axis
+            return
         self.samples.append(RateSample(timestamp, upload_bps, download_bps))
 
-    def as_tuple(self) -> tuple[RateSample, ...]:
-        """Return a snapshot of current samples (oldest first)."""
+    def as_tuple(self, now: float) -> tuple[RateSample, ...]:
+        """Return samples within the time window (oldest first).
+
+        Prunes samples older than duration_seconds from the reference time.
+        """
+        cutoff = now - self.duration_seconds
+        # Remove expired samples from the left
+        while self.samples and self.samples[0].timestamp < cutoff:
+            self.samples.popleft()
         return tuple(self.samples)
 
     def __len__(self) -> int:
@@ -53,8 +70,7 @@ class RateHistoryStore:
     Parameters
     ----------
     duration_seconds : float
-        Target history window. Actual sample count is derived from
-        expected_interval_seconds to avoid depending on exact timing.
+        Time window for history. Samples older than this are pruned.
     expected_interval_seconds : float
         Nominal sampling interval (e.g. 0.5 for 500 ms heartbeat).
     max_applications : int
@@ -111,27 +127,37 @@ class RateHistoryStore:
     ) -> None:
         """Record one rate observation for an application.
 
-        None rates are treated as 0.0 for plotting continuity. The application
+        None rates are preserved as None (UNKNOWN != 0). The application
         key is the sole identity; PID changes within the same trusted key do
         not create a new series.
         """
         if timestamp is None:
             timestamp = self._clock()
 
-        upload = 0.0 if upload_bytes_per_second is None else float(upload_bytes_per_second)
-        download = 0.0 if download_bytes_per_second is None else float(download_bytes_per_second)
-
         if application_key not in self._series:
             self._evict_if_needed(application_key)
-            self._series[application_key] = RateSeries(application_key, self._max_samples)
+            self._series[application_key] = RateSeries(
+                application_key, self._max_samples, self._duration_seconds
+            )
 
-        self._series[application_key].record(timestamp, upload, download)
+        self._series[application_key].record(timestamp, upload_bytes_per_second, download_bytes_per_second)
         self._last_seen[application_key] = timestamp
 
-    def get_series(self, application_key: str) -> tuple[RateSample, ...]:
-        """Return the current sample history for one application (oldest first)."""
+    def get_series(self, application_key: str, *, now: float | None = None) -> tuple[RateSample, ...]:
+        """Return the current sample history for one application (oldest first).
+
+        Prunes samples older than duration_seconds. If now is None, uses the
+        injected clock. Accessing a key refreshes its last-seen timestamp for
+        LRU eviction purposes.
+        """
         series = self._series.get(application_key)
-        return series.as_tuple() if series is not None else ()
+        if series is None:
+            return ()
+        if now is None:
+            now = self._clock()
+        # Refresh last-seen timestamp for LRU eviction
+        self._last_seen[application_key] = now
+        return series.as_tuple(now)
 
     def tracked_keys(self) -> tuple[str, ...]:
         """Return all currently tracked application keys."""

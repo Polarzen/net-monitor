@@ -1,7 +1,7 @@
 """Minimal sparkline widget for Stage 3E rate history visualization.
 
 Draws upload (green) and download (blue) lines from a sequence of RateSample
-points. No axes, no labels - just the two lines scaled to the data range.
+points. None values create gaps in the line (not drawn as 0).
 """
 from __future__ import annotations
 
@@ -25,14 +25,14 @@ class Sparkline(QWidget):
 
     The widget is fixed at 60x20 logical pixels. Y-axis is auto-scaled to the
     maximum absolute value across both series so that the dominant line always
-    uses the full vertical range.
+    uses the full vertical range. None values create gaps in the line.
     """
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setFixedSize(_SPARKLINE_WIDTH, _SPARKLINE_HEIGHT)
-        self._upload: list[float] = []
-        self._download: list[float] = []
+        self._upload: list[float | None] = []
+        self._download: list[float | None] = []
 
     def set_data(self, samples: tuple[RateSample, ...]) -> None:
         """Replace the displayed data with a new sample sequence (oldest first)."""
@@ -60,18 +60,22 @@ class Sparkline(QWidget):
             painter.end()
             return
 
-        # Auto-scale Y to the peak of both series combined.
+        # Auto-scale Y to the peak of both series combined (ignoring None).
+        valid_uploads = [v for v in self._upload if v is not None]
+        valid_downloads = [v for v in self._download if v is not None]
         peak = max(
-            max(self._upload, default=0.0),
-            max(self._download, default=0.0),
+            max(valid_uploads, default=0.0),
+            max(valid_downloads, default=0.0),
         )
         if peak <= 0.0:
-            # All zeros - draw flat lines at the vertical midpoint.
+            # All zeros or all None - draw flat lines at the vertical midpoint.
             mid_y = height / 2.0
-            painter.setPen(QPen(_UPLOAD_COLOR, 1.0))
-            painter.drawLine(0, int(mid_y), width, int(mid_y))
-            painter.setPen(QPen(_DOWNLOAD_COLOR, 1.0))
-            painter.drawLine(0, int(mid_y), width, int(mid_y))
+            if valid_uploads:
+                painter.setPen(QPen(_UPLOAD_COLOR, 1.0))
+                painter.drawLine(0, int(mid_y), width, int(mid_y))
+            if valid_downloads:
+                painter.setPen(QPen(_DOWNLOAD_COLOR, 1.0))
+                painter.drawLine(0, int(mid_y), width, int(mid_y))
             painter.end()
             return
 
@@ -84,25 +88,25 @@ class Sparkline(QWidget):
         def _x(index: int) -> int:
             return int(index * step_x)
 
-        # Draw upload (green) line.
-        if len(self._upload) >= 2:
-            painter.setPen(QPen(_UPLOAD_COLOR, 1.0))
-            for i in range(len(self._upload) - 1):
-                painter.drawLine(_x(i), _y(self._upload[i]),
-                                 _x(i + 1), _y(self._upload[i + 1]))
-        elif len(self._upload) == 1:
-            painter.setPen(QPen(_UPLOAD_COLOR, 1.0))
-            painter.drawPoint(_x(0), _y(self._upload[0]))
+        def _draw_line(values: list[float | None], color: QColor) -> None:
+            """Draw a line with gaps for None values."""
+            painter.setPen(QPen(color, 1.0))
+            prev_x = None
+            prev_y = None
+            for i, value in enumerate(values):
+                if value is None:
+                    # Gap: reset previous point
+                    prev_x = None
+                    prev_y = None
+                    continue
+                curr_x = _x(i)
+                curr_y = _y(value)
+                if prev_x is not None:
+                    painter.drawLine(prev_x, prev_y, curr_x, curr_y)
+                prev_x = curr_x
+                prev_y = curr_y
 
-        # Draw download (blue) line.
-        if len(self._download) >= 2:
-            painter.setPen(QPen(_DOWNLOAD_COLOR, 1.0))
-            for i in range(len(self._download) - 1):
-                painter.drawLine(_x(i), _y(self._download[i]),
-                                 _x(i + 1), _y(self._download[i + 1]))
-        elif len(self._download) == 1:
-            painter.setPen(QPen(_DOWNLOAD_COLOR, 1.0))
-            painter.drawPoint(_x(0), _y(self._download[0]))
+        _draw_line(self._upload, _UPLOAD_COLOR)
+        _draw_line(self._download, _DOWNLOAD_COLOR)
 
         painter.end()
-
