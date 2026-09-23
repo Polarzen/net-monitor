@@ -16,6 +16,7 @@ from net_monitor.core.models import (
 from net_monitor.core.process_visibility import ProcessClassifier, visible_processes
 from net_monitor.ui.session_model import observed_process_count
 from net_monitor.ui.rate_history import RateSample
+from net_monitor.ui.network_spotlight import SpotlightFrame, compute_network_spotlight
 
 CHALLENGER_SECONDS = 2.0
 STALE_SECONDS = 4.0
@@ -116,6 +117,7 @@ class WidgetFrame:
     partial_unknown: bool = False
     presence: PresenceState = PresenceState.UNKNOWN
     rate_history: tuple[RateSample, ...] = ()
+    spotlight: SpotlightFrame | None = None
 
     @property
     def source_usable(self) -> bool:
@@ -210,10 +212,15 @@ class MicroProjection:
         self._presence = PresenceState.UNKNOWN
         self._presence_context: PresenceContext | None = None
         self._rate_history_store = None
+        self._spotlight_foreground_pid = None
 
     def set_rate_history_store(self, store) -> None:
         """Attach a RateHistoryStore so frame() can populate rate_history."""
         self._rate_history_store = store
+
+    def set_foreground_pid(self, pid: int | None) -> None:
+        """Set the current foreground PID for spotlight computation."""
+        self._spotlight_foreground_pid = pid
 
     def receive(self, snapshot: MonitorSnapshot) -> None:
         now = self.clock()
@@ -380,9 +387,13 @@ class MicroProjection:
         history: tuple[RateSample, ...] = ()
         if selected is not None and self._rate_history_store is not None:
             history = self._rate_history_store.get_series(selected.key)
+        spotlight = compute_network_spotlight(
+            self._groups, self._spotlight_foreground_pid,
+            source is DisplayState.ACTIVE,
+        )
         return WidgetFrame(selected, state, source, message, upload, download,
                            ranked, self.choices(), self._focus is not None, account, partial,
-                           self.cached_presence_state(), history)
+                           self.cached_presence_state(), history, spotlight)
 
     def display_snapshot(self) -> MonitorSnapshot | None:
         """Fresh snapshots keep identity. Failure/staleness produces a UI-only copy."""

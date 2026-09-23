@@ -2,9 +2,9 @@
 
 Net Monitor 是一个面向 Windows 11 的轻量第三方应用网络活动监视器。它的核心问题不是“做另一个任务管理器”，而是让用户随时看一眼：**现在谁在联网、谁正在下载、谁正在上传、哪个应用最活跃。**
 
-当前版本：**v0.3 / Stage 3E Rate History**。
+当前版本：**v0.4 / Stage 3F Network Spotlight**。
 
-实现、验证范围和指定桌面待验收项目见 [Stage 3E 记录](docs/stage3e-rate-history.md)。Stage 3E 在 Stage 3D 的采集、聚合、会话累计、多层窗口和前台状态能力上做增量升级，新增短期速率历史和 sparkline 趋势图。
+实现、验证范围和指定桌面待验收项目见 [Stage 3F 记录](docs/stage3f-network-spotlight.md)。Stage 3F 在 Stage 3E 基础上新增 Network Spotlight：一眼看清当前前台应用、后台总流量、主导后台应用及其占比。
 
 ## 产品形态
 
@@ -217,6 +217,6 @@ GitHub Actions 不替代真实桌面体验。**Stage 3D Micro Presence 仍待** 
 
 正式观察于 `2026-09-16 20:49:57–21:19:58+08` 完成 `1800.0012464s`、31 个连续样本；2 秒 collector probe 停流后约 `2.25s` 严格归零，GUI 观察中启动期外未再复现规律性双零，用户确认窗口、数据和托盘正常。该观察属于已验证的 Stage 3A 精确提交；该历史记录中的“待集成”不是当前状态：本轮基于远端 Stage 3B `09ff140dfa5c299840189fe02ede1b1cb95fd9cb` 续接 Stage 3C，当前验证以对应功能分支精确 SHA 的交付报告为准。
 
-## Stage 3E 范围边界
+## Stage 3F 范围边界
 
-本阶段不提供网络加速、任务完成识别、动画宠物、流量控制，也不实现 SQLite、持久化历史数据库、时间线、AI 分析、域名/IP/GeoIP、限速、防火墙、Npcap、WinDivert、WFP、驱动、开机启动、自动更新、installer、账号或云同步。Stage 3E 的速率历史为短期内存缓存，不持久化。
+本阶段不提供网络加速、任务完成识别、动画宠物、流量控制，也不实现 SQLite、持久化历史数据库、时间线、AI 分析、域名/IP/GeoIP、限速、防火墙、Npcap、WinDivert、WFP、驱动、开机启动、自动更新、installer、账号或云同步。Stage 3F 的 Network Spotlight 为实时纯计算投影，不持久化。

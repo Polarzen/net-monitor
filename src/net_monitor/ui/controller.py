@@ -464,11 +464,13 @@ class UiController(QObject):
             context = self.projection.presence_context()
             self.projection.set_presence_state(
                 resolve_presence(context, foreground_pid), context)
+            self.projection.set_foreground_pid(foreground_pid)
         elif self.mode == "micro" and (self.micro_window.isVisible() or self.card.isVisible()):
             self.projection.set_presence_state(self.projection.cached_presence_state(),
                                                self.projection.presence_context())
         else:
             self.projection.set_presence_state(PresenceState.UNKNOWN, None)
+            self.projection.set_foreground_pid(None)
         frame = self.projection.frame()
         # The tiny window is cheap; hidden cards receive no painting/text/icon work.
         self.micro_window.apply_frame(frame)

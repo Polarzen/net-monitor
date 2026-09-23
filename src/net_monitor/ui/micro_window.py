@@ -269,8 +269,26 @@ class MicroWindow(QFrame):
             activity = f"当前未运行 · {mode}"
         else:
             activity = f"状态未知 · {mode}"
-        set_text(self.state_label, activity)
-        self.setToolTip(f"{name}\n{frame.presence.value}\n{activity}\n{frame.message}\n"
+        # Add spotlight context to state_label if available
+        spotlight_text = ""
+        if hasattr(frame, 'spotlight') and frame.spotlight and frame.spotlight.source_usable:
+            sp = frame.spotlight
+            if sp.background_share is not None and sp.share_reliable:
+                pct = round(sp.background_share * 100)
+                if sp.dominant_background:
+                    if frame.selected and sp.dominant_background.key == frame.selected.key:
+                        spotlight_text = f"\n后台主导 · {pct}%"
+                    else:
+                        dom_name = sp.dominant_background.name
+                        spotlight_text = f"\n后台 {pct}% · {dom_name}"
+                elif pct > 0:
+                    spotlight_text = f"\n后台 {pct}%"
+            elif sp.foreground is None and frame.source_usable:
+                spotlight_text = "\n前台应用未知"
+        
+        set_text(self.state_label, activity + spotlight_text)
+        tooltip_sp = spotlight_text.replace("\n", " ") if spotlight_text else ""
+        self.setToolTip(f"{name}\n{frame.presence.value}\n{activity}{tooltip_sp}\n{frame.message}\n"
                         "↓ 下载 / ↑ 上传；B 是字节，KiB=1024 B。点击展开，右键菜单。")
         if hasattr(frame, 'rate_history'):
             self._sparkline.set_data(frame.rate_history)
@@ -388,6 +406,12 @@ class ApplicationCard(QFrame):
             row.hide()
         self.top_caption = plain_label("当前可见应用 Top 3（按当前速率）")
         self.session_totals = SessionTotals()
+        # Network Spotlight section
+        self.spotlight_caption = plain_label("网络焦点")
+        self.spotlight_caption.setStyleSheet("font-weight:600;")
+        self.spotlight_fg_label = plain_label("前台应用：—")
+        self.spotlight_bg_label = plain_label("后台合计：—")
+        self.spotlight_dom_label = plain_label("后台主导：—")
 
         header = QHBoxLayout()
         header.addWidget(self.icon_label)
@@ -411,6 +435,10 @@ class ApplicationCard(QFrame):
         self.body_layout.addWidget(self.rates_label)
         self.body_layout.addLayout(attention)
         self.body_layout.addWidget(self.session_totals)
+        self.body_layout.addWidget(self.spotlight_caption)
+        self.body_layout.addWidget(self.spotlight_fg_label)
+        self.body_layout.addWidget(self.spotlight_bg_label)
+        self.body_layout.addWidget(self.spotlight_dom_label)
         self.body_layout.addWidget(self.top_caption)
         for row in self._top_rows:
             self.body_layout.addWidget(row)
@@ -450,6 +478,37 @@ class ApplicationCard(QFrame):
         set_text(self.rates_label, "↓ 下载 " + format_rate(frame.download)
                  + "\n↑ 上传 " + format_rate(frame.upload))
         self.session_totals.apply_frame(frame)
+        # Update Network Spotlight section
+        sp = getattr(frame, 'spotlight', None)
+        if sp is not None and sp.source_usable:
+            self.spotlight_caption.show()
+            self.spotlight_fg_label.show()
+            self.spotlight_bg_label.show()
+            self.spotlight_dom_label.show()
+            if sp.foreground is not None:
+                fg_rate = format_rate(sp.foreground.total_bps, compact=True)
+                set_text(self.spotlight_fg_label, f"当前前台：{sp.foreground.name}  {fg_rate}")
+            else:
+                set_text(self.spotlight_fg_label, "当前前台：未知")
+            if sp.background_total_bps is not None:
+                bg_rate = format_rate(sp.background_total_bps, compact=True)
+                if sp.background_share is not None and sp.share_reliable:
+                    pct = round(sp.background_share * 100)
+                    set_text(self.spotlight_bg_label, f"后台合计：{bg_rate}（占已识别流量 {pct}%）")
+                else:
+                    set_text(self.spotlight_bg_label, f"后台合计：{bg_rate}")
+            else:
+                set_text(self.spotlight_bg_label, "后台合计：—")
+            if sp.dominant_background is not None:
+                dom_rate = format_rate(sp.dominant_background.total_bps, compact=True)
+                set_text(self.spotlight_dom_label, f"后台主导：{sp.dominant_background.name}  {dom_rate}")
+            else:
+                set_text(self.spotlight_dom_label, "后台主导：无")
+        else:
+            self.spotlight_caption.hide()
+            self.spotlight_fg_label.hide()
+            self.spotlight_bg_label.hide()
+            self.spotlight_dom_label.hide()
         self.focus_button.bind(choice.key if choice else "", "固定关注",
                                enabled=bool(choice and choice.can_follow and not frame.focused))
         self.unfocus_button.setVisible(frame.focused)
