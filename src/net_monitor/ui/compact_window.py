@@ -193,22 +193,25 @@ class CompactWindow(QMainWindow):
     def set_shutdown_in_progress(self, shutting_down: bool) -> None:
         self._shutdown_in_progress = shutting_down
 
-    def apply_snapshot(self, snapshot: MonitorSnapshot) -> None:
+    def apply_snapshot(self, snapshot: MonitorSnapshot, groups: dict = None) -> None:
         self._latest_snapshot = snapshot
         state = snapshot.process_network_state
-        groups = aggregate_application_network(
-            visible_processes(snapshot.processes, show_system=False, classifier=self._classifier),
-            snapshot.process_network,
-        )
-        upload_rate, download_rate = self._third_party_rates(state, groups)
+        # Use pre-aggregated groups from controller
+        if groups is None:
+            groups = aggregate_application_network(
+                visible_processes(snapshot.processes, show_system=False, classifier=self._classifier),
+                snapshot.process_network,
+            )
+        groups_list = list(groups.values()) if isinstance(groups, dict) else groups
+        upload_rate, download_rate = self._third_party_rates(state, groups_list)
         self._upload_value.setText("—" if upload_rate is None else format_bytes_per_second(upload_rate))
         self._download_value.setText("—" if download_rate is None else format_bytes_per_second(download_rate))
         self._apply_state(state)
 
-        active = [] if not state.available else [group for group in groups if self._is_active(group)]
+        active = [] if not state.available else [group for group in groups_list if self._is_active(group)]
         active.sort(key=self._activity_score, reverse=True)
         partial_unknown = any(g.upload_bytes_per_second is None or g.download_bytes_per_second is None
-                              for g in groups)
+                              for g in groups_list)
         count_text = ("当前联网应用数未知" if not state.available else
                       f"至少 {len(active)} 个应用正在联网；另有数据未知" if partial_unknown else
                       f"{len(active)} 个应用正在联网")

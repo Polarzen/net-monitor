@@ -30,7 +30,7 @@ from net_monitor.ui.windows_foreground import read_foreground_pid
 
 
 class UiController(QObject):
-    snapshot_ready = Signal(object)
+    snapshot_ready = Signal(object, object)
     sampling_failed = Signal(str)
 
     def __init__(
@@ -406,14 +406,8 @@ class UiController(QObject):
         self._latest_snapshot = snapshot
         self.projection.receive(snapshot)
         
-        # Record rates for each application group
-        from net_monitor.core.application_aggregation import aggregate_application_network
-        from net_monitor.core.process_visibility import visible_processes
-        groups = aggregate_application_network(
-            visible_processes(snapshot.processes, classifier=self.projection.classifier),
-            snapshot.process_network
-        )
-        for group in groups:
+        # Record rates for each application group - reuse projection's aggregation
+        for group in self.projection.groups.values():
             self._rate_history.record(
                 group.key,
                 group.upload_bytes_per_second,
@@ -433,7 +427,7 @@ class UiController(QObject):
         snapshot = self.projection.display_snapshot()
         if snapshot is not None:
             self._published_snapshot = snapshot
-            self.snapshot_ready.emit(snapshot)
+            self.snapshot_ready.emit(snapshot, self.projection.groups)
         self._published_state = source
         if source in (DisplayState.STALE, DisplayState.FAILED):
             self.compact_window._status_label.setText(source.value)

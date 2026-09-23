@@ -222,6 +222,11 @@ class MicroProjection:
         """Set the current foreground PID for spotlight computation."""
         self._spotlight_foreground_pid = pid
 
+    @property
+    def groups(self) -> dict[str, ApplicationNetworkGroup]:
+        """Expose aggregated application groups for reuse by other components."""
+        return self._groups
+
     def receive(self, snapshot: MonitorSnapshot) -> None:
         now = self.clock()
         # A gap is not evidence of a continuously leading challenger.

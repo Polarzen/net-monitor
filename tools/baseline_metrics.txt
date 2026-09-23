@@ -1,0 +1,11 @@
+Stage 3F Baseline Metrics
+============================================================
+Initial RSS: 18.2 MB
+Mean RSS: 19.2 MB
+Median RSS: 19.2 MB
+Peak RSS: 19.3 MB
+Mean CPU: 0.0%
+Median CPU: 0.0%
+Peak CPU: 0.0%
+Initial threads: 4
+Final threads: 6

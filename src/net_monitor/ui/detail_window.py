@@ -111,7 +111,7 @@ class DetailWindow(MainWindow):
         self._spotlight_label.setText('\n'.join(lines))
         self._spotlight_label.setVisible(True)
 
-    def apply_snapshot(self, snapshot: MonitorSnapshot) -> None:
+    def apply_snapshot(self, snapshot: MonitorSnapshot, groups: dict = None) -> None:
         self._on_snapshot(snapshot)
         self.session_view.apply_snapshot(snapshot)
 
