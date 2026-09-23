@@ -269,10 +269,29 @@ class MicroWindow(QFrame):
             activity = f"当前未运行 · {mode}"
         else:
             activity = f"状态未知 · {mode}"
-        # Spotlight context goes into tooltip only to avoid 220x112 clipping
+        # Build Spotlight glanceable text for state_label
+        spotlight_glance = ""
         spotlight_tip = ""
         if hasattr(frame, 'spotlight') and frame.spotlight and frame.spotlight.source_usable:
             sp = frame.spotlight
+            # Build glanceable one-liner for state_label
+            if sp.background_share is not None and sp.share_reliable:
+                pct = round(sp.background_share * 100)
+                if sp.dominant_background:
+                    if frame.selected and sp.dominant_background.key == frame.selected.key:
+                        spotlight_glance = f"后台主导 {pct}%"
+                    else:
+                        # Elide long names for 220px width
+                        dom_name = sp.dominant_background.name
+                        if len(dom_name) > 12:
+                            dom_name = dom_name[:10] + "…"
+                        spotlight_glance = f"后台 {pct}% · {dom_name}"
+                elif pct > 0:
+                    spotlight_glance = f"后台 {pct}%"
+            elif sp.foreground is None:
+                spotlight_glance = "前台未知"
+            
+            # Build full tooltip text
             if sp.background_share is not None and sp.share_reliable:
                 pct = round(sp.background_share * 100)
                 if sp.dominant_background:
@@ -286,7 +305,12 @@ class MicroWindow(QFrame):
                 fg_tip = f"前台: {sp.foreground.name}"
                 spotlight_tip = fg_tip + ("\n" + spotlight_tip if spotlight_tip else "")
         extra = "\n" + spotlight_tip if spotlight_tip else ""
-        set_text(self.state_label, activity)
+        
+        # Add glanceable Spotlight to state_label (single line, no wrap)
+        if spotlight_glance:
+            set_text(self.state_label, activity + "\n" + spotlight_glance)
+        else:
+            set_text(self.state_label, activity)
         self.setToolTip(f"{name}\n{frame.presence.value}\n{activity}{extra}\n{frame.message}\n"
                         "↓ 下载 / ↑ 上传；B 是字节，KiB=1024 B。点击展开，右键菜单。")
         if hasattr(frame, 'rate_history'):
