@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 import time
 
-from PySide6.QtCore import QMetaObject, QObject, QPoint, QThread, QTimer, Qt, Signal
+from PySide6.QtCore import QEvent, QMetaObject, QObject, QPoint, QThread, QTimer, Qt, Signal
 from PySide6.QtGui import QCursor, QIcon, QImage, QPixmap
 from PySide6.QtWidgets import QApplication, QMenu, QStyle
 
@@ -56,13 +57,14 @@ class UiController(QObject):
         self._latest_snapshot: MonitorSnapshot | None = None
         self._published_snapshot: MonitorSnapshot | None = None
         self._published_state: DisplayState | None = None
+        self._published_groups: dict = {}
         self._detail_window: DetailWindow | None = None
         self._shutdown_complete = False
         self._card_persistent = False
         self._main_menu_open = False
         self._screens: list = []
         self.projection = MicroProjection(clock=clock)
-        self._rate_history = RateHistoryStore()
+        self._rate_history = RateHistoryStore(clock=clock)
         self.projection.set_rate_history_store(self._rate_history)
         self._foreground_pid_reader = foreground_pid_reader or read_foreground_pid
         self.preferences_store = preferences_store or PreferencesStore()
@@ -79,12 +81,13 @@ class UiController(QObject):
         self.compact_window = CompactWindow(elevation_launcher=self._elevation_launcher)
         self.micro_window = MicroWindow()
         self.card = ApplicationCard()
+        self.micro_window.installEventFilter(self)
+        self.card.installEventFilter(self)
         self.micro_window.set_icon(self._generic_icon)
         self.card.set_icon(self._generic_icon)
         self.compact_window.details_requested.connect(self.show_details)
         self.compact_window.exit_requested.connect(self.exit_application)
         self.compact_window.always_on_top_changed.connect(self.set_always_on_top)
-        self.snapshot_ready.connect(self.compact_window.apply_snapshot)
         self.sampling_failed.connect(self._on_sampling_failed)
         self.compact_window.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.compact_window.customContextMenuRequested.connect(
@@ -187,16 +190,17 @@ class UiController(QObject):
             return
         self._recover_positions()
         window = self.primary_window
+        self._refresh_views(showing=(window,))
         window.show()
         if activate:
             window.raise_()
             window.activateWindow()
-        self._refresh_views()
 
     def set_mode(self, mode: str) -> None:
         if mode not in ("micro", "compact"):
             raise ValueError("Unknown primary mode")
         self.collapse_card()
+        self._invalidate_foreground()
         self.mode = mode
         other = self.compact_window if mode == "micro" else self.micro_window
         other.hide()
@@ -215,11 +219,8 @@ class UiController(QObject):
         if self._detail_window is None:
             detail = DetailWindow(service=self._service, elevation_launcher=self._elevation_launcher)
             detail.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
-            self.snapshot_ready.connect(detail.apply_snapshot)
             self._detail_window = detail
-            snapshot = self.projection.display_snapshot()
-            if snapshot is not None:
-                detail.apply_snapshot(snapshot)
+        self._refresh_views(showing=(self._detail_window,))
         self._detail_window.show()
         self._detail_window.raise_()
         self._detail_window.activateWindow()
@@ -231,10 +232,12 @@ class UiController(QObject):
             was_visible = self.micro_window.isVisible()
             self.micro_window.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, enabled)
             if was_visible:
+                self._refresh_views(showing=(self.micro_window,))
                 self.micro_window.show()  # WA_ShowWithoutActivating stays set.
             self._save_preferences()
         else:
             self.compact_window.set_always_on_top(enabled)
+            self._refresh_views()
         # Fixed attention and topmost are different. Detail never inherits this flag.
         self.tray.set_always_on_top_checked(enabled)
 
@@ -262,9 +265,8 @@ class UiController(QObject):
         self._hover_timer.stop()
         self._collapse_timer.stop()
         self._card_persistent = self._card_persistent or interactive
-        self.card.apply_frame(self.projection.frame())
-        self.card.set_icon(self._current_icon)
         self._position_card(force=True)
+        self._refresh_views(showing=(self.card,))
         self.card.show()
         # Preview/automatic refresh never raises or activates a window.
         if interactive:
@@ -308,7 +310,7 @@ class UiController(QObject):
         top.setCheckable(True)
         top.setChecked(self._micro_on_top if self.mode == "micro" else self.compact_window.always_on_top)
         top.toggled.connect(self.set_always_on_top)
-        if self.projection.frame().focused:
+        if self.projection.focused:
             menu.addAction("取消固定关注", self.unfollow)
         if self.tray.available:
             menu.addAction("隐藏到托盘", self._close_primary)
@@ -403,6 +405,9 @@ class UiController(QObject):
     def _on_snapshot(self, snapshot: MonitorSnapshot) -> None:
         if self._shutdown_complete:
             return
+        if snapshot is self._latest_snapshot:
+            self._refresh_views()
+            return
         self._latest_snapshot = snapshot
         self.projection.receive(snapshot)
         
@@ -420,27 +425,38 @@ class UiController(QObject):
     def _on_sampling_failed(self, message: str) -> None:
         if not self._shutdown_complete:
             self.projection.fail(message)
+            self._publish_snapshot()
             self._refresh_views()
 
     def _publish_snapshot(self) -> None:
         source = self.projection.source_state()
         snapshot = self.projection.display_snapshot()
+        groups = self.projection.groups
+        if source is not DisplayState.ACTIVE:
+            groups = {key: replace(group, upload_bytes_per_second=None,
+                                   download_bytes_per_second=None)
+                      for key, group in groups.items()}
+        self._published_groups = groups
         if snapshot is not None:
             self._published_snapshot = snapshot
-            self.snapshot_ready.emit(snapshot, self.projection.groups)
+            self.snapshot_ready.emit(snapshot, groups)
         self._published_state = source
-        if source in (DisplayState.STALE, DisplayState.FAILED):
-            self.compact_window._status_label.setText(source.value)
-            self.compact_window._status_label.setToolTip(self.projection.frame().message)
-            if self._detail_window is not None:
-                self._detail_window._network_status_label.setText(source.value)
+
+    def _invalidate_foreground(self) -> None:
+        self.projection.set_presence_state(PresenceState.UNKNOWN, None)
+        self.projection.set_foreground_pid(None)
+
+    def eventFilter(self, watched, event) -> bool:
+        if event.type() == QEvent.Type.Hide and watched in (self.micro_window, self.card):
+            self._invalidate_foreground()
+        return super().eventFilter(watched, event)
 
     def _heartbeat_refresh(self) -> None:
         """Poll foreground once for this 500 ms UI tick, then repaint views."""
 
         self._refresh_views(poll_foreground=True)
 
-    def _refresh_views(self, *, poll_foreground: bool = False) -> None:
+    def _refresh_views(self, *, poll_foreground: bool = False, showing: tuple = ()) -> None:
         if self._shutdown_complete:
             return
         if self._published_state != self.projection.source_state():
@@ -463,18 +479,40 @@ class UiController(QObject):
             self.projection.set_presence_state(self.projection.cached_presence_state(),
                                                self.projection.presence_context())
         else:
-            self.projection.set_presence_state(PresenceState.UNKNOWN, None)
-            self.projection.set_foreground_pid(None)
-        frame = self.projection.frame()
-        # The tiny window is cheap; hidden cards receive no painting/text/icon work.
-        self.micro_window.apply_frame(frame)
-        if self.card.isVisible():
+            self._invalidate_foreground()
+        # Drain existing IO even when hidden, retaining its bounded cache without
+        # requesting or converting display icons. Only showing views build frames.
+        self._icons.poll()
+        micro_visible = self.micro_window.isVisible() or self.micro_window in showing
+        card_visible = self.card.isVisible() or self.card in showing
+        detail_visible = self._detail_window is not None and (
+            self._detail_window.isVisible() or self._detail_window in showing)
+        snapshot = self._published_snapshot
+        for window, visible in ((self.compact_window, self.compact_window.isVisible()
+                                 or self.compact_window in showing),
+                                (self._detail_window, detail_visible)):
+            if visible:
+                if snapshot is not None and window._latest_snapshot is not snapshot:
+                    window.apply_snapshot(snapshot, self._published_groups)
+                if self._published_state in (DisplayState.STALE, DisplayState.FAILED):
+                    label = (window._status_label if window is self.compact_window else window._network_status_label)
+                    if label.text() != self._published_state.value:
+                        label.setText(self._published_state.value)
+                    message = self.projection.source_message(self._published_state)
+                    if label.toolTip() != message:
+                        label.setToolTip(message)
+        if not (micro_visible or card_visible or detail_visible):
+            return  # Data publication, time state and pending icon IO already maintained.
+        frame = self.projection.frame(include_history=card_visible, include_details=card_visible)
+        if micro_visible:
+            self.micro_window.apply_frame(replace(frame, rate_history=(), top=(), choices=(), account=None))
+        if card_visible:
             self.card.apply_frame(frame)
-        completed = self._icons.poll()
-        for key, normalized, _pixels in completed:
-            if frame.selected and frame.selected.key == key:
-                self._icon_token = None  # Only the still-selected key may repaint.
-        if (self.micro_window.isVisible() or self.card.isVisible()) and frame.selected:
+        if detail_visible:
+            self._detail_window.update_spotlight(frame)
+        if not (micro_visible or card_visible):
+            return
+        if frame.selected:
             choice = frame.selected
             pixels = self._icons.request(choice.key, choice.executable)
             token = (choice.key, id(pixels))
@@ -486,15 +524,19 @@ class UiController(QObject):
                                    pixels.width * 4, QImage.Format.Format_ARGB32).copy()
                     icon = QIcon(QPixmap.fromImage(image))
                 self._current_icon = icon
-                self.micro_window.set_icon(icon)
-                if self.card.isVisible():
-                    self.card.set_icon(icon)
+            for window in (self.micro_window, self.card):
+                if (window.isVisible() or window in showing) and (
+                        getattr(window, "_applied_icon_token", None) != token):
+                    window.set_icon(self._current_icon)
+                    window._applied_icon_token = token
         elif frame.selected is None and self._icon_token is not None:
             self._icon_token = None
             self._current_icon = self._generic_icon
-            self.micro_window.set_icon(self._generic_icon)
-            if self.card.isVisible():
-                self.card.set_icon(self._generic_icon)
+        if frame.selected is None:
+            for window in (self.micro_window, self.card):
+                if (window.isVisible() or window in showing) and getattr(window, "_applied_icon_token", None) is not None:
+                    window.set_icon(self._generic_icon)
+                    window._applied_icon_token = None
 
     def exit_application(self) -> None:
         self.shutdown()

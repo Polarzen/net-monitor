@@ -28,14 +28,11 @@ class SessionTotals(QWidget):
         super().__init__()
         self.caption = label(SESSION_CAPTION)
         self.values = label("无可信累计")
-        self.note = label("本次启动以来已确认；不跨重启保存。")
-        self.note.setToolTip(SESSION_EXPLANATION)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 4, 0, 4)
         layout.setSpacing(2)
         layout.addWidget(self.caption)
         layout.addWidget(self.values)
-        layout.addWidget(self.note)
         self.setToolTip(SESSION_EXPLANATION)
 
     def apply_frame(self, frame: WidgetFrame) -> None:
@@ -46,8 +43,8 @@ class SessionTotals(QWidget):
             text = f"↓ 下载 {format_bytes(account.download_bytes)}\n↑ 上传 {format_bytes(account.upload_bytes)}"
         set_text(self.values, text)
         self.values.setToolTip(text)
-        set_text(self.note, "本次启动以来已确认；不跨重启保存。" if frame.source_usable
-                 else "保留已确认累计；当前采集数据不可用。")
+        self.caption.setToolTip(SESSION_EXPLANATION + ("" if frame.source_usable
+                                 else "\n保留已确认累计；当前采集数据不可用。"))
 
 
 class SessionItem(QTreeWidgetItem):

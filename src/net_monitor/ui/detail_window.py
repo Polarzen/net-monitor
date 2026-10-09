@@ -34,6 +34,7 @@ class DetailWindow(MainWindow):
             elevation_launcher=elevation_launcher or restart_as_administrator,
         )
         self._controller_shutdown = False
+        self._last_spotlight = None
         # Reparent the existing live page, preserving its tree, filters and signals.
         self.live_page = self.takeCentralWidget()
         # Spotlight summary label
@@ -67,6 +68,9 @@ class DetailWindow(MainWindow):
             return
         
         spotlight = frame.spotlight
+        if spotlight == self._last_spotlight:
+            return
+        self._last_spotlight = spotlight
         if not spotlight.source_usable:
             self._spotlight_label.setVisible(False)
             return
@@ -96,7 +100,7 @@ class DetailWindow(MainWindow):
             else:
                 lines.append(f'后台: {bg_text}')
         else:
-            lines.append('后台: 无活动')
+            lines.append('后台: 未知')
         
         # Dominant background
         if spotlight.dominant_background is not None:
@@ -112,7 +116,8 @@ class DetailWindow(MainWindow):
         self._spotlight_label.setVisible(True)
 
     def apply_snapshot(self, snapshot: MonitorSnapshot, groups: dict = None) -> None:
-        self._on_snapshot(snapshot)
+        self._latest_snapshot = snapshot
+        self._apply_snapshot(snapshot, shared_groups=groups)
         self.session_view.apply_snapshot(snapshot)
 
     def set_shutdown_in_progress(self, shutting_down: bool) -> None:

@@ -122,7 +122,7 @@ def test_micro_quiet_and_followed_idle_states(make_controller, app):
     c._heartbeat_refresh()
     assert c.micro_window.name_label.text() == "Net Monitor"
     assert "当前安静" in c.micro_window.state_label.text()
-    assert "暂无明显网络活动" in c.micro_window.state_label.text()
+    assert "\n" not in c.micro_window.state_label.text()
     key = application_key(idle.processes[3])
     c.follow(key)
     assert c.micro_window.name_label.toolTip() == idle.processes[3].name

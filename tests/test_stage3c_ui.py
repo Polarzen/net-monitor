@@ -187,11 +187,13 @@ def test_stale_and_failure_mask_legacy_rates_without_modifying_snapshot(make_con
     assert c.projection.frame().state is DisplayState.STALE
     assert c.compact_window._upload_value.text() == "—"
     assert detail._upload_label.text().endswith("—")
-    assert "数据更新已停止" in c.card.state_label.text()
+    assert "数据已过期" in c.card.state_label.text()
+    assert "数据更新已停止" in c.card.state_label.toolTip()
     assert c.latest_snapshot is data
     assert data.process_network[0].upload_bytes_per_second > 0
-    c._on_snapshot(data)
+    c._on_snapshot(replace(data))
     c.sampling_failed.emit("failure")
+    c.show_compact()
     assert c.projection.frame().state is DisplayState.FAILED
     assert c.compact_window._status_label.text() == "采样失败"
     assert c.projection.frame().account is data.application_session[0]

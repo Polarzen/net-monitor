@@ -165,29 +165,18 @@ class MainWindow(QMainWindow):
         if self._latest_snapshot is not None:
             self._apply_snapshot(self._latest_snapshot)
 
-    def _apply_snapshot(self, snapshot: MonitorSnapshot) -> None:
+    def _apply_snapshot(self, snapshot: MonitorSnapshot, shared_groups: dict | None = None) -> None:
         started = time.perf_counter()
         network_rows = {item.pid: item for item in snapshot.process_network}
 
-        third_party_processes = visible_processes(
-            snapshot.processes,
-            show_system=False,
-            classifier=self._classifier,
-        )
-        third_party_groups = aggregate_application_network(
-            third_party_processes,
-            snapshot.process_network,
-        )
-        groups = list(
-            aggregate_application_network(
-                visible_processes(
-                    snapshot.processes,
-                    show_system=self._show_system_processes.isChecked(),
-                    classifier=self._classifier,
-                ),
-                snapshot.process_network,
-            )
-        )
+        third_party_groups = (tuple(shared_groups.values()) if shared_groups is not None else
+                              aggregate_application_network(
+                                  visible_processes(snapshot.processes, show_system=False,
+                                                    classifier=self._classifier),
+                                  snapshot.process_network))
+        groups = list(aggregate_application_network(
+            visible_processes(snapshot.processes, show_system=True, classifier=self._classifier),
+            snapshot.process_network) if self._show_system_processes.isChecked() else third_party_groups)
 
         state = snapshot.process_network_state
         upload_rate, download_rate = self._third_party_rates(state, third_party_groups)

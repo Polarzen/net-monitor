@@ -15,7 +15,7 @@ from net_monitor.ui.rate_history import RateSample
 _UPLOAD_COLOR = QColor("#7dd3a8")
 _DOWNLOAD_COLOR = QColor("#6ba4d9")
 
-# Fixed logical size - keeps the micro window layout stable.
+# Fixed logical size for the expanded application card.
 _SPARKLINE_WIDTH = 60
 _SPARKLINE_HEIGHT = 20
 
@@ -35,6 +35,7 @@ class Sparkline(QWidget):
         self.setFixedSize(_SPARKLINE_WIDTH, _SPARKLINE_HEIGHT)
         self._upload: list[float | None] = []
         self._download: list[float | None] = []
+        self._samples: tuple[RateSample, ...] = ()
         # Start hidden - only show when we have data
         self.hide()
 
@@ -43,6 +44,9 @@ class Sparkline(QWidget):
 
         Shows the widget if there's data, hides it if empty.
         """
+        if samples == self._samples:
+            return
+        self._samples = samples
         self._upload = [s.upload_bytes_per_second for s in samples]
         self._download = [s.download_bytes_per_second for s in samples]
 
@@ -59,6 +63,7 @@ class Sparkline(QWidget):
         """Remove all data and hide the widget."""
         self._upload.clear()
         self._download.clear()
+        self._samples = ()
         self.hide()
         self.update()
 
@@ -83,22 +88,12 @@ class Sparkline(QWidget):
             max(valid_uploads, default=0.0),
             max(valid_downloads, default=0.0),
         )
-        if peak <= 0.0:
-            # All zeros or all None - draw flat lines at the vertical midpoint.
-            mid_y = height / 2.0
-            if valid_uploads:
-                painter.setPen(QPen(_UPLOAD_COLOR, 1.0))
-                painter.drawLine(0, int(mid_y), width, int(mid_y))
-            if valid_downloads:
-                painter.setPen(QPen(_DOWNLOAD_COLOR, 1.0))
-                painter.drawLine(0, int(mid_y), width, int(mid_y))
-            painter.end()
-            return
-
         step_x = width / max(count - 1, 1) if count > 1 else 0.0
 
         def _y(value: float) -> int:
             # Invert so that larger values are drawn higher.
+            if peak <= 0.0:
+                return int(height / 2.0)
             return int(height - 1 - (value / peak) * (height - 1))
 
         def _x(index: int) -> int:

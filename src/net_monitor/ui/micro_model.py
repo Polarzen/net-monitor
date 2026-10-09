@@ -213,6 +213,7 @@ class MicroProjection:
         self._presence_context: PresenceContext | None = None
         self._rate_history_store = None
         self._spotlight_foreground_pid = None
+        self._foreground_identity = ()
 
     def set_rate_history_store(self, store) -> None:
         """Attach a RateHistoryStore so frame() can populate rate_history."""
@@ -221,6 +222,18 @@ class MicroProjection:
     def set_foreground_pid(self, pid: int | None) -> None:
         """Set the current foreground PID for spotlight computation."""
         self._spotlight_foreground_pid = pid
+        self._foreground_identity = self._foreground_context(pid)
+
+    def _foreground_context(self, pid: int | None) -> tuple:
+        return tuple(sorted((group.key, process.identity)
+                            for group in self._groups.values() for process in group.processes
+                            if pid is not None and process.pid == pid and process.create_time is not None))
+
+    def cached_foreground_pid(self) -> int | None:
+        if (not self._foreground_identity or self._foreground_identity !=
+                self._foreground_context(self._spotlight_foreground_pid)):
+            self.set_foreground_pid(None)
+        return self._spotlight_foreground_pid
 
     @property
     def groups(self) -> dict[str, ApplicationNetworkGroup]:
@@ -342,7 +355,21 @@ class MicroProjection:
         elif now - self._challenger_since >= self.challenger_seconds:
             self._auto_key, self._challenger = leader.key, None
 
-    def frame(self) -> WidgetFrame:
+    def source_message(self, source: DisplayState | None = None) -> str:
+        source = source or self.source_state()
+        if source is DisplayState.FAILED:
+            return f"采样失败：{self._failure}"
+        if source is DisplayState.STALE:
+            return "数据更新已停止；旧速率不作为实时值。已确认累计仍保留。"
+        if self.snapshot is not None:
+            return self.snapshot.process_network_state.message or source.value
+        return source.value
+
+    @property
+    def focused(self) -> bool:
+        return self._focus is not None
+
+    def frame(self, *, include_history: bool = True, include_details: bool = True) -> WidgetFrame:
         source = self.source_state()
         key = self._focus.key if self._focus else self._auto_key
         group = self._groups.get(key or "")
@@ -358,7 +385,7 @@ class MicroProjection:
         if source is DisplayState.ACTIVE:
             ranked = tuple(RankedApp(_choice(g), float(g.upload_bytes_per_second),
                                      float(g.download_bytes_per_second))
-                           for g in self._ranked_groups()[:3])
+                           for g in self._ranked_groups()[:3]) if include_details else ()
             if group is not None:
                 upload = rate_number(group.upload_bytes_per_second)
                 download = rate_number(group.download_bytes_per_second)
@@ -383,21 +410,17 @@ class MicroProjection:
             else:
                 state, message = DisplayState.IDLE, "当前默认可见应用未观察到流量"
                 upload = download = 0.0
-        elif source is DisplayState.FAILED:
-            message = f"采样失败：{self._failure}"
-        elif source is DisplayState.STALE:
-            message = "数据更新已停止；旧速率不作为实时值。已确认累计仍保留。"
-        elif self.snapshot is not None:
-            message = self.snapshot.process_network_state.message or source.value
+        else:
+            message = self.source_message(source)
         history: tuple[RateSample, ...] = ()
-        if selected is not None and self._rate_history_store is not None:
+        if include_history and selected is not None and self._rate_history_store is not None:
             history = self._rate_history_store.get_series(selected.key)
         spotlight = compute_network_spotlight(
-            self._groups, self._spotlight_foreground_pid,
+            self._groups, self.cached_foreground_pid(),
             source is DisplayState.ACTIVE,
         )
         return WidgetFrame(selected, state, source, message, upload, download,
-                           ranked, self.choices(), self._focus is not None, account, partial,
+                           ranked, self.choices() if include_details else (), self._focus is not None, account, partial,
                            self.cached_presence_state(), history, spotlight)
 
     def display_snapshot(self) -> MonitorSnapshot | None:
@@ -413,5 +436,5 @@ class MicroProjection:
                        process_network=tuple(replace(row, upload_bytes_per_second=None,
                                                      download_bytes_per_second=None)
                                              for row in snapshot.process_network),
-                       process_network_state=ProcessNetworkState(status, self.frame().message,
+                       process_network_state=ProcessNetworkState(status, self.source_message(source),
                                                                  snapshot.process_network_state.error_code))

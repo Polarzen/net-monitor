@@ -152,6 +152,8 @@ def test_controller_reuses_one_detail_instance_and_one_service() -> None:
     assert first is second
     assert first._service is service
     assert controller.service is service
+    assert controller.compact_window.latest_snapshot is None  # Hidden views do no display work.
+    controller.show_compact()
     assert controller.compact_window.latest_snapshot is controller.latest_snapshot
     assert first._latest_snapshot is controller.latest_snapshot
 
@@ -230,6 +232,7 @@ def test_compact_and_detail_consume_same_snapshot_object() -> None:
     qapp()
     controller = UiController(service=FakeService(), start_worker=False)
     detail = controller.show_details()
+    controller.show_compact()
     snapshot = make_snapshot()
     controller._on_snapshot(snapshot)
     assert controller.compact_window.latest_snapshot is snapshot

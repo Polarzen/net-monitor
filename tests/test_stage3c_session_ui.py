@@ -170,6 +170,7 @@ def test_card_and_tab_do_not_reset_accounts_across_modes(make_controller, app):
 
 def test_compact_partial_unknown_and_unavailable_are_not_all_idle(make_controller):
     c = make_controller()
+    c.show_compact()
     data = snapshot(idle=True)
     rows = (replace(data.process_network[0], upload_bytes_per_second=None), *data.process_network[1:])
     c._on_snapshot(replace(data, process_network=rows))
@@ -201,6 +202,7 @@ def test_themed_micro_rate_glyphs_and_fixed_layout(make_controller, app, rate):
 
 def test_permission_warning_is_visible_even_while_focused(make_controller):
     c = make_controller()
+    c.show_primary(activate=False)
     data = snapshot()
     c._on_snapshot(data)
     c.follow(data.application_session[0].key)

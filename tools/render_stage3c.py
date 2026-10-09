@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import replace
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -24,6 +25,7 @@ from net_monitor.core.models import (
 )
 from net_monitor.ui.controller import UiController
 from net_monitor.ui.preferences import PreferencesStore
+from net_monitor.ui.sparkline import Sparkline
 from net_monitor.ui.theme import DARK_STYLESHEET
 
 
@@ -64,6 +66,10 @@ def main() -> int:
     app.setStyleSheet(DARK_STYLESHEET)
     metadata = {"fake_snapshot": True, "physical_desktop": False, "real_etw": False,
                 "sha": head, "controller_path": str(expected), "platform": platform.platform(),
+                "ui_source_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                                     for p in sorted(expected.parent.glob('*.py'))},
+                "source_worktree_status": subprocess.check_output(
+                    ["git", "status", "--porcelain", "--", "src"], text=True),
                 "python": platform.python_version(), "pyside": PySide6.__version__,
                 "qt_scale_factor": scale, "font": font_evidence, "renders": [], "label_metrics": []}
     clock_value = [0.0]
@@ -104,6 +110,14 @@ def main() -> int:
             data = fake_snapshot()
             c._on_snapshot(data)
             check_micro("micro-active")
+            assert not c.micro_window.findChildren(Sparkline)
+            for label, value in (("huge", 1e100), ("unknown", None)):
+                c._on_snapshot(replace(data, process_network=tuple(
+                    replace(row, upload_bytes_per_second=value, download_bytes_per_second=value)
+                    for row in data.process_network)))
+                check_micro(f"micro-{label}")
+            c._on_sampling_failed("fake render failure")
+            check_micro("micro-failed")
             quiet_rows = tuple(replace(row, upload_bytes_per_second=0.0,
                                        download_bytes_per_second=0.0)
                                for row in data.process_network)

@@ -221,7 +221,6 @@ class MicroWindow(QFrame):
             label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self.state_label = plain_label("启动中", wrap=True)
         self.state_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-        self._sparkline = Sparkline()
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 4, 6, 4)
         layout.setSpacing(0)
@@ -229,7 +228,6 @@ class MicroWindow(QFrame):
         layout.addWidget(self.download_label)
         layout.addWidget(self.upload_label)
         layout.addWidget(self.state_label)
-        layout.addWidget(self._sparkline)
         for label in self.findChildren(QLabel):
             label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
@@ -251,70 +249,38 @@ class MicroWindow(QFrame):
         self.badge_label.setToolTip(mode + "；" + frame.presence.value)
         set_text(self.download_label, "↓ 下载 " + format_rate(frame.download, compact=True))
         set_text(self.upload_label, "↑ 上传 " + format_rate(frame.upload, compact=True))
-        if frame.selected is None and frame.source_usable:
-            activity = f"当前安静 · {mode}\n暂无明显网络活动"
+        if frame.selected is None and frame.state is DisplayState.IDLE:
+            activity = f"当前安静 · {mode}"
         elif frame.state is DisplayState.ACTIVE:
             activity = f"当前有流量 · {mode}"
         elif frame.state is DisplayState.IDLE:
             activity = f"当前无流量 · {mode}"
         elif frame.source_state is DisplayState.STALE:
-            activity = f"{frame.presence.value} · 数据已过期"
+            activity = f"数据已过期 · {mode}"
         elif frame.source_state is DisplayState.FAILED:
-            activity = f"{frame.presence.value} · 采样失败"
+            activity = f"采样失败 · {mode}"
         elif frame.source_state is DisplayState.PERMISSION:
-            activity = f"{frame.presence.value} · 需要管理员权限"
+            activity = "需要管理员权限"
         elif frame.source_state is DisplayState.UNAVAILABLE:
             activity = f"采集不可用 · {mode}"
         elif frame.state is DisplayState.NOT_RUNNING:
             activity = f"当前未运行 · {mode}"
         else:
             activity = f"状态未知 · {mode}"
-        # Build Spotlight glanceable text for state_label
-        spotlight_glance = ""
+        # Spotlight stays in the tooltip; no permanent metrics row in Micro.
         spotlight_tip = ""
-        if hasattr(frame, 'spotlight') and frame.spotlight and frame.spotlight.source_usable:
+        if frame.spotlight and frame.spotlight.source_usable:
             sp = frame.spotlight
-            # Build glanceable one-liner for state_label
-            if sp.background_share is not None and sp.share_reliable:
-                pct = round(sp.background_share * 100)
-                if sp.dominant_background:
-                    if frame.selected and sp.dominant_background.key == frame.selected.key:
-                        spotlight_glance = f"后台主导 {pct}%"
-                    else:
-                        # Elide long names for 220px width
-                        dom_name = sp.dominant_background.name
-                        if len(dom_name) > 12:
-                            dom_name = dom_name[:10] + "…"
-                        spotlight_glance = f"后台 {pct}% · {dom_name}"
-                elif pct > 0:
-                    spotlight_glance = f"后台 {pct}%"
-            elif sp.foreground is None:
-                spotlight_glance = "前台未知"
-            
-            # Build full tooltip text
-            if sp.background_share is not None and sp.share_reliable:
-                pct = round(sp.background_share * 100)
-                if sp.dominant_background:
-                    if frame.selected and sp.dominant_background.key == frame.selected.key:
-                        spotlight_tip = f"后台主导 {pct}%"
-                    else:
-                        spotlight_tip = f"后台 {pct}% · {sp.dominant_background.name}"
-                elif pct > 0:
-                    spotlight_tip = f"后台 {pct}%"
             if sp.foreground is not None:
-                fg_tip = f"前台: {sp.foreground.name}"
-                spotlight_tip = fg_tip + ("\n" + spotlight_tip if spotlight_tip else "")
+                spotlight_tip = f"前台: {sp.foreground.name}"
+            if sp.background_share is not None and sp.share_reliable:
+                spotlight_tip += f"\n后台占可见应用流量 {sp.background_share:.0%}"
+            if sp.dominant_background is not None:
+                spotlight_tip += f"\n后台主导: {sp.dominant_background.name}"
         extra = "\n" + spotlight_tip if spotlight_tip else ""
-        
-        # Add glanceable Spotlight to state_label (single line, no wrap)
-        if spotlight_glance:
-            set_text(self.state_label, activity + "\n" + spotlight_glance)
-        else:
-            set_text(self.state_label, activity)
+        set_text(self.state_label, activity)
         self.setToolTip(f"{name}\n{frame.presence.value}\n{activity}{extra}\n{frame.message}\n"
                         "↓ 下载 / ↑ 上传；B 是字节，KiB=1024 B。点击展开，右键菜单。")
-        if hasattr(frame, 'rate_history'):
-            self._sparkline.set_data(frame.rate_history)
 
     def set_icon(self, icon: QIcon) -> None:
         self.icon_label.setPixmap(icon.pixmap(16, 16))
@@ -402,12 +368,7 @@ class ApplicationCard(QFrame):
         self.icon_label.setFixedSize(24, 24)
         self.name_label = plain_label("启动中", wrap=True)
         self.name_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.path_label = plain_label("路径不可用", wrap=True)
-        self.path_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.path_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
-        self.path_label.setMaximumHeight(64)
         self.state_label = plain_label("启动中", wrap=True)
-        self.mode_label = plain_label("自动显示（对象切换有防抖）")
         self.rates_label = plain_label("↓ 下载 —\n↑ 上传 —", wrap=True)
         self.focus_button = KeyButton("固定关注")
         self.focus_button.key_activated.connect(self.follow_requested.emit)
@@ -432,9 +393,9 @@ class ApplicationCard(QFrame):
         # Network Spotlight section
         self.spotlight_caption = plain_label("网络焦点")
         self.spotlight_caption.setStyleSheet("font-weight:600;")
-        self.spotlight_fg_label = plain_label("前台应用：—")
-        self.spotlight_bg_label = plain_label("后台合计：—")
-        self.spotlight_dom_label = plain_label("后台主导：—")
+        self.spotlight_fg_label = plain_label("前台应用：—", wrap=True)
+        self.spotlight_bg_label = plain_label("后台合计：—", wrap=True)
+        self.spotlight_dom_label = plain_label("后台主导：—", wrap=True)
 
         header = QHBoxLayout()
         header.addWidget(self.icon_label)
@@ -452,10 +413,10 @@ class ApplicationCard(QFrame):
         self.body_layout.setContentsMargins(10, 10, 10, 10)
         self.body_layout.setSpacing(6)
         self.body_layout.addLayout(header)
-        self.body_layout.addWidget(self.path_label)
         self.body_layout.addWidget(self.state_label)
-        self.body_layout.addWidget(self.mode_label)
         self.body_layout.addWidget(self.rates_label)
+        self._sparkline = Sparkline()
+        self.body_layout.addWidget(self._sparkline)
         self.body_layout.addLayout(attention)
         self.body_layout.addWidget(self.session_totals)
         self.body_layout.addWidget(self.spotlight_caption)
@@ -465,8 +426,6 @@ class ApplicationCard(QFrame):
         self.body_layout.addWidget(self.top_caption)
         for row in self._top_rows:
             self.body_layout.addWidget(row)
-        self._sparkline = Sparkline()
-        self.body_layout.addWidget(self._sparkline)
         self.body_layout.addWidget(self.restart_button)
         self.body_layout.addLayout(footer)
         self.body_layout.addStretch()
@@ -494,10 +453,10 @@ class ApplicationCard(QFrame):
         choice = frame.selected
         set_text(self.name_label, choice.name if choice else "Net Monitor")
         path = choice.executable if choice and choice.executable else "无可读取的可执行文件路径"
-        set_text(self.path_label, path)
-        self.path_label.setToolTip(path)
-        set_text(self.state_label, frame.message)
-        set_text(self.mode_label, "固定关注" if frame.focused else "自动显示（对象切换有防抖）")
+        self.name_label.setToolTip(f"{choice.name if choice else 'Net Monitor'}\n{path}\n{choice.key if choice else ''}")
+        mode = "固定关注" if frame.focused else "自动显示"
+        set_text(self.state_label, f"{frame.state.value} · {frame.presence.value} · {mode}")
+        self.state_label.setToolTip(frame.message + "\n自动显示对象切换有防抖；固定关注不等于置顶或前台。")
         set_text(self.rates_label, "↓ 下载 " + format_rate(frame.download)
                  + "\n↑ 上传 " + format_rate(frame.upload))
         self.session_totals.apply_frame(frame)
@@ -510,7 +469,7 @@ class ApplicationCard(QFrame):
             self.spotlight_dom_label.show()
             if sp.foreground is not None:
                 fg_rate = format_rate(sp.foreground.total_bps, compact=True)
-                set_text(self.spotlight_fg_label, f"当前前台：{sp.foreground.name}  {fg_rate}")
+                set_text(self.spotlight_fg_label, f"当前前台：{'当前应用' if choice and sp.foreground.key == choice.key else sp.foreground.name}  {fg_rate}")
             else:
                 set_text(self.spotlight_fg_label, "当前前台：未知")
             if sp.background_total_bps is not None:
@@ -524,7 +483,7 @@ class ApplicationCard(QFrame):
                 set_text(self.spotlight_bg_label, "后台合计：—")
             if sp.dominant_background is not None:
                 dom_rate = format_rate(sp.dominant_background.total_bps, compact=True)
-                set_text(self.spotlight_dom_label, f"后台主导：{sp.dominant_background.name}  {dom_rate}")
+                set_text(self.spotlight_dom_label, f"后台主导：{'当前应用' if choice and sp.dominant_background.key == choice.key else sp.dominant_background.name}  {dom_rate}")
             else:
                 set_text(self.spotlight_dom_label, "后台主导：无")
         else:
@@ -546,7 +505,8 @@ class ApplicationCard(QFrame):
             app = frame.top[index]
             # Full name/path are available without widening the card.
             name = row.fontMetrics().elidedText(app.choice.name, Qt.TextElideMode.ElideRight, 125)
-            text = f"{name}  ↓{format_rate(app.download, compact=True)} ↑{format_rate(app.upload, compact=True)}"
+            text = (f"{index + 1}. 当前应用" if choice and app.choice.key == choice.key else
+                    f"{index + 1}. {name}  ↓{format_rate(app.download, compact=True)} ↑{format_rate(app.upload, compact=True)}")
             row.bind(app.choice.key, text, enabled=app.choice.can_follow)
             row.setToolTip(f"{app.choice.name}\n{app.choice.executable or app.choice.key}\n点击固定关注")
             row.show()
