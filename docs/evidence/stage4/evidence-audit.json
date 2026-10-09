@@ -1,0 +1,25 @@
+{
+  "implementation": "612ebe5ddd1e9680facd17b36c38a7863b828730",
+  "paired_scenarios": [
+    "micro",
+    "detail",
+    "hidden"
+  ],
+  "checks": [
+    "same interpreter and dependency versions",
+    "same fixed 24-app/96-process workload",
+    "30 second warmup and >=120 second observation",
+    "120 CPU samples per formal scenario",
+    "before hashes match archived baseline",
+    "after hashes match committed implementation",
+    "all steady hidden display calls zero",
+    "history and accounts retained",
+    "3 exact-HEAD layout manifests and 54 PNG files validated"
+  ],
+  "limitations": [
+    "offline Qt with fake service; no ETW worker in benchmark",
+    "single-run CPU variance; no significance claim",
+    "physical desktop and real ETW acceptance pending per goal environment fallback"
+  ],
+  "text_log_normalization": "Trailing whitespace normalized for Git; test outputs and results unchanged."
+}

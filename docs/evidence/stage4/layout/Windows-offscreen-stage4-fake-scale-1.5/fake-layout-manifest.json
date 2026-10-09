@@ -1,0 +1,654 @@
+{
+  "fake_snapshot": true,
+  "physical_desktop": false,
+  "real_etw": false,
+  "sha": "612ebe5ddd1e9680facd17b36c38a7863b828730",
+  "controller_path": "D:\\code\\net-monitor\\src\\net_monitor\\ui\\controller.py",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "ui_source_sha256": {
+    "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compact_window.py": "93f00fb887bc3c2fdd79601de6c14f28deab6539e7cfe93e00705fce44ddaf73",
+    "controller.py": "61ab069e84b520ec19d72dd12a8ce01eaccb909c9d5afcb8c99c7bad708a22be",
+    "detail_window.py": "85a66e471cee22efeef020e2d7cf44bf114c4dc5bddbf259bdf8bd1d05f251e7",
+    "icon_cache.py": "bfe166b78dead48c665ad8ce18c2fea1d4c397d75611896ceaac896856b65304",
+    "main_window.py": "f732ebb23169143703f65919cff2636130a37a97420f2aec19a4ff3cc13fe579",
+    "micro_model.py": "fadfda156bcf9889449da081dd9c2de694c11c72422000dfe2a8fba612efbee1",
+    "micro_window.py": "d68f581bdae0f1045a722ac9ae629e78248fb0b6bc22850a4058a790b4fe17fc",
+    "network_spotlight.py": "1204c5e70f5c73edcef8530e40f26e699ddb65dd1ab8f335133ecf378e9d04e2",
+    "preferences.py": "7a32be461de887097a4d4ac35871e9b9def610706821442467dba0d7be8ef0cd",
+    "rate_history.py": "01a3260b415503b19290dfe2011b58f29f43f7699e39e31f1816cce560c4cbf2",
+    "sampling_worker.py": "9d833a659127a8b4515b28d9e05f9875777dcdc7dece862a66542ef292b8f969",
+    "session_model.py": "9ad57868f626f512682c9281f2a2b712f87816c2f7f72b08f903fb2e8f698d47",
+    "session_view.py": "fb7d3e5b8d1fc05eb71f5581fa6816f9c0d4b12ed2a5adface601b61c5c5cd70",
+    "sparkline.py": "7ee0748cd3deb2375a5006cad2d493f27b14e733044e437426c9bb6218a5926a",
+    "theme.py": "155c19dbfb930aa876304abd64771815eedc43394552f0e6b85d1b2dc006faea",
+    "tray.py": "e8af891eb19e8421ec6a68bae01275b3c941441ef7e67b519ad940025b7382d9",
+    "window_geometry.py": "0502631c7095caf50d0f2e213faeec11db465c4d397542277017043171eb0837",
+    "windows_foreground.py": "899b4fc5ce187464c96666f24ed123b44a3076aa7f2c56b7d9be27a69d4b12f5",
+    "windows_icons.py": "f608a07b0dcba5dcf2df537fbdf28f70db98c96495c8a595b9803346da4f99ab"
+  },
+  "source_worktree_status": "",
+  "python": "3.14.7",
+  "pyside": "6.11.2",
+  "qt_scale_factor": "1.5",
+  "font": {
+    "family": "Noto Sans CJK SC",
+    "glyphs_checked": "中文应用本次监控累计0123456789KiB/s↑↓—…●",
+    "pinned_font": true,
+    "upstream_commit": "f8d157532fbfaeda587e826d4cd5b21a49186f7c",
+    "upstream_blob": "dc15562470b4f842321894787a0d066879ccff8b"
+  },
+  "renders": [
+    {
+      "file": "fake-micro-active.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-huge.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-unknown.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-failed.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-quiet.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-card-active.png",
+      "width": 372,
+      "height": 460,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-detail-live.png",
+      "width": 1040,
+      "height": 640,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-detail-session.png",
+      "width": 1040,
+      "height": 640,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-not-running.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-card-retired-total.png",
+      "width": 372,
+      "height": 460,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-card-retired-controls.png",
+      "width": 372,
+      "height": 460,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-focused-idle.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-card-focused-idle.png",
+      "width": 372,
+      "height": 460,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-permission.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-card-permission.png",
+      "width": 372,
+      "height": 460,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-micro-stale.png",
+      "width": 220,
+      "height": 112,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-card-stale.png",
+      "width": 372,
+      "height": 460,
+      "device_pixel_ratio": 1.5
+    },
+    {
+      "file": "fake-detail-session-stale.png",
+      "width": 1040,
+      "height": 640,
+      "device_pixel_ratio": 1.5
+    }
+  ],
+  "label_metrics": [
+    {
+      "scene": "micro-active",
+      "text": "中文应用名称很长…",
+      "width": 128,
+      "height": 26,
+      "contents_width": 128,
+      "advance": 126,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-active",
+      "text": "状态未知",
+      "width": 56,
+      "height": 26,
+      "contents_width": 56,
+      "advance": 56,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-active",
+      "text": "↑ 上传 4.0KiB/s",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 102,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-active",
+      "text": "↓ 下载 2.5MiB/s",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 104,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-active",
+      "text": "当前有流量 · 自动显示",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 146,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-huge",
+      "text": "中文应用名称很长…",
+      "width": 128,
+      "height": 26,
+      "contents_width": 128,
+      "advance": 126,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-huge",
+      "text": "状态未知",
+      "width": 56,
+      "height": 26,
+      "contents_width": 56,
+      "advance": 56,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-huge",
+      "text": "↑ 上传 >999YiB/s",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 112,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-huge",
+      "text": "↓ 下载 >999YiB/s",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 112,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-huge",
+      "text": "当前有流量 · 自动显示",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 146,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-unknown",
+      "text": "Net Monitor",
+      "width": 128,
+      "height": 26,
+      "contents_width": 128,
+      "advance": 76,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-unknown",
+      "text": "状态未知",
+      "width": 56,
+      "height": 26,
+      "contents_width": 56,
+      "advance": 56,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-unknown",
+      "text": "↑ 上传 —",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-unknown",
+      "text": "↓ 下载 —",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-unknown",
+      "text": "状态未知 · 自动显示",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 132,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-failed",
+      "text": "Net Monitor",
+      "width": 136,
+      "height": 26,
+      "contents_width": 136,
+      "advance": 76,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-failed",
+      "text": "!",
+      "width": 48,
+      "height": 26,
+      "contents_width": 48,
+      "advance": 5,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-failed",
+      "text": "↑ 上传 —",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-failed",
+      "text": "↓ 下载 —",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-failed",
+      "text": "采样失败 · 自动显示",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 132,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-quiet",
+      "text": "Net Monitor",
+      "width": 128,
+      "height": 26,
+      "contents_width": 128,
+      "advance": 76,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-quiet",
+      "text": "状态未知",
+      "width": 56,
+      "height": 26,
+      "contents_width": 56,
+      "advance": 56,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-quiet",
+      "text": "↑ 上传 0 B/s",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 80,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-quiet",
+      "text": "↓ 下载 0 B/s",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 80,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-quiet",
+      "text": "当前安静 · 自动显示",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 132,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-not-running",
+      "text": "已退出应用.exe",
+      "width": 128,
+      "height": 26,
+      "contents_width": 128,
+      "advance": 97,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-not-running",
+      "text": "状态未知",
+      "width": 56,
+      "height": 26,
+      "contents_width": 56,
+      "advance": 56,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-not-running",
+      "text": "↑ 上传 0 B/s",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 80,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-not-running",
+      "text": "↓ 下载 0 B/s",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 80,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-not-running",
+      "text": "当前未运行 · 固定关注",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 146,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-focused-idle",
+      "text": "Idle.exe",
+      "width": 128,
+      "height": 26,
+      "contents_width": 128,
+      "advance": 52,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-focused-idle",
+      "text": "状态未知",
+      "width": 56,
+      "height": 26,
+      "contents_width": 56,
+      "advance": 56,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-focused-idle",
+      "text": "↑ 上传 0 B/s",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 80,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-focused-idle",
+      "text": "↓ 下载 0 B/s",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 80,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-focused-idle",
+      "text": "当前无流量 · 固定关注",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 146,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-permission",
+      "text": "Idle.exe",
+      "width": 136,
+      "height": 26,
+      "contents_width": 136,
+      "advance": 52,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-permission",
+      "text": "!",
+      "width": 48,
+      "height": 26,
+      "contents_width": 48,
+      "advance": 5,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-permission",
+      "text": "↑ 上传 —",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-permission",
+      "text": "↓ 下载 —",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-permission",
+      "text": "需要管理员权限",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 98,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-stale",
+      "text": "Idle.exe",
+      "width": 136,
+      "height": 26,
+      "contents_width": 136,
+      "advance": 52,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-stale",
+      "text": "!",
+      "width": 48,
+      "height": 26,
+      "contents_width": 48,
+      "advance": 5,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-stale",
+      "text": "↑ 上传 —",
+      "width": 206,
+      "height": 26,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-stale",
+      "text": "↓ 下载 —",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 62,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    },
+    {
+      "scene": "micro-stale",
+      "text": "数据已过期 · 固定关注",
+      "width": 206,
+      "height": 25,
+      "contents_width": 206,
+      "advance": 146,
+      "font_height": 20,
+      "font_pixel_size": 14,
+      "logical_dpi": 96
+    }
+  ],
+  "cleanup": {
+    "fake_service_close_count": 1,
+    "icon_worker_stopped": true,
+    "sampling_worker_started": false,
+    "etw_started": false
+  }
+}

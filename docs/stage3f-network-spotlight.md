@@ -141,7 +141,7 @@ python -m pytest tests/test_network_spotlight.py -v
 - [ ] Windows 11 物理机验收
 - [ ] 性能测试（CPU/内存占用）
 - [ ] 用户反馈收集
-- [ ] 考虑 Stage 3G（待定）
+- 后续范围已更新为 [Stage 4 轻量化收尾](stage4-lightweight.md)，本轮不增加 Stage 3G 类功能。
 
 ## 回滚方案
 

@@ -1,5 +1,7 @@
 # Stage 3E: Rate History / Sparkline
 
+> 历史记录：Stage 4 已移除 Micro 的曲线控件，曲线仅保留在 ApplicationCard；历史窗口和数据语义保持不变。当前实现与验收状态以 [Stage 4](stage4-lightweight.md) 为准。
+
 **Baseline:** Stage 3D at commit 5ee642a  
 **Implementation SHA:** 20f8db1  
 **Branch:** feat/stage-3e-rate-history
