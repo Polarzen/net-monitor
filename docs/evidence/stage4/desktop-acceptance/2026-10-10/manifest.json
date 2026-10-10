@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-10T04:44:03.975303+00:00",
+  "branch": "feat/stage-4-lean-core",
+  "measurement_head": "7f25287cdf675acbb8788d1d3a45552ec6245a3b",
+  "product_matches_implementation": "612ebe5ddd1e9680facd17b36c38a7863b828730",
+  "stage4_fully_accepted": false,
+  "desktop_tool": {
+    "connection": "available; actual Compact/Detailed operations and disposable-editor typing",
+    "micro": "not returned by list_windows/list_apps; previous Compact capture after switching reports window is not a usable app window",
+    "hover": "no pointer-move/hover method in documented sky window2 API",
+    "workarounds": "No fabricated handles, custom input injection, or product window flag changes"
+  },
+  "tools_sha256": {
+    "tools/measure_stage4_live.py": "445cf21829d34a75466c5ed9f3e350eae6d98b9ee93cb3d3baf9f87b149d381b",
+    "tools/observe_stage4_desktop.py": "f30b72b27c9f5a1cf5007387ac20a80430ec9b129d9405ebfd41239cdcacf448",
+    "tools/verify_stage4_etw.py": "8a3b1fe3fb0e56443b7ba60c20ec28f6a1e22ecc17f7f727642e10a0384cc740"
+  },
+  "tool_version_note": "Observer docstring clarified after measurement; executable behavior unchanged. Product source hashes recorded per run.",
+  "privacy_review": {
+    "screenshots": "Only three necessary target-window screenshots; no occluded/unrelated-window captures committed.",
+    "logs": "Private profile in probe payload redacted; no secrets or unrelated foreground identities recorded. Required project source/interpreter paths retained."
+  },
+  "preserved": {
+    "staged_docs/stage4-lean-core.md_blob": "e05e54120fee12ef6abe8bbcde81c5ba5b4a0045",
+    "untracked_goal.md_sha256": "3c406e89c9f3a815d59715eb595111732f649d72f6260ee14bed507a05a87cef"
+  },
+  "remaining": [
+    "Micro/Card hover, cross-in, delayed close, click hold, Esc, drag, docking, visual readability and tooltip",
+    "Micro to Compact reverse mode switch",
+    "Real tray restore and tray-click exit; current shutdown evidence uses controller path",
+    "Pin/unpin and topmost independence with real data; selected/foreground/focused independence",
+    "Real GUI idle-rate drain and restored current history",
+    "UAC cancel path not exercised (conditional)"
+  ],
+  "validation": {
+    "syntax": "All three new Python helpers parse successfully",
+    "evidence": "All JSON/JSONL parse successfully; resource summaries independently recomputed",
+    "product_diff": "empty against implementation SHA",
+    "local_real_tray_test": "1 passed in 0.52s",
+    "full_suite": "Historical 312 passed, 1 skipped reused for identical product source; not rerun locally this round"
+  },
+  "files": {
+    "20-cycles-verification.json": {
+      "bytes": 257,
+      "sha256": "791dd951f40732cf64d017873407c71fd5876f3caf1b3a45db0ac5d2833c2732",
+      "git_content_sha256": "b2ef478f004c5430cb7fbf53cae03905a495f1bc47e1b6604f669e85457a6df9"
+    },
+    "desktop-actions.json": {
+      "bytes": 11448,
+      "sha256": "005a897417999e5797c395ce8af2155f58fe5d9f7f495de7a455c5ac3974cfd1",
+      "git_content_sha256": "005a897417999e5797c395ce8af2155f58fe5d9f7f495de7a455c5ac3974cfd1"
+    },
+    "environment.json": {
+      "bytes": 7846,
+      "sha256": "59b7ec3528adced79bd7c7358af1299029365be147ed846ec368934fc5a0636b",
+      "git_content_sha256": "27ed1e8326c7c75997b13b3e30861bb342379539364f71abd50104c839b9326c"
+    },
+    "etw-probes-attempt2.json": {
+      "bytes": 15098,
+      "sha256": "47619ae3ea368fdaa5f626453f669a7b6343937340dc819e74c5550466f4b6a2",
+      "git_content_sha256": "6e2b52821702b7cbf6bbd2cf0d845dc67429353f5a137f1e753d0918ddcbc17e"
+    },
+    "etw-session-query.json": {
+      "bytes": 290,
+      "sha256": "0f0c358505dbf73d36253ac61d36901284338b925e47a6148e4996e618f0f3ee",
+      "git_content_sha256": "cc307d33d17b818ec785910833f0f49a3acccdac20abe6f43fd92b1a8b85858a"
+    },
+    "focus-actions.json": {
+      "bytes": 347,
+      "sha256": "4d9a6d14cad993d2a380b4c0e5c56908b22513d4ada52ca2a51cb3ae16a8a7d9",
+      "git_content_sha256": "4d9a6d14cad993d2a380b4c0e5c56908b22513d4ada52ca2a51cb3ae16a8a7d9"
+    },
+    "focus-editor-after-input.png": {
+      "bytes": 14224,
+      "sha256": "8acc6fb42222b66e99aa6d063e676c470b6770b1bd17cf853a9d620a19c62624",
+      "git_content_sha256": "8acc6fb42222b66e99aa6d063e676c470b6770b1bd17cf853a9d620a19c62624"
+    },
+    "focus-editor-attempt2.jsonl": {
+      "bytes": 62004,
+      "sha256": "f36126ab71b8f4a466f49f0b912969a802ee9576bd9fecfd5ab5680fcace4ef1",
+      "git_content_sha256": "191ef295ca889c0548ca509ee0e69c621c14bff2b6fc7f2d6575796053c33dcb"
+    },
+    "focus-editor.jsonl": {
+      "bytes": 18011,
+      "sha256": "f176ae24a4577b57c6e6342c60604caecc06f3411bba6be259697c36ffd8198c",
+      "git_content_sha256": "dd5e4270b05bde1dd8dcb0bca05992bae834b84ae4ee4343dd3bf10d9412c102"
+    },
+    "focus-gui-attempt2.jsonl": {
+      "bytes": 122173,
+      "sha256": "6f4b647a70f9d93d1e2d17f40707e50b4767d3cbbca2c1a25c369f8404854fc2",
+      "git_content_sha256": "174a0161cfd4ac48615ed562697144c75c63dc00f831de65d24c9bbb12b4f61b"
+    },
+    "focus-gui.jsonl": {
+      "bytes": 55118,
+      "sha256": "c31e7c71c033f9177bcfc633ca165468728f44696e51ca3b20f1a762be682ff8",
+      "git_content_sha256": "ac7a9435d8f3ce25ed833e493f750dd4fa8d137ff651ad100b6937330e6e98c7"
+    },
+    "focus-verification.json": {
+      "bytes": 1618,
+      "sha256": "76c565ad791ed57db9ecd6930a90f7b33b521cba389a7d85ab3260a79a32917c",
+      "git_content_sha256": "5cfbda2f8c9d2f0ce7c2fb0e0a11e26ec4a9701bd9d84789e743bcd91c1322ac"
+    },
+    "live-performance/detail-gui-output.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "live-performance/detail-gui.jsonl": {
+      "bytes": 148323,
+      "sha256": "073596ac5fb775eb64aab2f667b09f5c6d19138aa91c37c394ac6b540459e656",
+      "git_content_sha256": "c6d77e95c98578cbb351c20da90139f4d3bce11a58a950c23cb60edcebee5d67"
+    },
+    "live-performance/detail-resources.json": {
+      "bytes": 115987,
+      "sha256": "2a46347e4efe182fe587227410d9bd2233cff6e48d408fa73848b65dc49a0b5e",
+      "git_content_sha256": "282efc31cf89e6d2117830edb5111f7fd179d720dfac3c217c5af43a272470b1"
+    },
+    "live-performance/hidden-gui-output.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "live-performance/hidden-gui.jsonl": {
+      "bytes": 147971,
+      "sha256": "47d9beac556e62a6170054a8e8d0d94ccc8a49cb44175d172741fb94f0086488",
+      "git_content_sha256": "6b65896c9c028dfbf495d95761213c6b66dd8bf90820f257afa55d5f6aaa93ae"
+    },
+    "live-performance/hidden-resources.json": {
+      "bytes": 115630,
+      "sha256": "1d4f4faa8c282a14c93a68f3b4ce97931ad397b1173bd07da59711012972c253",
+      "git_content_sha256": "12f80ba158ba5ab35bce0a38e47fa6cb804c1696948d94d23ee69f5c19ab5dac"
+    },
+    "live-performance/micro-gui-output.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "live-performance/micro-gui.jsonl": {
+      "bytes": 147241,
+      "sha256": "e75e5f99e5eb7c5271a2212a544ef6a12381d104d50a914e2b780f3be442fcb3",
+      "git_content_sha256": "50a443444098389e704a6b5c53e47b233888232595fd66a8cf300bc5361104dc"
+    },
+    "live-performance/micro-resources.json": {
+      "bytes": 115726,
+      "sha256": "12fd14060e796894d8abaae8f12338f026460f540ffb8c6d1c66c51058c604f1",
+      "git_content_sha256": "47f2f64388229cffe21c6374bb523dad9576b77d52232687bfe8a382a9ed4c50"
+    },
+    "live-performance/root-verification.json": {
+      "bytes": 9300,
+      "sha256": "590803d667067aeef4a675cbf9c078aaa6b9d3d69d4b84e6b5047309c9604a2c",
+      "git_content_sha256": "5ebfe7461d62eb9120a07d5daf342d968f485cc88e6bb8fad227796dade6bbd3"
+    },
+    "observer-preflight.jsonl": {
+      "bytes": 7920,
+      "sha256": "8111d090393f5d79d43cc210335fd319650057ee25e8a5cb4e2dbf4241ee9e6d",
+      "git_content_sha256": "6c30197d318b000275594190c479e83fa4072b4a7652bd021ed5bf0c0e96ba6a"
+    },
+    "ordinary-cleanup.json": {
+      "bytes": 209,
+      "sha256": "cc7f0b7dc33ed96e1b19362f3cf2d1da04b24e1ffc621c1359e0f10b4b8ca850",
+      "git_content_sha256": "7c90624d3d01e1774fcdb515cc9b0fa11d21cf48c0ef1aed8c1884c11e9d720b"
+    },
+    "ordinary-compact-after-20-cycles.png": {
+      "bytes": 18950,
+      "sha256": "781b28e79cc6e65e5fc040e44ba32148267e0c841f674c088af0d474ecec04d0",
+      "git_content_sha256": "781b28e79cc6e65e5fc040e44ba32148267e0c841f674c088af0d474ecec04d0"
+    },
+    "ordinary-compact-permission.png": {
+      "bytes": 18296,
+      "sha256": "e2eadfefe3a7d7364b308f183e0f464f62884aa014c091a38770d425161e9001",
+      "git_content_sha256": "e2eadfefe3a7d7364b308f183e0f464f62884aa014c091a38770d425161e9001"
+    },
+    "ordinary-ui-20-cycles.jsonl": {
+      "bytes": 19741,
+      "sha256": "a513d6ee8d05746f08aef81eba40208af7d4ae9eec23a459523b1c74731e0f64",
+      "git_content_sha256": "b2fa9295dff596fb0f09e80b8869c5861a3b60075aef877d0481546a6de706a8"
+    },
+    "ordinary-ui-observations.jsonl": {
+      "bytes": 13033,
+      "sha256": "69b2062d5b46bbb9860785ac251b5376a9543675c7cf2d51f80b341a6b00f769",
+      "git_content_sha256": "322d298b0ae74260a3c630f745aab32fdca7d41c56d8d2b3d23b39cca6cbd59f"
+    }
+  },
+  "hash_scope": "sha256 and tools_sha256 describe local Windows working-tree bytes; git_content_sha256 describes staged bytes after Git line-ending normalization."
+}

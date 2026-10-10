@@ -1,0 +1,464 @@
+[
+  {
+    "at": "2026-10-10T03:14:59.915Z",
+    "action": "screenshot",
+    "window": "Net Monitor",
+    "file": "ordinary-compact-permission.png",
+    "width": 381,
+    "height": 391
+  },
+  {
+    "at": "2026-10-10T03:15:00.266Z",
+    "action": "clicked Compact details button",
+    "window": "Net Monitor"
+  },
+  {
+    "at": "2026-10-10T03:15:27.580Z",
+    "action": "Detailed opened",
+    "window": "Net Monitor",
+    "detail_window_id": 128191604
+  },
+  {
+    "at": "2026-10-10T03:15:27.792Z",
+    "action": "Detailed closed; Compact remains available",
+    "window": "Net Monitor",
+    "detail_window_id": 128191604,
+    "cycle": 1
+  },
+  {
+    "at": "2026-10-10T03:16:46.235Z",
+    "action": "Detailed visible after reopen; native window ID changed",
+    "window": "Net Monitor",
+    "cycle": 2,
+    "detail_window_id": 10686010
+  },
+  {
+    "at": "2026-10-10T03:17:01.604Z",
+    "action": "Detailed closed; Compact alive",
+    "window": "Net Monitor",
+    "cycle": 2
+  },
+  {
+    "at": "2026-10-10T03:20:00.897Z",
+    "action": "Third Detailed opening verified",
+    "window": "Net Monitor",
+    "cycle": 3,
+    "detail_window_id": 41357642
+  },
+  {
+    "at": "2026-10-10T03:26:10.163Z",
+    "action": "Detailed closed; Compact alive",
+    "window": "Net Monitor",
+    "cycle": 3
+  },
+  {
+    "at": "2026-10-10T03:26:25.780Z",
+    "action": "Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 4,
+    "detail_window_id": 41423178
+  },
+  {
+    "at": "2026-10-10T03:30:59.177Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 1,
+    "detail_window_id": 59640844
+  },
+  {
+    "at": "2026-10-10T03:33:10.226Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 1
+  },
+  {
+    "at": "2026-10-10T03:33:17.177Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 2,
+    "detail_window_id": 85528340
+  },
+  {
+    "at": "2026-10-10T03:33:25.552Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 2
+  },
+  {
+    "at": "2026-10-10T03:33:36.147Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 3,
+    "detail_window_id": 59771916
+  },
+  {
+    "at": "2026-10-10T03:33:42.284Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 3
+  },
+  {
+    "at": "2026-10-10T03:33:50.522Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 4,
+    "detail_window_id": 59837452
+  },
+  {
+    "at": "2026-10-10T03:34:09.777Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 4
+  },
+  {
+    "at": "2026-10-10T03:34:19.728Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 5,
+    "detail_window_id": 59968524
+  },
+  {
+    "at": "2026-10-10T03:35:37.023Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 5
+  },
+  {
+    "at": "2026-10-10T03:35:43.567Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 6,
+    "detail_window_id": 85921556
+  },
+  {
+    "at": "2026-10-10T03:35:53.861Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 6
+  },
+  {
+    "at": "2026-10-10T03:36:01.565Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 7,
+    "detail_window_id": 97784014
+  },
+  {
+    "at": "2026-10-10T03:36:46.747Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 7
+  },
+  {
+    "at": "2026-10-10T03:36:58.354Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 8,
+    "detail_window_id": 97915086
+  },
+  {
+    "at": "2026-10-10T03:37:09.950Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 8
+  },
+  {
+    "at": "2026-10-10T03:37:21.410Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 9,
+    "detail_window_id": 97980622
+  },
+  {
+    "at": "2026-10-10T03:37:32.819Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 9
+  },
+  {
+    "at": "2026-10-10T03:37:43.118Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 10,
+    "detail_window_id": 98046158
+  },
+  {
+    "at": "2026-10-10T03:40:02.771Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 10
+  },
+  {
+    "at": "2026-10-10T03:54:58.237Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 1,
+    "detail_window_id": 461516
+  },
+  {
+    "at": "2026-10-10T03:55:04.500Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 1
+  },
+  {
+    "at": "2026-10-10T03:55:15.358Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 2,
+    "detail_window_id": 852136
+  },
+  {
+    "at": "2026-10-10T03:55:25.259Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 2
+  },
+  {
+    "at": "2026-10-10T03:56:29.368Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 3,
+    "detail_window_id": 787230
+  },
+  {
+    "at": "2026-10-10T03:56:35.772Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 3
+  },
+  {
+    "at": "2026-10-10T03:56:45.848Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 4,
+    "detail_window_id": 852766
+  },
+  {
+    "at": "2026-10-10T03:56:54.509Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 4
+  },
+  {
+    "at": "2026-10-10T03:59:17.556Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 5,
+    "detail_window_id": 658262
+  },
+  {
+    "at": "2026-10-10T03:59:34.368Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 5
+  },
+  {
+    "at": "2026-10-10T03:59:43.363Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 6,
+    "detail_window_id": 1051340
+  },
+  {
+    "at": "2026-10-10T03:59:53.115Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 6
+  },
+  {
+    "at": "2026-10-10T04:00:03.488Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 7,
+    "detail_window_id": 789334
+  },
+  {
+    "at": "2026-10-10T04:00:10.288Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 7
+  },
+  {
+    "at": "2026-10-10T04:00:30.190Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 8,
+    "detail_window_id": 2098066
+  },
+  {
+    "at": "2026-10-10T04:00:42.705Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 8
+  },
+  {
+    "at": "2026-10-10T04:00:49.834Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 9,
+    "detail_window_id": 920406
+  },
+  {
+    "at": "2026-10-10T04:01:05.296Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 9
+  },
+  {
+    "at": "2026-10-10T04:01:11.557Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 10,
+    "detail_window_id": 1313484
+  },
+  {
+    "at": "2026-10-10T04:01:17.209Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 10
+  },
+  {
+    "at": "2026-10-10T04:01:24.822Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 11,
+    "detail_window_id": 119933062
+  },
+  {
+    "at": "2026-10-10T04:01:35.127Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 11
+  },
+  {
+    "at": "2026-10-10T04:01:42.339Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 12,
+    "detail_window_id": 38014400
+  },
+  {
+    "at": "2026-10-10T04:01:50.181Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 12
+  },
+  {
+    "at": "2026-10-10T04:02:06.072Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 13,
+    "detail_window_id": 120064134
+  },
+  {
+    "at": "2026-10-10T04:03:16.932Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 13
+  },
+  {
+    "at": "2026-10-10T04:03:55.721Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 14,
+    "detail_window_id": 120260742
+  },
+  {
+    "at": "2026-10-10T04:04:05.421Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 14
+  },
+  {
+    "at": "2026-10-10T04:04:19.034Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 15,
+    "detail_window_id": 38211008
+  },
+  {
+    "at": "2026-10-10T04:04:27.358Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 15
+  },
+  {
+    "at": "2026-10-10T04:04:39.267Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 16,
+    "detail_window_id": 2556066
+  },
+  {
+    "at": "2026-10-10T04:05:37.157Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 16
+  },
+  {
+    "at": "2026-10-10T04:05:47.802Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 17,
+    "detail_window_id": 2687138
+  },
+  {
+    "at": "2026-10-10T04:05:54.803Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 17
+  },
+  {
+    "at": "2026-10-10T04:06:09.291Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 18,
+    "detail_window_id": 1180446
+  },
+  {
+    "at": "2026-10-10T04:08:14.259Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 18
+  },
+  {
+    "at": "2026-10-10T04:08:26.276Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 19,
+    "detail_window_id": 1311518
+  },
+  {
+    "at": "2026-10-10T04:08:31.692Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 19
+  },
+  {
+    "at": "2026-10-10T04:11:00.728Z",
+    "action": "Observed Detailed opened",
+    "window": "Net Monitor",
+    "cycle": 20,
+    "detail_window_id": 1442590
+  },
+  {
+    "at": "2026-10-10T04:11:19.464Z",
+    "action": "Observed Detailed closed",
+    "window": "Net Monitor - Desktop Acceptance",
+    "cycle": 20
+  },
+  {
+    "at": "2026-10-10T04:11:19.467Z",
+    "action": "screenshot",
+    "window": "Net Monitor - Desktop Acceptance",
+    "file": "ordinary-compact-after-20-cycles.png",
+    "width": 381,
+    "height": 391
+  },
+  {
+    "at": "2026-10-10T04:11:52.551Z",
+    "action": "Selected Micro mode from Compact menu",
+    "window": "Net Monitor - Desktop Acceptance"
+  }
+]

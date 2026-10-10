@@ -2,7 +2,7 @@
 
 本轮从 `feat/stage-4-lean-core` / `89e6c1f5d000f75790b034155135aa965bea372c` 继续，保留已在本地的 Stage 3F 和后续聚合优化，没有回退到历史参考提交。实际实现提交为 `612ebe5ddd1e9680facd17b36c38a7863b828730`，继续使用原 Stage 4 分支。
 
-实现和自动回归已完成。性能证据是同机、固定模拟负载的离线 UI 对比，**不代表真实 ETW 产品资源占用**。真实 ETW 探测被权限拒绝，物理桌面交互尚未验收；本分支不是已全面验收的正式发布版本。
+实现和自动回归已完成。下文早期性能对比使用固定模拟负载，**不代表真实 ETW 产品资源占用**。2026-10-10 的桌面应用续验已补充真实窗口交互和管理员 ETW 回环证据，详情见文末“桌面应用续验”；仍有必要桌面行为未完成，本分支不是已全面验收的正式发布版本。
 
 ## 实际修改与信息分工
 
@@ -128,7 +128,9 @@ CPU 使用 psutil 区间 CPU%，**100% 表示一个逻辑处理器满载**，除
 
 未见此固定集合、短时循环内 widget／timer／账户数持续增长；没有据此声称长期绝无泄漏。新进程身份带来的原设计账户保留未纳入该固定集合压力场景，也未删除底层账户来压低数据。
 
-## Windows 11 实机验收状态
+## CLI 阶段的 Windows 11 验收记录（历史）
+
+本节保留首次验收及 CLI 重试原文；当前桌面宿主的连接、ETW 和资源测量结果见后文“2026-10-10 桌面应用续验”。
 
 环境与真实 ETW 探测原文见 [environment.json](evidence/stage4/environment.json)。直接执行原项目 `permission_probe` 得到 `success=false`，`EnableTraceEx2` 返回 Windows error 5。该工具退出码为 0 仅表示探测正常结束，**不是 ETW 启用成功**。未自动弹 UAC，未改变系统缩放。
 
@@ -162,10 +164,88 @@ foreach ($scale in @('1','1.25','1.5')) {
 
 只有桌面连接恢复后才能执行当前受阻的 Computer Use 项目。恢复连接不意味着还需要用户逐项人工验收；不因缺少额外显示器或未切换系统设置而要求用户准备非必要环境。
 
-## 交付与限制
+## CLI 阶段的交付与限制（历史）
 
 代码提交：`612ebe5ddd1e9680facd17b36c38a7863b828730`。文档与证据单独提交到同一任务分支。所有 after 测量源码哈希与该实现一致，布局 manifest 也记录该完整 SHA。
 
 开始时 README 和 `docs/stage4-lean-core.md` 已暂存，`goal.md` 未跟踪。README 按当前明确要求继续更新；旧 Stage 4 草稿暂存内容原样保留，未纳入本轮提交，也未用其“Complete”及未经实测的性能结论作为证据。当前权威记录为本文；`goal.md` 同样保留在工作区。没有 reset、clean、stash、强制切换、强推、合并 main 或发布版本。
 
 本轮已知限制：真实 ETW 和物理桌面验收未完成；离线 UI 性能不能推断真实采集总占用；固定集合、短时窗口循环只能说明该观测范围内的资源趋势，无法证明任何情况下都无泄漏。原设计跨新进程身份保留会话账户的内存增长未被裁剪或掩盖。
+
+## 2026-10-10 桌面应用续验
+
+本节追加桌面宿主的新证据，不替换上文 CLI 的 native pipe 失败记录。起点与实际运行源码为 `feat/stage-4-lean-core` / `7f25287cdf675acbb8788d1d3a45552ec6245a3b`；`src` 与实现提交 `612ebe5ddd1e9680facd17b36c38a7863b828730` 内容相同，续验未修改产品源码。逐文件 SHA-256、解释器和权限探测见 [environment.json](evidence/stage4/desktop-acceptance/2026-10-10/environment.json)。
+
+使用现有 Windows 11 x64 / Python 3.14.7 `.venv`，Qt 平台实际为 `windows`，屏幕 DPR 为 1.5，Micro 为 220×112 逻辑像素。没有重建环境、升级依赖或修改系统 DPI。启动环境中没有 Qt 测试覆盖变量。普通 GUI 首次使用现有 `net-monitor.exe`；后续独立观察入口使用真实 `UiController`、Service、Worker、Collector 和托盘，未注入 fake snapshot。
+
+### 已取得的桌面操作证据
+
+Computer Use 成功列举窗口、捕获真实 Compact 窗口，并实际打开、关闭 Detailed。因此桌面连接已经验证，不能继续将旧 native pipe 错误当作当前连接状态。操作时间和动作见 [desktop-actions.json](evidence/stage4/desktop-acceptance/2026-10-10/desktop-actions.json)，真实权限界面见 [截图](evidence/stage4/desktop-acceptance/2026-10-10/ordinary-compact-permission.png)。仅保存目标窗口的必要截图；被其他窗口遮挡的捕获没有作为证据保存。
+
+为验证对象复用，独立工具 [observe_stage4_desktop.py](../tools/observe_stage4_desktop.py) 连接现有 heartbeat 记录窗口对象身份和显隐变化；它不增加产品 timer、线程或输入自动化。测试使用临时显示偏好，并将 Compact 标题标记为 `Desktop Acceptance`。正常桌面动作仍由 Computer Use 执行。资源测量入口另可按参数初始化指定场景，并通过现有 shutdown 限时结束；这种程序化生命周期检查不等同于托盘点击退出。
+
+| 项目 | 本轮结果 | 证据与边界 |
+| --- | --- | --- |
+| 桌面连接与可逆操作 | 通过 | 真实 Compact 截图、Detailed 打开及关闭 |
+| 普通权限提示 | 通过 | `permission_denied` 与“需要管理员权限”；`—` 没有被当作真实流量通过 |
+| Detailed 连续开关 20 次 | 通过 | [核验](evidence/stage4/desktop-acceptance/2026-10-10/20-cycles-verification.json)：20 次打开、20 次关闭，同一 Python 对象，Compact 始终显示；[原始日志](evidence/stage4/desktop-acceptance/2026-10-10/ordinary-ui-20-cycles.jsonl) |
+| 关闭 Detailed 不退出主程序 | 通过 | 同一 GUI PID 与 create_time 持续存活，窗口恢复可操作 |
+| Compact → Micro 仅一个主入口 | 单向通过 | Computer Use 选择真实菜单后，日志记录 Compact 隐藏、Micro 显示；反向切换尚未完成 |
+| Micro 实际尺寸 | 几何已确认，视觉未完成 | 220×112 / DPR 1.5；不以运行时尺寸冒充真实 Micro 截图 |
+| Micro/Card 悬停、跨入、延迟收起、点击保持、Esc、拖动、停靠、选择及固定关注 | 工具受阻 | `list_windows()` 不返回 Micro 工具窗口；切换后旧 Compact 的捕获返回 `window is not a usable app window`。没有构造句柄或改产品窗口标志绕过限制 |
+| 实际托盘条件测试 | 通过 | `QT_QPA_PLATFORM=windows` 下原条件用例实际执行：`1 passed in 0.52s`，不是沿用 skip |
+| 托盘恢复模式、托盘点击退出 | 未完成 | 创建真实托盘不等于恢复／退出交互通过；测试 Micro 实例按精确 PID 清理，[记录](evidence/stage4/desktop-acceptance/2026-10-10/ordinary-cleanup.json) 不记作正常托盘退出 |
+| 自动刷新不抢焦点 | 普通权限场景通过 | 临时编辑窗口三段输入；输入间及之后 140.5 秒、279 次独立前台观测全部仍为编辑器；Micro 快照计数 75 → 352 |
+| 悬停预览不抢焦点 | 工具受阻 | 当前接口不能定位 Micro 或执行已记录的 hover；不扩大自动刷新检查的结论 |
+| 置顶与关注分离、selected/foreground/focused 独立 | 沿用自动回归；真实数据交互未完成 | 本轮没有将代码和 fake snapshot 测试扩大为桌面通过 |
+
+早期普通窗口被管理员重启或正常退出中断的记录单独保留在 `ordinary-ui-observations.jsonl`，不能把其中 10 次开关与后续记录拼成连续 20 次。最终 20 次结果来自一个不中断实例。原生窗口句柄在重开时变化，因此复用结论使用实际 Python 对象身份，不使用 HWND 相同作为替代。
+
+焦点检查使用新建的独立、可丢弃文本编辑窗口，Computer Use 依次输入三段测试文字。[截图](evidence/stage4/desktop-acceptance/2026-10-10/focus-editor-after-input.png)、[动作](evidence/stage4/desktop-acceptance/2026-10-10/focus-actions.json)与[核验](evidence/stage4/desktop-acceptance/2026-10-10/focus-verification.json)相互对应；`focus-editor-attempt2.jsonl` 和 `focus-gui-attempt2.jsonl` 保留原始记录。工具输入会主动激活编辑器，因此结论来自输入之间独立的 500 ms 前台轮询，未将输入自身的激活当作证据。Micro 处于普通权限提示状态，没有触发 hover。第一次编辑窗口在文字输入前达到 90 秒上限并正常关闭，随后工具报 `foreground window did not report a process id`；该次保留为未完成尝试，不记作产品抢焦点或输入通过。
+
+### 原生 UAC 与真实 ETW
+
+首次正式 GUI 普通实例（实际 Python PID 2664）之后出现已提权 PID 7588，创建时间 `1791601605.1318035`；用户确认接受应用内管理员重启的 UAC，旧 launcher/Python 实例已退出。没有代点安全许可或输入凭据。原生 UAC 取消路径本轮未执行；额外启动的普通诊断实例清理不算托盘退出证据。
+
+普通权限 `permission_probe` 再次得到 `success=false / EnableTraceEx2 / error 5`，退出码 0 仅表示探测完成。第一次独立诊断提权请求返回 `ShellExecuteW=5`，没有诊断进程或输出；用户随后说明没有看到相应系统 UAC，并明确要求重试。第二次原生 UAC 接受后返回 42，诊断进程确实以管理员运行。
+
+[verify_stage4_etw.py](../tools/verify_stage4_etw.py) 仅运行现有探测入口，使用受控 `127.0.0.1` 负载，最多四次双向各 512 KiB 数据交换。它不会被产品导入或随产品启动。结果见 [etw-probes-attempt2.json](evidence/stage4/desktop-acceptance/2026-10-10/etw-probes-attempt2.json)：
+
+- 提权后的 `permission_probe` 内部 `success=true`。
+- raw probe 连续两次均匹配受控子进程 PID，双向各记录 524,288 字节。
+- production collector probe 连续两次均 `collector_available=true`、`identity_verified=true`、`collector_closed=true`；上传和下载都有正速率，累计均为 524,288 字节，停流后双向归零且累计稳定。
+- 同一 raw 名称、同一 production 名称分别成功复用，未更换名称掩盖重启失败。独立 `ControlTraceW(..., QUERY)` 对这两个自有名称均返回 4201，确认会话不存在，见 [会话查询](evidence/stage4/desktop-acceptance/2026-10-10/etw-session-query.json)。未停止系统或其他程序的会话。
+
+探测内的 `logman` 本地化文本发生编码损失，原始结果保留但不作为语义依据；清理结论另由不依赖文本编码的直接 API 查询支持。以上是 Windows ETW 与生产 Collector 的真实回环证据，**不是外网带宽、GUI 约 2 秒速率窗口、GUI 隐藏累计或托盘退出的替代证据**。
+
+### 真实产品进程资源测量
+
+独立工具 [measure_stage4_live.py](../tools/measure_stage4_live.py) 完成三个真实 GUI 场景，原始每秒资源记录和 GUI 状态日志见 [live-performance](evidence/stage4/desktop-acceptance/2026-10-10/live-performance/)，逐项重新计算的核验见 [root-verification.json](evidence/stage4/desktop-acceptance/2026-10-10/live-performance/root-verification.json)。没有调用旧 `measure_stage4.py`，没有 fake service、fake tray 或合成快照。
+
+测量时间为 2026-10-10 12:21–12:31（UTC+8）。三个新 GUI 进程均管理员权限、Qt `windows`、同一产品源码哈希，使用各自临时偏好。每场预热实际不少于 30 秒，然后获取 120 个一秒 CPU 区间样本，含记录开销的实际观测分别为 121.877、121.862、121.851 秒；每个 GUI 共运行约 190.4 秒。独立观察进程 PID 8780 和负载进程均不包含在 GUI 资源数字中。CPU 100% 表示占满一个逻辑处理器；本机 32 个逻辑处理器，整机百分比为该值除以 32。
+
+| 场景（其余窗口隐藏） | GUI PID / create_time | CPU 单核均值 / P95 | CPU 整机均值 / P95 | 工作集 MiB 均值 / P95 | Private MiB 均值 / P95 | 线程范围 | 句柄范围 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Micro | 14116 / 1791606075.7442372 | 2.918% / 4.7% | 0.0912% / 0.1469% | 82.24 / 82.42 | 43.61 / 43.73 | 5–10 | 343–347 |
+| Detailed | 27432 / 1791606267.5441487 | 5.279% / 7.8% | 0.1650% / 0.2438% | 93.94 / 94.00 | 51.78 / 51.91 | 11–16 | 390–394 |
+| 全部隐藏，真实托盘保留 | 2624 / 1791606459.6120427 | 2.257% / 4.7% | 0.0705% / 0.1469% | 79.22 / 81.17 | 43.27 / 43.32 | 4–9 | 339–343 |
+
+Card 全程隐藏；Detailed 场景中 Micro 和 Compact 均隐藏。三个场景记录到的进程数范围分别为 398–405、399–405、398–413，累计账户数为 163–165、162–163、163–174。这些集合来自当时实际桌面，未固定或裁剪账户以降低占用。
+
+每个独立负载在 `127.0.0.1` 上以 1 Hz 进行 160 次 64 KiB 上传、128 KiB 下载，自报总量 10 MiB / 20 MiB，持续约 159 秒。GUI 记录中的负载 PID 和 create_time 与实际子进程匹配，应用分组键一致，资源采样期间双向速率均为正，累计单调增长。全部 GUI 采样为 `available`，快照计数持续增加至 378 / 378 / 377；外部资源记录使用的 GUI 状态最大年龄低于 1.5 秒，GUI 日志相邻采样最大间隔低于 1.54 秒。
+
+负载退出后，三个场景的进程网络行均消失，有流量的应用账户保留且活动进程数归零。最终累计分别为 10,354,688 / 20,709,376、10,354,688 / 20,709,376、10,420,224 / 20,840,448 字节，较负载自报值少 1.25%、1.25%、0.625%。原值完整保留。负载发送完成即退出，ETW 批次交付与身份退役存在时间边界；当前记录没有定位差额发生于起始还是退出边界，不能据此声称逐字节完整、归因于 UI 或修改受保护核心。它仍提供了明确的上传／下载方向、正确身份、活动累计和退出后账户保留证据。
+
+三个 GUI 均经现有 `exit_application` 正常关闭，退出码 0、`shutdown_complete=true`、Worker 已结束；实际 PID 已消失，自有 ETW 会话查询均为 4201，没有强制清理。顺序启动的后续两个场景也能重新采集。隐藏场景真实累计不中断，但场景初始化与限时关闭由独立入口调用真实 Controller 完成，**不等于 Computer Use 托盘恢复／点击退出通过**。负载退出前未安排独立空闲阶段，GUI 约 2 秒速率窗口的停流回落尚缺直接证据；不能借用前述零窗口 collector probe 替代。
+
+测量只覆盖本次回环负载与短时运行；验收入口在现有 heartbeat 上增加少量状态记录开销，三个场景均采用同一方式。没有在采样期间操作或截图 GUI。该结果不是无仪器开销的发行版基准、外网带宽测量、随机配对性能对比或长期无泄漏证明。
+
+### 本轮代码与验证边界
+
+仅新增独立验收工具和证据，产品 UI、Controller、Collector、MonitorService、SamplingWorker、ETW、Session Tracker、TDH、采样频率、累计及历史契约均未修改。没有发现足以按最小复现确认并修复的产品缺陷；工具定位、截图几何和焦点接口错误没有被归因于产品。
+
+沿用同一 `src` 内容的历史完整测试 `312 passed, 1 skipped`；本轮补跑原真实托盘用例为 `1 passed`。新工具执行了语法检查、普通权限阻断、防覆盖检查以及真实观察器的限时退出预检；具体真实 ETW 结果见上文。本轮未重跑整个历史测试集，也没有将历史测试称作本轮执行。
+
+开始时暂存的 `docs/stage4-lean-core.md`（blob `e05e54120fee12ef6abe8bbcde81c5ba5b4a0045`）与未跟踪 `goal.md` 继续保留，不纳入本轮交付。
+
+当前结论仍为**部分验收完成，尚不能标记 Stage 4 全面通过，也不能宣布已具备合并与打包条件**。Micro/Card、悬停焦点、真实托盘恢复／退出和真实关注行为仍需可定位该类窗口的桌面工具能力；GUI 停流后的速率窗口及恢复后的当前历史也未完成。缺少第二显示器、没有物理拔插或额外 DPI 切换不作为当前阻塞。

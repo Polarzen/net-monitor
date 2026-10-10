@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-10T04:37:50.001352+00:00",
+  "scenes": [
+    {
+      "scene": "micro",
+      "checks": {
+        "120_samples": true,
+        "warmup_30s": true,
+        "duration_120s": true,
+        "source_matches": true,
+        "native_elevated": true,
+        "different_pids": true,
+        "gui_pid_gone": true,
+        "load_pid_gone": true,
+        "scene_visibility": true,
+        "available_all": true,
+        "load_identity": true,
+        "snapshots_increase": true,
+        "normal_shutdown": true,
+        "own_session_absent": true,
+        "load_success": true,
+        "network_monotonic": true,
+        "account_monotonic": true,
+        "positive_both_rates": true,
+        "retained_after_exit": true,
+        "summary_recomputed": true
+      },
+      "qualified_for_resource_measurement": true,
+      "gui_pid": 14116,
+      "gui_create_time": 1791606075.7442372,
+      "load_identity": {
+        "pid": 31412,
+        "create_time": 1791606075.339934
+      },
+      "actual_warmup_seconds": 30.000646600004984,
+      "observed_seconds": 121.87675589998253,
+      "gui_observed_seconds": 190.37679869998829,
+      "max_resource_snapshot_age_seconds": 1.494796,
+      "max_gui_sample_gap_seconds": 1.535654599982081,
+      "snapshot_count_at_end": 378,
+      "load_reported_totals": {
+        "sent": 10485760,
+        "received": 20971520,
+        "seconds": 159.00063919997774
+      },
+      "retained_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "difference_from_payload": {
+        "upload_bytes": 131072,
+        "download_bytes": 262144
+      },
+      "summary": {
+        "cpu_one_core_percent": {
+          "mean": 2.9183333333333334,
+          "p95": 4.7,
+          "min": 0.0,
+          "max": 9.4
+        },
+        "cpu_machine_percent": {
+          "mean": 0.09119791666666667,
+          "p95": 0.146875,
+          "min": 0.0,
+          "max": 0.29375
+        },
+        "working_set_bytes": {
+          "mean": 86234828.8,
+          "p95": 86421504,
+          "min": 85979136,
+          "max": 86421504
+        },
+        "private_bytes": {
+          "mean": 45732044.8,
+          "p95": 45858816,
+          "min": 45539328,
+          "max": 45858816
+        },
+        "threads": {
+          "mean": 7.308333333333334,
+          "p95": 10,
+          "min": 5,
+          "max": 10
+        },
+        "handles": {
+          "mean": 344.96666666666664,
+          "p95": 347,
+          "min": 343,
+          "max": 347
+        },
+        "processes": {
+          "mean": 400.775,
+          "p95": 405,
+          "min": 398,
+          "max": 405
+        },
+        "accounts": {
+          "mean": 164.63333333333333,
+          "p95": 165,
+          "min": 163,
+          "max": 165
+        }
+      }
+    },
+    {
+      "scene": "detail",
+      "checks": {
+        "120_samples": true,
+        "warmup_30s": true,
+        "duration_120s": true,
+        "source_matches": true,
+        "native_elevated": true,
+        "different_pids": true,
+        "gui_pid_gone": true,
+        "load_pid_gone": true,
+        "scene_visibility": true,
+        "available_all": true,
+        "load_identity": true,
+        "snapshots_increase": true,
+        "normal_shutdown": true,
+        "own_session_absent": true,
+        "load_success": true,
+        "network_monotonic": true,
+        "account_monotonic": true,
+        "positive_both_rates": true,
+        "retained_after_exit": true,
+        "summary_recomputed": true
+      },
+      "qualified_for_resource_measurement": true,
+      "gui_pid": 27432,
+      "gui_create_time": 1791606267.5441487,
+      "load_identity": {
+        "pid": 19408,
+        "create_time": 1791606267.1506696
+      },
+      "actual_warmup_seconds": 30.000185099983355,
+      "observed_seconds": 121.86188599999878,
+      "gui_observed_seconds": 190.40742499998305,
+      "max_resource_snapshot_age_seconds": 1.48053,
+      "max_gui_sample_gap_seconds": 1.5261073000147007,
+      "snapshot_count_at_end": 378,
+      "load_reported_totals": {
+        "sent": 10485760,
+        "received": 20971520,
+        "seconds": 159.00033700000495
+      },
+      "retained_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "difference_from_payload": {
+        "upload_bytes": 131072,
+        "download_bytes": 262144
+      },
+      "summary": {
+        "cpu_one_core_percent": {
+          "mean": 5.279166666666667,
+          "p95": 7.8,
+          "min": 1.6,
+          "max": 9.4
+        },
+        "cpu_machine_percent": {
+          "mean": 0.16497395833333334,
+          "p95": 0.24375,
+          "min": 0.05,
+          "max": 0.29375
+        },
+        "working_set_bytes": {
+          "mean": 98504055.46666667,
+          "p95": 98562048,
+          "min": 98115584,
+          "max": 98562048
+        },
+        "private_bytes": {
+          "mean": 54294493.86666667,
+          "p95": 54431744,
+          "min": 53997568,
+          "max": 54431744
+        },
+        "threads": {
+          "mean": 13.308333333333334,
+          "p95": 16,
+          "min": 11,
+          "max": 16
+        },
+        "handles": {
+          "mean": 391.96666666666664,
+          "p95": 394,
+          "min": 390,
+          "max": 394
+        },
+        "processes": {
+          "mean": 401.15,
+          "p95": 403,
+          "min": 399,
+          "max": 405
+        },
+        "accounts": {
+          "mean": 162.83333333333334,
+          "p95": 163,
+          "min": 162,
+          "max": 163
+        }
+      }
+    },
+    {
+      "scene": "hidden",
+      "checks": {
+        "120_samples": true,
+        "warmup_30s": true,
+        "duration_120s": true,
+        "source_matches": true,
+        "native_elevated": true,
+        "different_pids": true,
+        "gui_pid_gone": true,
+        "load_pid_gone": true,
+        "scene_visibility": true,
+        "available_all": true,
+        "load_identity": true,
+        "snapshots_increase": true,
+        "normal_shutdown": true,
+        "own_session_absent": true,
+        "load_success": true,
+        "network_monotonic": true,
+        "account_monotonic": true,
+        "positive_both_rates": true,
+        "retained_after_exit": true,
+        "summary_recomputed": true
+      },
+      "qualified_for_resource_measurement": true,
+      "gui_pid": 2624,
+      "gui_create_time": 1791606459.6120427,
+      "load_identity": {
+        "pid": 33236,
+        "create_time": 1791606459.225851
+      },
+      "actual_warmup_seconds": 30.000311599986162,
+      "observed_seconds": 121.85068990002037,
+      "gui_observed_seconds": 190.44249320001109,
+      "max_resource_snapshot_age_seconds": 1.472823,
+      "max_gui_sample_gap_seconds": 1.5302323999931104,
+      "snapshot_count_at_end": 377,
+      "load_reported_totals": {
+        "sent": 10485760,
+        "received": 20971520,
+        "seconds": 159.00071349999052
+      },
+      "retained_account": {
+        "upload_bytes": 10420224,
+        "download_bytes": 20840448,
+        "active_process_count": 0
+      },
+      "difference_from_payload": {
+        "upload_bytes": 65536,
+        "download_bytes": 131072
+      },
+      "summary": {
+        "cpu_one_core_percent": {
+          "mean": 2.256666666666667,
+          "p95": 4.7,
+          "min": 0.0,
+          "max": 6.2
+        },
+        "cpu_machine_percent": {
+          "mean": 0.07052083333333334,
+          "p95": 0.146875,
+          "min": 0.0,
+          "max": 0.19375
+        },
+        "working_set_bytes": {
+          "mean": 83067460.26666667,
+          "p95": 85114880,
+          "min": 79630336,
+          "max": 85131264
+        },
+        "private_bytes": {
+          "mean": 45367569.06666667,
+          "p95": 45424640,
+          "min": 45314048,
+          "max": 45424640
+        },
+        "threads": {
+          "mean": 6.308333333333334,
+          "p95": 9,
+          "min": 4,
+          "max": 9
+        },
+        "handles": {
+          "mean": 340.96666666666664,
+          "p95": 343,
+          "min": 339,
+          "max": 343
+        },
+        "processes": {
+          "mean": 403.475,
+          "p95": 408,
+          "min": 398,
+          "max": 413
+        },
+        "accounts": {
+          "mean": 171.24166666666667,
+          "p95": 173,
+          "min": 163,
+          "max": 174
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Bounded loopback workload, not Internet bandwidth.",
+    "GUI has existing-heartbeat acceptance logging overhead; external observer/load are excluded.",
+    "Three fresh sequential processes, not paired randomized comparison or long-run leak proof.",
+    "Load exits immediately after sending; no GUI-window idle drain assertion. Final retired-account totals differ from payload; do not adjust counters.",
+    "Hidden visibility initialized through real controller; CU tray restore/exit and Card interactions remain unverified."
+  ]
+}

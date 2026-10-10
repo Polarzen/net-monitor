@@ -1,0 +1,12 @@
+[
+  {
+    "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-production",
+    "control_trace_query_code": 4201,
+    "absent": true
+  },
+  {
+    "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+    "control_trace_query_code": 4201,
+    "absent": true
+  }
+]
