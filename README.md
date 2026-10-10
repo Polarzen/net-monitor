@@ -4,9 +4,9 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 默认的微型窗口占用 **220 × 112 Qt 逻辑像素**；需要更多信息时，可以展开应用卡片、切换 Compact 列表，或打开按应用和进程组织的详细窗口。
 
-**当前版本：`0.2.1.dev1`，Windows x64 内部测试版。** CI 包已在本机实际启动，经用户操作应用内重启和 UAC 后，验证了管理员权限、回环真实 ETW、双向速率、累计增长及负载退出后的账户保留。部分桌面交互与退出会话清理仍未验证。程序未签名，尚未正式发布。具体边界见[验证状态](#验证状态与已知限制)。
+**当前版本：`0.2.1.dev2`，Windows x64 内部测试版。** 修复了 Compact 默认宽度下权限说明被裁切的问题，已在新 CI EXE 中复验，并完成 Detailed 查看、管理员启动和短时回环活动到空闲的试用。完整桌面交互与退出会话清理仍有未验证项。程序未签名，尚未正式发布。具体边界见[验证状态](#验证状态与已知限制)。
 
-[下载测试包](https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996) · [使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [验收记录](docs/stage5-windows-package.md)
+[下载测试包](https://github.com/Polarzen/net-monitor/actions/runs/38051119145/artifacts/11668988603) · [使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [验收记录](docs/stage5-windows-package.md)
 
 ## 主要功能
 
@@ -33,10 +33,10 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 ### 获取测试包
 
-当前可下载的 [Actions artifact](https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996) 对应提交 `e0eafaa`，包含产品 ZIP、`SHA256SUMS.txt` 和构建记录。下载可能需要登录 GitHub；该 artifact 当前到期时间为 **2026-10-24 17:40（香港时间）**。
+当前可下载的 [Actions artifact](https://github.com/Polarzen/net-monitor/actions/runs/38051119145/artifacts/11668988603) 对应提交 `2b6db24`，包含产品 ZIP、`SHA256SUMS.txt` 和构建记录。下载可能需要登录 GitHub；该 artifact 当前到期时间为 **2026-10-24 20:13（香港时间）**。
 
 1. 下载并解压 Actions artifact。
-2. 找到其中的 `NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip`，再将这个产品 ZIP **完整解压**。
+2. 找到其中的 `NetMonitor-0.2.1.dev2-windows-x64-2b6db24173a1-test.zip`，再将这个产品 ZIP **完整解压**。
 3. 打开解压后的 `NetMonitor` 文件夹，双击 `NetMonitor.exe`。
 4. 首次启动默认进入微型模式；之后按保存的显示偏好恢复主模式。
 
@@ -45,7 +45,7 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 需要核对下载完整性时，在产品 ZIP 所在目录执行：
 
 ```powershell
-Get-FileHash -Algorithm SHA256 -LiteralPath .\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip
+Get-FileHash -Algorithm SHA256 -LiteralPath .\NetMonitor-0.2.1.dev2-windows-x64-2b6db24173a1-test.zip
 Get-Content -LiteralPath .\SHA256SUMS.txt
 ```
 
@@ -57,7 +57,7 @@ Get-Content -LiteralPath .\SHA256SUMS.txt
 
 程序默认以普通权限启动，不自动要求提权。提示需要管理员权限时，展开应用卡片，或切换到 Compact，点击 **“以管理员身份重启”**，再由你决定是否接受 Windows 原生 UAC。
 
-权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。取消或启动失败时，现有实例应继续运行；打包版实际提权路径仍在待验证范围内。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
+权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。取消或启动失败时，现有实例应继续运行；新包成功提权已实际使用，原生取消仍只有自动测试证据。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
 
 ## 使用方法
 
@@ -203,20 +203,20 @@ try {
 
 ## 验证状态与已知限制
 
-以下状态对应 2026-10-10 的 `0.2.1.dev1` 交付，不代表所有后续提交都已执行相同验证。
+以下状态对应 2026-10-10 的实际包，不代表后续二进制自动继承相同验证。
 
 | 范围 | 当前结果 |
 | --- | --- |
-| CI x64 打包 | 成功，已上传 artifact |
-| CI x64／ARM64 源码回归 | 各 331 passed、1 skipped；跳过项需要真实托盘 |
-| 本地最终 EXE | 已验证启动、Compact／Detailed、中文及空格路径、不同 cwd、不可写发行目录、配置保存、目录迁移和程序菜单退出 |
-| CI 下载包 | 已验证 ZIP／文件哈希，并实际启动；普通权限下由工具完成 Detailed 打开／关闭和窗口菜单退出 |
-| CI 包管理员重启／真实 ETW | 用户操作应用内重启并接受 UAC，同目录新进程实际提权；受控回环双向速率、累计增长与负载退出后账户保留通过 |
-| 停流／退出清理 | 空闲与退出后累计相同；显式 `0 B/s`、两次空闲采样、自有 ETW 会话清理未验证；窗口菜单退出后进程已结束 |
-| Micro/Card、关注、托盘交互 | 部分受 Computer Use 窗口定位限制，仍有未验证项 |
-| 干净 Windows 机器 | 未执行；当前实测来自开发机的隔离目录 |
+| 新 CI 包 `0.2.1.dev2` | 提交 `2b6db24`；打包及静态检查成功，实际 EXE 已运行 |
+| 新 CI x64／ARM64 源码回归 | 各 333 passed、1 skipped；跳过项需要真实托盘 |
+| Compact 权限说明 | 原包可复现裁切；换行修复后，340／380 宽度回归通过，新 EXE 默认宽度显示完整 |
+| 新包实际使用 | 普通 Detailed 打开／关闭；接受 UAC 后同目录新进程实际提权，Compact 显示短回环双向流量 |
+| 新包停流观察 | 两次独立观察均确认负载进程存活；退出活跃列表，但未取得目标行的显式 `0 B/s` |
+| 退出与会话 | 用户从窗口菜单退出新包，进程结束已核对；不等于托盘退出或 ETW 会话清理通过 |
+| Micro/Card、关注、托盘 | 已知工具限制保留，没有重复无效点击 |
+| 干净 Windows 机器 | 未执行；当前为开发机试用 |
 
-早期本地实测包来自 `56f049b`，本轮实际运行验收的是 `e0eafaa` 的 CI 包；两者是分别构建的二进制，哈希不同。上述新结论来自该 CI EXE 的真实界面和受控负载，范围限定为本机回环；管理员窗口的工具点击受阻，部分步骤由用户协助。原生取消、隐藏恢复、Micro/Card、关注和托盘仍有未验证项，详见[Stage 5 新增实测记录](docs/stage5-windows-package.md#ci-包真实运行补验2026-10-10)。[本次 CI](https://github.com/Polarzen/net-monitor/actions/runs/38042146780) 与 Stage 4 历史结果不代替这些桌面验收。
+旧 `0.2.1.dev1` 包的完整累计增长、停流累计与退出账户保留记录继续保留，**没有自动升级为新 `0.2.1.dev2` 二进制的完整验收**。本轮只修复实际复现的提示裁切，未改采集、速率、累计或窗口权限行为。详见[内部试用与问题闭环](docs/stage5-windows-package.md#内部试用与问题闭环2026-10-10)和[新 CI](https://github.com/Polarzen/net-monitor/actions/runs/38051119145)。
 
 ## 技术与文档
 

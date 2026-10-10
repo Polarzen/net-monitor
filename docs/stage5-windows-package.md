@@ -1,6 +1,6 @@
 # Stage 5：Windows x64 内部测试包
 
-> 最新结果：`e0eafaa` CI 包已完成本机实际启动、用户操作的应用内管理员重启及回环真实 ETW 补验，双向速率、累计增长和负载退出后账户保留通过。显式停流零速率、隐藏恢复、部分桌面交互及自有 ETW 会话清理仍未验证。详见文末“CI 包真实运行补验”；下文早期交付结论和两个不同构建的身份保留作为历史记录。
+> 最新结果：内部试用复现了 Compact 权限说明裁切，已做局部换行修复并由 CI 构建 `0.2.1.dev2`（`2b6db24`）。新 EXE 已复验显示修复、Detailed 和短时真实活动到空闲流程。详见文末“内部试用与问题闭环”；原 `0.2.1.dev1` 的累计等实测记录作为历史保留，不自动套用给新二进制。
 
 日期：2026-10-10（Asia/Hong_Kong）。目标平台 Windows 11 x64；构建和桌面验证均在当前 Windows 11 x64 开发机进行。
 
@@ -259,3 +259,60 @@ D:\code\net-monitor\artifacts\stage5\actions-38042146780\NetMonitor-0.2.1.dev1-w
 普通 Compact 截图与必要文本在本证据目录。活动与累计原始截图包含无关应用名／路径，只留在 Git 忽略的本地 `artifacts/stage5/packaged-runtime-raw/`，不提交完整个人进程清单；公开 JSON 只转录本轮负载行的原始数值，并保留原始截图 SHA-256。共享文本的用户目录前缀替换为 `%USERPROFILE%`。所有临时负载和本轮 EXE 已结束，没有强制结束或修改其他 ETW 会话。
 
 本次只提交 README、本文及 `docs/evidence/stage5/packaged-runtime/` 的已审阅证据，使用 `[skip ci]`。保留原有 Stage 4 暂存 blob 与未跟踪 `goal.md`，不提交 ZIP／EXE，不合并 main、不发布 Release。
+
+
+## 内部试用与问题闭环（2026-10-10）
+
+本轮从原 `e0eafaa` CI 包做一次日常使用流程，未重复已通过的打包、提权和完整回环累计验收。起始 HEAD 为 `82e13a1d4360743caee55dd86cc38bbb7caa70be`，没有可复用实例；普通实例使用隔离 Compact 偏好，明确属于测试初始化。运行中发现以下可复现问题，才按约定修复并递增开发版。
+
+### 实际问题与最小修复
+
+普通权限、默认 380 逻辑像素宽的 Compact 中，“需要管理员权限才能读取按进程网络流量”尾部被裁切。最大化后可完整显示，恢复默认尺寸后再次裁切。权限状态和重启按钮仍可读，没有把这个显示问题写成采集或提权失败。[原包截图](evidence/stage5/internal-trial/compact-permission-before.png)来自实际 EXE。
+
+原因是权限说明与按钮同处横向布局，QLabel 没有换行。在固定中文测试字体下，文字单行需要 234 px，而默认宽度只分配 202 px，最小 340 宽度只分配 162 px。修复只在这一个现有 QLabel 上启用 word wrap；未改 Collector、MonitorService、SamplingWorker、ETW、累计、窗口标志或权限策略。
+
+实现提交 `2b6db24173a17532e3371d7e14406247d72e380e`，版本递增到 `0.2.1.dev2`，同步包内版本说明。新增几何回归检查文字边界完全位于可用区域、重启按钮可用且不与文字重叠。两个宽度用例修复前均失败，修复后通过。
+
+- 本地针对性回归：34 passed、1 skipped。
+- 本地完整回归：333 passed、1 skipped，12.17 秒。
+- [CI 38051119145](https://github.com/Polarzen/net-monitor/actions/runs/38051119145)：打包、x64、ARM64 三项作业成功；两平台各 333 passed、1 skipped，分别 11.38／17.33 秒。
+- 跳过项均是离屏环境无真实托盘；没有删除、弱化测试或增加 skip。日志见 [internal-trial](evidence/stage5/internal-trial/)。
+
+### 新包身份与实际复验
+
+使用现有 Actions 锁定依赖和构建脚本重新构建；没有再制造一个不同的本地构建。原 `0.2.1.dev1` ZIP 保留。实际复验的是新 [Actions artifact 11668988603](https://github.com/Polarzen/net-monitor/actions/runs/38051119145/artifacts/11668988603) 内的产品 ZIP，下载后校验外部 SHA256SUMS、CRC 和 302 个清单文件，再运行完整解压目录的 EXE。
+
+| 字段 | 本轮最终对象 |
+| --- | --- |
+| 版本／源码提交 | `0.2.1.dev2`／`2b6db24173a17532e3371d7e14406247d72e380e` |
+| ZIP 字节数 | `38,757,752` |
+| ZIP SHA-256 | `b63547f20e0f09418cdd1194d93be05650ec92c3ef53c6f46c8f634e5c27e795` |
+| EXE SHA-256 | `97211256d60947eb556b2b26544acdcd4a034fc46a121b0ee0f30fab555f092e` |
+| 实际 EXE | `%TEMP%\NetMonitor-CI-2b6db24-trial-20261010\NetMonitor\NetMonitor.exe` |
+| Artifact 到期 | 2026-10-24 20:13（香港时间）；本地副本保留 |
+
+```text
+D:\code\net-monitor\artifacts\stage5\actions-38051119145\NetMonitor-0.2.1.dev2-windows-x64-2b6db24173a1-test\NetMonitor-0.2.1.dev2-windows-x64-2b6db24173a1-test.zip
+```
+
+新包普通 PID `59068`，create_time `1791634991.753301`。默认 Compact 已显示完整的两行权限说明，[修复后截图](evidence/stage5/internal-trial/compact-permission-after.png)与原包对应同一失败场景；按钮仍可用。工具实际打开 Detailed 并关闭返回主窗口，权限不足与 `—` 易于区分。一次无截图的关闭请求遇到工具 geometry unavailable，刷新截图后关闭成功，不作为产品故障。
+
+为继续这次实际使用，工具点击一次管理员入口，用户接受 UAC。新 PID `61092`、create_time `1791635146.3442104`，确认属于新发行目录且 TokenElevation 为 true；普通 PID 已退出。这里的提权是流程准备，不重跑原生取消或多次 UAC。管理员窗口的历史输入限制没有新的能力变化，因此没有重复无效点击，也没有让用户代做整套检查。
+
+### 活动到空闲及使用边界
+
+原有临时回环 helper 原样复用，只运行一次短负载，没有新建测速框架。客户端 PID `58964`、create_time `1791635305.7215047`；服务端 PID `51856`、create_time `1791635306.0618584`。流量仅 `127.0.0.1` 和可丢弃字节，程序上限仍为 240 帧／约 240 秒；本次实际 44 帧、约 44 秒，客户端发送 2,883,584 B、接收 5,767,168 B。
+
+UTC 12:28:49.868，实际新 EXE 的 Compact 显示客户端约下载 127.44 KB/s、上传 63.72 KB/s，服务端相反。停流后分别在 12:29:37.740 和 12:30:10.351 核对负载 PID、create_time、EXE 和存活状态，并紧接着观察界面；两次都还活着，两组均已离开活跃 Top 5。
+
+这只是活动到空闲的实际使用观察。**列表消失不等于已取得明确 `0 B/s`，两次存活观察也不等于两次零速率或累计采样。** 当前没有通过工具展开管理员实例的 PID 子项、固定／取消关注、隐藏后托盘恢复或查看卡片历史。本轮没有为这些已知限制重试输入、提升工具宿主、修改安全设置或改窗口类型。
+
+负载通过正常结束信号退出，精确身份对应的客户端、服务端及 launcher 均已消失。用户确认从新包的“窗口 → 退出”正常结束，随后核对 PID `61092`／create_time 对应实例已消失；这是窗口菜单退出，不是托盘退出。所有本轮实例和负载均已结束，未强制清理；未以进程消失替代 ETW 会话清理。生产 UI 没有公开本实例会话名，未枚举／停止其他会话；原生取消、退出后再次提权采集及干净机器也未执行。
+
+### 配置、证据及结论
+
+本轮普通实例使用隔离 LOCALAPPDATA。正常用户偏好起始为 Micro，但其后出现了本轮工具没有写入的模式／位置变化；保留最新字段，没有用旧备份整文件覆盖。管理员实例使用这些当前用户偏好。本轮没有直接修改正常 `ui.json`。
+
+[trial-results.json](evidence/stage5/internal-trial/trial-results.json)集中记录包切换、缺陷、修复、CI、新包身份和流程结果。只有不含无关应用的修复前后截图进入 Git；活动截图、原始偏好和临时负载留在忽略目录 `artifacts/stage5/internal-trial-raw/`，公开记录只保留必要数值和负载身份，用户目录前缀替换为 `%USERPROFILE%`。
+
+结论限定为：新 `0.2.1.dev2` CI 内部包的提示裁切已修复并在实际 EXE 复验，适合继续进行同范围内部试用。本次已执行范围内未复现其他新的产品缺陷；工具受限项保留。旧 `0.2.1.dev1` 的累计精度／账户保留等证据不自动继承给新二进制。新代码已执行完整 CI，之后纯文档／证据提交可使用 `[skip ci]`；原有 Stage 4 暂存和 `goal.md` 保留，二进制不进 Git，不合并 main、不创建 Release。

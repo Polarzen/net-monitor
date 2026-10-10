@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "initial_head": "82e13a1d4360743caee55dd86cc38bbb7caa70be",
+  "initial_package": {
+    "version": "0.2.1.dev1",
+    "source_commit": "e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+    "zip_sha256": "a5cdc3566e29b24498e08f3e08809af67d69861f07e3e4c8abb42447acdd89d3",
+    "bytes": 38757174
+  },
+  "issue": {
+    "classification": "reproducible local UI defect",
+    "title": "Compact permission explanation clipped at default width",
+    "preconditions": "ordinary permissions, Compact at default 380 logical-pixel width",
+    "steps": [
+      "Start original CI EXE with isolated Compact preference",
+      "Read permission explanation",
+      "Maximize to reveal complete text",
+      "Restore and observe clipping again"
+    ],
+    "expected": "complete permission explanation and usable restart button",
+    "actual": "single-line text needs 234 px in pinned-font reproduction but has only 202 px at width 380, 162 px at width 340; trailing text clipped",
+    "impact": "permission explanation incomplete; status and restart button remain readable; no collection failure claimed",
+    "repeated": true,
+    "fix": "enable word wrapping only on existing permission explanation QLabel",
+    "regression_before": "2 failed at 340 and 380",
+    "regression_after": "34 passed, 1 skipped targeted",
+    "full_regression": "333 passed, 1 skipped in 12.17s",
+    "skip": "no real tray in offscreen runner"
+  },
+  "implementation_commit": "2b6db24173a17532e3371d7e14406247d72e380e",
+  "new_version": "0.2.1.dev2",
+  "ci_run": 38051119145,
+  "old_trial": {
+    "at": "2026-10-10T12:04:51.472422+00:00",
+    "pid": 58540,
+    "create_time": 1791633891.4591615,
+    "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\NetMonitor\\NetMonitor.exe",
+    "version": "0.2.1.dev1",
+    "source_commit": "e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+    "normal_preferences": "%USERPROFILE%\\AppData\\Local\\NetMonitor\\ui.json",
+    "isolated_preferences": "D:\\code\\net-monitor\\artifacts\\stage5\\internal-trial-raw\\isolated-user\\NetMonitor\\ui.json",
+    "initialization": "Compact preseeded in isolated test preferences; not mouse switching",
+    "initial_head": "82e13a1d4360743caee55dd86cc38bbb7caa70be"
+  },
+  "old_trial_exit": "Computer Use window menu Exit; PID 58540 absent",
+  "normal_preferences": {
+    "agent_modified": false,
+    "external_change_observed": true,
+    "action": "preserve newer normal-profile fields; do not restore launch-time backup",
+    "final_fields": {
+      "version": 1,
+      "mode": "compact",
+      "micro_position": [
+        580,
+        19
+      ],
+      "compact_position": [
+        420,
+        245
+      ],
+      "micro_on_top": false
+    },
+    "restoration": "none: agent never wrote normal profile; external changes preserved"
+  },
+  "protected_staged_blob": "e05e54120fee12ef6abe8bbcde81c5ba5b4a0045",
+  "protected_goal_sha256": "3c406e89c9f3a815d59715eb595111732f649d72f6260ee14bed507a05a87cef",
+  "new_package_runtime": {
+    "rendering": "passed: full permission explanation wraps at default width; actual new CI EXE screenshot",
+    "ordinary_Detailed": "Computer Use opened and closed Detailed; main window remained",
+    "ordinary_unknown_state": "permission-needed label plus em dash; no false zero",
+    "admin": {
+      "at": "2026-10-10T12:27:52.346721+00:00",
+      "old_pid": 59068,
+      "old_exited": true,
+      "process": {
+        "name": "NetMonitor.exe",
+        "create_time": 1791635146.3442104,
+        "pid": 61092,
+        "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-2b6db24-trial-20261010\\NetMonitor\\NetMonitor.exe",
+        "elevated": true
+      },
+      "user_UAC": "accepted"
+    },
+    "active_observation": {
+      "at": "2026-10-10T12:28:49.868Z",
+      "client_download_KBps": 127.44,
+      "client_upload_KBps": 63.72,
+      "server_download_KBps": 63.72,
+      "server_upload_KBps": 127.44,
+      "surface": "real Compact; application groups only"
+    },
+    "idle_observations": [
+      {
+        "at": "2026-10-10T12:29:37.739560+00:00",
+        "phase": "idle observation 1",
+        "processes": [
+          {
+            "role": "client",
+            "pid": 58964,
+            "create_time": 1791635305.7215047,
+            "exe": "%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+            "alive": true,
+            "traffic_finished": {
+              "kind": "traffic_finished",
+              "at": "2026-10-10T12:29:10.778227+00:00",
+              "sent": 2883584,
+              "received": 5767168
+            }
+          },
+          {
+            "role": "server",
+            "pid": 51856,
+            "create_time": 1791635306.0618584,
+            "exe": "%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\pythonw.exe",
+            "alive": true,
+            "traffic_finished": {
+              "kind": "traffic_finished",
+              "at": "2026-10-10T12:29:10.778445+00:00",
+              "sent": 5767168,
+              "received": 2883584
+            }
+          }
+        ]
+      },
+      {
+        "at": "2026-10-10T12:30:10.351261+00:00",
+        "phase": "idle observation 2",
+        "processes": [
+          {
+            "role": "client",
+            "pid": 58964,
+            "create_time": 1791635305.7215047,
+            "exe": "%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+            "alive": true
+          },
+          {
+            "role": "server",
+            "pid": 51856,
+            "create_time": 1791635306.0618584,
+            "exe": "%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\pythonw.exe",
+            "alive": true
+          }
+        ]
+      }
+    ],
+    "idle_gui": "both load groups absent from Top 5 active list at 12:29:38.206Z and 12:30:10.847Z; do not infer explicit zero",
+    "load_exit": "normal file gate; client and server exit records below",
+    "normal_app_exit": {
+      "checked_at": "2026-10-10T12:36:13.330448+00:00",
+      "pid": 61092,
+      "create_time": 1791635146.3442104,
+      "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-2b6db24-trial-20261010\\NetMonitor\\NetMonitor.exe",
+      "same_process_alive": false,
+      "user_report": "已从窗口菜单退出",
+      "entry": "window menu, user operated; not tray",
+      "forced": false
+    }
+  },
+  "final_package": {
+    "at": "2026-10-10T12:23:11.778190+00:00",
+    "version": "0.2.1.dev2",
+    "source_commit": "2b6db24173a17532e3371d7e14406247d72e380e",
+    "zip": "D:\\code\\net-monitor\\artifacts\\stage5\\actions-38051119145\\NetMonitor-0.2.1.dev2-windows-x64-2b6db24173a1-test\\NetMonitor-0.2.1.dev2-windows-x64-2b6db24173a1-test.zip",
+    "zip_bytes": 38757752,
+    "zip_sha256": "b63547f20e0f09418cdd1194d93be05650ec92c3ef53c6f46c8f634e5c27e795",
+    "manifest_verified": 302,
+    "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-2b6db24-trial-20261010\\NetMonitor\\NetMonitor.exe",
+    "exe_sha256": "97211256d60947eb556b2b26544acdcd4a034fc46a121b0ee0f30fab555f092e",
+    "pid": 59068,
+    "create_time": 1791634991.753301,
+    "artifact": 11668988603,
+    "ci_run": 38051119145
+  },
+  "load_events": {
+    "client": [
+      {
+        "kind": "identity",
+        "at": "2026-10-10T12:28:26.026458+00:00",
+        "pid": 58964,
+        "create_time": 1791635305.7215047,
+        "exe": "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+        "role": "client"
+      },
+      {
+        "kind": "traffic_started",
+        "at": "2026-10-10T12:28:26.642378+00:00",
+        "maximum_frames": 240,
+        "upload_per_frame": 65536,
+        "download_per_frame": 131072
+      },
+      {
+        "kind": "traffic_finished",
+        "at": "2026-10-10T12:29:10.778227+00:00",
+        "sent": 2883584,
+        "received": 5767168
+      },
+      {
+        "kind": "server_exit",
+        "at": "2026-10-10T12:30:32.490509+00:00",
+        "exit_code": 0
+      },
+      {
+        "kind": "exit",
+        "at": "2026-10-10T12:30:32.491611+00:00"
+      }
+    ],
+    "server": [
+      {
+        "kind": "identity",
+        "at": "2026-10-10T12:28:26.406767+00:00",
+        "pid": 51856,
+        "create_time": 1791635306.0618584,
+        "exe": "D:\\code\\net-monitor\\.venv\\Scripts\\pythonw.exe",
+        "role": "server"
+      },
+      {
+        "kind": "traffic_finished",
+        "at": "2026-10-10T12:29:10.778445+00:00",
+        "sent": 5767168,
+        "received": 2883584
+      },
+      {
+        "kind": "exit",
+        "at": "2026-10-10T12:30:32.471139+00:00"
+      }
+    ]
+  },
+  "load_cleanup": {
+    "processes_absent": [
+      58964,
+      51856,
+      28120
+    ],
+    "forced": false
+  },
+  "ci": {
+    "run": 38051119145,
+    "artifact": 11668988603,
+    "conclusion": "success",
+    "x64": "333 passed, 1 skipped in 11.38s",
+    "arm64": "333 passed, 1 skipped in 17.33s",
+    "artifact_expires_at": "2026-10-24T12:13:29Z"
+  },
+  "retained_limits": {
+    "explicit_zero": "not observed; active-list disappearance is not zero",
+    "PID_child_and_selection_follow": "not executed, known privileged-window input boundary; no repeated clicks",
+    "hidden_restore_history_and_tray_exit": "not executed, known tool boundary",
+    "Micro_Card_hover": "not executed, known untargetable Micro/no hover API",
+    "native_UAC_cancel": "not executed",
+    "own_ETW_session_cleanup": "not observed; no session identity exposed; no unrelated sessions enumerated or stopped",
+    "relaunch_collection_after_exit": "not executed",
+    "clean_machine": "not executed",
+    "cumulative_retention": "previous dev1 evidence only, not revalidated for dev2"
+  },
+  "privacy": {
+    "policy": "Only target permission screenshots shared; activity screenshots and normal preference snapshots kept Git-ignored; shared user directory prefix redacted",
+    "private_raw_files": [
+      {
+        "name": "new-package-active.png",
+        "sha256": "edaab4a2917a03e49bc539e9971641ad45e88c7a166c2cc2b870fd31f73afaa5"
+      },
+      {
+        "name": "new-package-idle-1.png",
+        "sha256": "97494d533039acd0d0a21d2ed68a853516cd8b0cfe710ee19d72ca4dc5fd19dc"
+      },
+      {
+        "name": "new-package-idle-2.png",
+        "sha256": "7537b1985c725b91a0f6f570f8bc5c9788961fb4fd2ee86190ce7552ed8022e0"
+      }
+    ]
+  },
+  "final_integrity": "ZIP and EXE hashes unchanged after runtime trial"
+}
