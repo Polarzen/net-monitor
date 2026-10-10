@@ -82,13 +82,16 @@ def process(pid: int = 10, create_time: float | None = 100.0) -> ProcessInfo:
 
 
 def test_collector_starts_in_starting_state() -> None:
-    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=FakeSession
+    )
     assert collector.state.status is ProcessNetworkStatus.STARTING
     assert collector.available is False
 
 
 def test_collector_starts_lazily_and_computes_rates() -> None:
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([1.0, 3.0]),
     )
@@ -115,6 +118,7 @@ def test_collector_starts_lazily_and_computes_rates() -> None:
 
 def test_windowed_rates_use_real_elapsed_time_and_hold_until_window_expires() -> None:
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]),
         rate_window_seconds=2.0,
@@ -140,6 +144,7 @@ def test_windowed_rates_use_real_elapsed_time_and_hold_until_window_expires() ->
 
 def test_windowed_rate_uses_jittered_sample_elapsed_time() -> None:
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([10.0, 10.7]),
         rate_window_seconds=2.0,
@@ -155,6 +160,7 @@ def test_windowed_rate_uses_jittered_sample_elapsed_time() -> None:
 
 def test_windowed_rate_isolated_on_pid_reuse_and_counter_rollback() -> None:
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
         rate_window_seconds=2.0,
@@ -173,6 +179,7 @@ def test_windowed_rate_isolated_on_pid_reuse_and_counter_rollback() -> None:
 
     rollback = WindowsProcessNetworkCollector(
         aggregator=SequenceAggregator([(0, 0), (100, 200), (20, 300), (30, 350)]),
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
         rate_window_seconds=2.0,
@@ -194,6 +201,7 @@ def test_windowed_rate_isolated_on_pid_reuse_and_counter_rollback() -> None:
 def test_windowed_rate_reanchors_after_clock_rollback() -> None:
     collector = WindowsProcessNetworkCollector(
         aggregator=SequenceAggregator([(0, 0), (100, 0), (110, 0), (120, 0)]),
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([100.0, 101.0, 10.0, 11.0]),
         rate_window_seconds=2.0,
@@ -212,7 +220,9 @@ def test_window_rate_requires_finite_nonnegative_duration() -> None:
 
 
 def test_collector_reports_asynchronous_session_failure_before_snapshot() -> None:
-    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=FakeSession
+    )
     collector.collect((process(),))
     session = FakeSession.instances[0]
     error = RuntimeError("consumer exploded")
@@ -230,6 +240,7 @@ def test_collector_reports_asynchronous_session_failure_before_snapshot() -> Non
 
 def test_new_process_identity_resets_baseline_for_reused_pid() -> None:
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
     )
@@ -253,7 +264,9 @@ def test_new_process_identity_resets_baseline_for_reused_pid() -> None:
 
 def test_etw_access_denied_maps_to_permission_denied_without_retrying() -> None:
     FakeSession.start_error = EtwPermissionError("StartTraceW", 5)
-    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=FakeSession
+    )
 
     first = collector.collect((process(),))[0]
     second = collector.collect((process(),))[0]
@@ -270,7 +283,9 @@ def test_etw_access_denied_maps_to_permission_denied_without_retrying() -> None:
 
 def test_other_session_start_failure_maps_to_unavailable() -> None:
     FakeSession.start_error = RuntimeError("ETW failed")
-    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=FakeSession
+    )
 
     result = collector.collect((process(),))[0]
 
@@ -284,7 +299,9 @@ def test_session_factory_failure_maps_to_unavailable() -> None:
     def failing_factory(on_event: Callable[[NetworkEvent], None]) -> FakeSession:
         raise RuntimeError("factory failed")
 
-    collector = WindowsProcessNetworkCollector(session_factory=failing_factory)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=failing_factory
+    )
     result = collector.collect((process(),))[0]
 
     assert result.download_bytes is None
@@ -293,6 +310,7 @@ def test_session_factory_failure_maps_to_unavailable() -> None:
 
 def test_close_stops_session_is_idempotent_and_sets_stopped_state() -> None:
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=FakeSession,
         clock=FakeClock([1.0]),
     )
@@ -310,7 +328,9 @@ def test_close_stops_session_is_idempotent_and_sets_stopped_state() -> None:
 
 
 def test_close_retains_failed_session_for_retry_while_staying_stopped() -> None:
-    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=FakeSession
+    )
     collector.collect((process(),))
     session = FakeSession.instances[0]
     cleanup_error = RuntimeError("cleanup failed")
@@ -338,7 +358,9 @@ def test_start_failure_retains_session_when_startup_cleanup_fails_until_close() 
     cleanup_error = RuntimeError("startup cleanup failed")
     FakeSession.start_error = start_error
     FakeSession.stop_error = cleanup_error
-    collector = WindowsProcessNetworkCollector(session_factory=FakeSession)
+    collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True, session_factory=FakeSession
+    )
 
     result = collector.collect((process(),))[0]
     session = FakeSession.instances[0]

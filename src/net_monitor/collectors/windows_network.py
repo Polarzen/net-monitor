@@ -6,6 +6,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Protocol
 
+import psutil
+
 from net_monitor.collectors.base import ProcessNetworkCollector
 from net_monitor.collectors.etw.api import EtwPermissionError
 from net_monitor.collectors.etw.events import NetworkEvent, ProcessNetworkTotals
@@ -32,6 +34,17 @@ SessionFactory = Callable[[Callable[[NetworkEvent], None]], _SessionProtocol]
 ProcessIdentity = tuple[int, float | None]
 
 
+def _identity_is_current(process: ProcessInfo) -> bool:
+    if process.create_time is None:
+        return False
+    try:
+        # Construct a fresh handle; the enumeration cache may describe a previous
+        # lifetime of this PID. Call only after capturing the counters to assign.
+        return psutil.Process(process.pid).create_time() == process.create_time
+    except (psutil.Error, OSError):
+        return False
+
+
 @dataclass(slots=True)
 class _ProcessState:
     process: ProcessInfo
@@ -42,6 +55,7 @@ class _ProcessState:
     history: tuple[tuple[float, int, int], ...] = ()
     last_total_sent: int | None = None
     last_total_received: int | None = None
+    needs_rebaseline: bool = False
 
 
 class WindowsProcessNetworkCollector(ProcessNetworkCollector):
@@ -54,6 +68,7 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         session_factory: SessionFactory | None = None,
         clock: Callable[[], float] = time.monotonic,
         rate_window_seconds: float = 0.0,
+        identity_validator: Callable[[ProcessInfo], bool] | None = None,
     ) -> None:
         if not math.isfinite(rate_window_seconds) or rate_window_seconds < 0:
             raise ValueError("rate_window_seconds must be finite and non-negative")
@@ -61,6 +76,9 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
         self._session_factory = session_factory or (lambda callback: EtwSession(callback))
         self._clock = clock
         self._rate_window_seconds = float(rate_window_seconds)
+        self._identity_validator = (
+            _identity_is_current if identity_validator is None else identity_validator
+        )
         self._session: _SessionProtocol | None = None
         self._states: dict[ProcessIdentity, _ProcessState] = {}
         self._retired: list[RetiredProcessNetworkStats] = []
@@ -95,6 +113,12 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
             total = totals.get(process.pid, ProcessNetworkTotals(pid=process.pid))
             state = self._states.get(identity)
 
+            if not self._identity_validator(process):
+                if state is not None:
+                    state.needs_rebaseline = True
+                results.append(ProcessNetworkStats(pid=process.pid, name=process.name))
+                continue
+
             if state is None:
                 state = _ProcessState(
                     process=process,
@@ -112,6 +136,13 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
                     state.last_total_received = total.bytes_received
             else:
                 state.process = process
+                if state.needs_rebaseline:
+                    # Keep confirmed lifetime counters continuous, but exclude
+                    # the interval whose identity could not be established.
+                    state.baseline_sent = total.bytes_sent - state.previous_sent
+                    state.baseline_received = total.bytes_received - state.previous_received
+                    state.history = ()
+                    state.needs_rebaseline = False
                 if self._rate_window_seconds > 0:
                     if (
                         state.last_total_sent is not None
@@ -218,7 +249,13 @@ class WindowsProcessNetworkCollector(ProcessNetworkCollector):
             # aggregator's PID bucket may contain bytes from both lifetimes.
             # Keep the old identity's last confirmed counters rather than
             # attributing any of the new process's bytes to it.
-            if pid in active_pids:
+            # Validate after the atomic retirement cut as well: a replacement
+            # can emit events between the earlier snapshot and retain_pids().
+            if (
+                pid in active_pids
+                or state.needs_rebaseline
+                or not self._identity_validator(state.process)
+            ):
                 observed_sent = state.previous_sent
                 observed_received = state.previous_received
             else:

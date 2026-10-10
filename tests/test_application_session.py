@@ -272,6 +272,7 @@ def test_collector_captures_final_counter_when_process_retires() -> None:
         return session
 
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=factory,
         clock=FakeClock([1.0, 2.0, 3.0]),
     )
@@ -303,6 +304,7 @@ def test_collector_does_not_charge_reused_pid_bytes_to_old_identity() -> None:
         return session
 
     collector = WindowsProcessNetworkCollector(
+        identity_validator=lambda process: True,
         session_factory=factory,
         clock=FakeClock([1.0, 2.0, 3.0]),
     )
@@ -334,6 +336,7 @@ def test_pid_reuse_baselines_against_mixed_bucket_at_atomic_cut() -> None:
     aggregator = NetworkAggregator()
     collector = WindowsProcessNetworkCollector(
         aggregator=aggregator,
+        identity_validator=lambda process: True,
         session_factory=factory,
         clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
     )
@@ -376,6 +379,7 @@ def test_collector_atomically_hands_off_totals_at_retirement_cut() -> None:
     aggregator = InjectingAggregator()
     collector = WindowsProcessNetworkCollector(
         aggregator=aggregator,
+        identity_validator=lambda process: True,
         session_factory=factory,
         clock=FakeClock([1.0, 2.0, 3.0, 4.0]),
     )
