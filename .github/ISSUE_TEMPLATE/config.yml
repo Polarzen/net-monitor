@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 常见问题与使用说明
+    url: https://github.com/Polarzen/net-monitor/blob/main/README.md#常见问题
+    about: 查看完整解压、权限、窗口退出、配置和数据含义。
+  - name: 下载 dev3 公开测试版
+    url: https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev3
+    about: 获取 Windows x64 产品 ZIP、中文说明和校验文件。
