@@ -4,13 +4,13 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 默认的微型窗口占用 **220 × 112 Qt 逻辑像素**；需要更多信息时，可以展开应用卡片、切换 Compact 列表，或打开按应用和进程组织的详细窗口。
 
-**当前修复候选：`0.2.1.dev2 / 82ba3a1 / 含 PID 身份归属修复`，Windows x64。运行确认尚未完成。** 已有对应提交的自动回归、构建和静态检查证据；本轮核对了包和实际启动进程，但用户停止了后续运行确认，未取得界面、真实采集或有效资源测量结果。当前没有完成替换确认的推荐包。程序未签名，不是稳定版或正式发布。具体边界见[验证状态](#验证状态与已知限制)。
+**[下载 Windows x64 公开测试版 0.2.1.dev3](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev3)** · [产品 ZIP](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/NetMonitor-0.2.1.dev3-windows-x64-e5e4329b48f5-prerelease.zip) · [校验文件](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/SHA256SUMS.txt) · [中文说明](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/USAGE.zh-CN.txt)
 
-主分支用于继续有限范围内部开发和验证。下方入口绑定 main CI `38056842914` 的 `82ba3a1` 修复候选，不随后续文档提交或 CI 构建自动切换。旧 `2b6db24` 包移至[历史对照](#历史包对照)，其曾经通过的运行项目不抵消后来发现的 PID 归属缺陷，也不自动成为修复包的运行证据。
+本版已作为 GitHub **Pre-release** 发布，未签名，不是稳定版。包含 PID 身份归属修复及 Compact 权限说明自动换行修复；最终 ZIP 已完成实际启动、管理员实例核验、短回环采集和正常退出的最低确认，界面显示由用户定性确认。完整范围与尚未验证项见[本版发布记录](docs/releases/0.2.1.dev3.md)。
 
-**修复内容与代价：** 旧实现可能把枚举缓存期内复用 PID 的新进程流量计入旧应用。候选包在取得计数快照后和退出交接时核验创建时间；身份变化或无法核实时不归属新增字节，并保留最后确认的累计，恢复后排除不确定区间。因此未知间隔或退出尾部可能少计，不代表所有网络及 PID 竞态均已解决。详见[整合修复记录](docs/stage5-windows-package.md#主分支整合期间的身份归属修复)和[本轮候选记录](docs/stage5-windows-package.md#pid-修复包定向确认与入口调整2026-10-10)。
+发布包固定来自源码 `e5e4329b48f55fd48dbf7c72673a7a287690da1b`，标签 `v0.2.1.dev3` 精确指向它；main 可包含其后的合并和文档提交。后续 CI 产物不会自动替换已发布 ZIP。PID 身份不确定区间采用保守归属，可能少计未知区间或退出尾部。
 
-[获取修复候选包（运行待确认）](https://github.com/Polarzen/net-monitor/actions/runs/38056842914/artifacts/11671937543) · [使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [验收记录](docs/stage5-windows-package.md)
+[使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [历史包](#历史包对照)
 
 ## 主要功能
 
@@ -35,29 +35,27 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 | 采集权限 | 真实按进程网络采集需要管理员权限 |
 | ARM64 | 已有源码回归，当前没有 ARM64 发行包 |
 
-### 获取修复候选包
+### 获取公开测试版
 
-当前 [Actions artifact](https://github.com/Polarzen/net-monitor/actions/runs/38056842914/artifacts/11671937543) 对应提交 `82ba3a1f21f240e114a112d2b94800ef3b285696`，包含产品 ZIP、`SHA256SUMS.txt` 和构建记录。它是**修复候选包，运行确认尚未完成**。下载可能需要登录 GitHub；2026-10-10 查询时未过期，到期时间为 **2026-10-24 21:45（香港时间）**。
+1. 打开 [v0.2.1.dev3 Release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev3)，下载 `NetMonitor-0.2.1.dev3-windows-x64-e5e4329b48f5-prerelease.zip`。
+2. 将产品 ZIP **完整解压**，打开其中的 `NetMonitor` 文件夹。
+3. 双击 `NetMonitor.exe`。首次默认微型模式；之后按已保存偏好恢复。
 
-1. 下载并解压 Actions artifact。
-2. 找到其中的 `NetMonitor-0.2.1.dev2-windows-x64-82ba3a1f21f2-test.zip`，再将这个产品 ZIP **完整解压**。
-3. 打开解压后的 `NetMonitor` 文件夹，双击 `NetMonitor.exe`。
-4. 首次启动默认进入微型模式；之后按保存的显示偏好恢复主模式。
+无需安装 Python。请保留 EXE、`_internal`、`licenses` 等全部内容，**不能只复制 EXE**。普通用户不需要下载组件源码附件，也不要把 GitHub 自动生成的 Source code.zip 当作产品程序。
 
-请保留 EXE、`_internal` 和其他随包文件，**不能只复制 `NetMonitor.exe`**。包内有[中文使用说明](packaging/使用说明.txt)；版本、源码提交和依赖信息在 `BUILD-INFO.json` 中。
+| 产物信息 | 值 |
+| --- | --- |
+| 版本／标签 | `0.2.1.dev3` / `v0.2.1.dev3` |
+| 构建源码 S | `e5e4329b48f55fd48dbf7c72673a7a287690da1b` |
+| 产品 ZIP 大小 | 38,786,616 字节 |
+| SHA-256 | `062f0efcc43149a174e1c7ebd95fc86f0250f57fcf003e022e323b694ea9c241` |
+| 构建来源 | [push CI 38066558624](https://github.com/Polarzen/net-monitor/actions/runs/38066558624) |
 
-需要核对下载完整性时，在产品 ZIP 所在目录执行：
-
-```powershell
-Get-FileHash -Algorithm SHA256 -LiteralPath .\NetMonitor-0.2.1.dev2-windows-x64-82ba3a1f21f2-test.zip
-Get-Content -LiteralPath .\SHA256SUMS.txt
-```
-
-比较两处哈希是否一致。本候选产品 ZIP 为 38,757,694 字节，SHA-256 为 `400f047c83ec3d8341f9356fa41db6de202f4ca28b3bef19ce07f70d4648cb9d`。这里校验的是内部产品 ZIP，不是外层 Actions artifact 压缩包；SHA-256 也不等于数字签名。包身份和验证边界见 [Stage 5 打包记录](docs/stage5-windows-package.md)。
-
-若链接已过期，可使用与上述哈希一致的已保存副本。也可到 [CI 运行列表](https://github.com/Polarzen/net-monitor/actions/workflows/ci.yml) 查找后续产物，或按下文构建，但不同提交／哈希的包需单独确认身份和验证状态，不能沿用本候选的记录。不要把 GitHub 的源码 ZIP 当作可直接运行的程序包。
+需要校验时，可将 `Get-FileHash -Algorithm SHA256` 的结果与 Release 的 [SHA256SUMS.txt](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/SHA256SUMS.txt) 对照；校验和不是数字签名。包内 `BUILD-INFO.json`、中文说明及第三方材料对应同一源码；发布记录集中在 [0.2.1.dev3.md](docs/releases/0.2.1.dev3.md)。
 
 ### 历史包对照
+
+旧 `0.2.1.dev2 / 82ba3a1` 修复候选保留为历史：源码 `82ba3a1f21f240e114a112d2b94800ef3b285696`，产品 `NetMonitor-0.2.1.dev2-windows-x64-82ba3a1f21f2-test.zip`，SHA-256 `400f047c83ec3d8341f9356fa41db6de202f4ca28b3bef19ce07f70d4648cb9d`。[原 artifact](https://github.com/Polarzen/net-monitor/actions/runs/38056842914/artifacts/11671937543) 可能到期；该包当时由用户停止运行确认，未取得有效采集结论，不自动继承 dev3 结果。
 
 旧 [dev2 artifact 11668988603](https://github.com/Polarzen/net-monitor/actions/runs/38051119145/artifacts/11668988603) 仅保留作历史对照，**存在已复现的 PID 复用归属问题，不再作为默认推荐**：
 
@@ -71,7 +69,7 @@ Get-Content -LiteralPath .\SHA256SUMS.txt
 
 程序默认以普通权限启动，不自动要求提权。提示需要管理员权限时，展开应用卡片，或切换到 Compact，点击 **“以管理员身份重启”**，再由你决定是否接受 Windows 原生 UAC。
 
-权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。取消或启动失败时，现有实例应继续运行；上述是实现行为说明，`82ba3a1` 候选本轮未执行提权或取得界面提示证据，不能套用旧包的成功提权记录。原生取消仍只有自动测试证据。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
+权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。dev3 已核实同一发行目录的管理员新实例与有效令牌；原生取消仍只有自动测试证据。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
 
 ## 使用方法
 
@@ -157,7 +155,7 @@ Get-Content -LiteralPath .\SHA256SUMS.txt
 
 需要 Windows、Git 和 Python **3.14 或更新版本**。当前验收及打包使用 Python **3.14.7**；构建 x64 测试包时还需匹配下节的精确版本和架构。
 
-以下示例从主分支 `main` 创建新检出目录，使用 PowerShell；整合 PR 合并前，完整 Stage 5 源码仍以 `feat/stage-5-windows-package` 分支为准：
+以下示例从主分支 `main` 创建新检出目录，使用 PowerShell：
 
 ```powershell
 git clone --branch main https://github.com/Polarzen/net-monitor.git
@@ -189,6 +187,8 @@ py -3.14 -m venv .venv-build-stage5
 
 `py -3.14` 选择的解释器必须实际为 3.14.7 x64；可先用 `py -3.14 -c "import platform; print(platform.python_version(), platform.machine())"` 检查。已有构建环境时复用即可。
 
+使用 `-Channel public-prerelease` 可生成公开预发布候选元数据；默认 `internal-test`。构建成功不代表已发布或通过实际运行确认。
+
 默认输出到 `artifacts/stage5/NetMonitor-<版本>-windows-x64-<源码短 SHA>-test/`，包含 ZIP、外部校验文件和构建报告。重复构建同一提交不会覆盖旧目录，可使用 `-OutputRoot` 指定新的输出根目录。
 
 锁文件固定 PyInstaller 6.22.3、hooks-contrib 2026.8、PySide6 6.11.2、psutil 7.2.2 及传递依赖的版本和哈希。完整复现步骤、许可证来源、失败修复和产物身份见 [Stage 5 打包记录](docs/stage5-windows-package.md)。构建目录、虚拟环境和二进制产物均不进入 Git。
@@ -217,20 +217,19 @@ try {
 
 ## 验证状态与已知限制
 
-以下状态对应 `0.2.1.dev2 / 82ba3a1` 候选的 2026-10-10 记录，不代表后续二进制自动继承相同验证。
+以下状态只对应上述最终 dev3 ZIP；不自动适用于其他源码或哈希。
 
-| 范围 | 当前结果 |
+| 范围 | 本版结果 |
 | --- | --- |
-| 候选身份与文件 | ZIP 哈希、CRC、BUILD-INFO、302 个清单文件及 EXE 哈希已核对 |
-| 历史 main CI | [38056842914](https://github.com/Polarzen/net-monitor/actions/runs/38056842914)：x64／ARM64 各 343 passed、1 skipped；x64 构建及静态检查成功。本轮未重跑完整回归 |
-| PID 复用边界 | 新增 10 项受控回归在既有 CI 通过；未现场制造操作系统 PID 复用 |
-| 本轮启动 | 实际进程的路径、PID、create_time 与普通权限已核实；桌面工具被 Esc 中止，随后用户选择停止运行确认 |
-| 界面与真实采集 | 未取得界面提示证据，未提权、未启动负载；有效速率、方向、累计、正常进程退出后的账户行为均未验证 |
-| 资源观察 | 无有效采样区间；未建立已确认可见模式及真实采集状态，不能判断占用或相对性能变化 |
-| 退出与会话 | 用户报告窗口菜单退出；只读确认实例已结束。未取得菜单操作证据，自有 ETW 会话清理仍未验证 |
-| 其他桌面项目 | Micro/Card、关注、托盘、原生取消、干净机器和长期稳定性等仍未验证 |
+| 自动回归 | 本地、CI x64／ARM64 各 347 passed、1 skipped；x64 打包成功 |
+| 产物身份 | CI 来源、ZIP、322 个清单条目、62 个二进制来源、PE 版本及 asInvoker 已复核 |
+| 实际启动／提权 | 中文和空格目录、不同工作目录启动；管理员新实例路径、PID、创建时间和令牌已核实 |
+| 真实采集 | 有上限的 60 秒本机回环负载；用户确认目标 Python 应用上下行及累计“正常显示”，未提供具体 UI 数值或有效截图 |
+| 正常退出 | 用户经 Compact“窗口 → 退出”，只读确认目标实例与负载进程均结束 |
+| PID 复用 | 当前完整回归包含 10 项受控身份归属回归；没有现场制造 OS PID 复用 |
+| 仍未完整验证 | 干净机器、全部 Micro/Card/DPI/多屏/关注/托盘交互、原生取消、显式零值、长时间稳定性、性能与 ETW 会话清理 |
 
-本轮结论是**证据不足，保留修复候选**，没有据此判定修复包不可用或复现新的产品缺陷。旧 dev1 的累计／账户保留及旧 dev2 `2b6db24` 的界面／活动记录保持各自历史范围，不提升为 `82ba3a1` 的运行结论。详细过程与缺失项见[本轮记录](docs/stage5-windows-package.md#pid-修复包定向确认与入口调整2026-10-10)及[包身份](docs/evidence/stage5/pid-fix-runtime/package.json)。
+本版达到带上述限制的公开测试版最低确认范围，不代表全套 Stage 4／Stage 5 验收通过。初次负载工具启动失败及随后有效补验均如实保留在[发布记录](docs/releases/0.2.1.dev3.md)，历史 dev1/dev2 结果保留各自源码与哈希边界。
 
 ## 技术与文档
 
@@ -240,6 +239,7 @@ try {
 
 | 文档 | 内容 |
 | --- | --- |
+| [dev3 公开发布记录](docs/releases/0.2.1.dev3.md) | 已发布资产、源码/标签、实际验证及限制 |
 | [Stage 5 打包与交付](docs/stage5-windows-package.md) | 构建、版本、校验值、实际 EXE 验证及 CI artifact |
 | [Stage 4 轻量化与验收](docs/stage4-lightweight.md) | 隐藏刷新、真实桌面／ETW、资源测量及限制 |
 | [微型窗口设计](docs/stage3c-micro-widget.md) | 卡片、选择、关注、窗口和显示偏好 |
@@ -250,4 +250,4 @@ try {
 
 仓库当前没有项目顶层 `LICENSE` 文件，第三方组件说明不等于对项目源码授予开源许可证。包内包含 `THIRD-PARTY-NOTICES.txt` 和 `licenses/`；来源记录见 [第三方说明](packaging/THIRD-PARTY-NOTICES.txt)。
 
-本版用于内部测试，完整再分发审查尚未完成，不能据此认定已经适合公开正式发行。
+本版公开测试包保留第三方许可证、版权和实际来源；Qt/PySide/shiboken 采用 LGPLv3，匹配源码随 Release 提供，外部 DLL 与 Python 包装层可替换，详见[分发与替换说明](packaging/licenses/REDISTRIBUTION.txt)。Microsoft 运行库保留其单独条款。发布本项目二进制不等于为项目源码新增开源许可证。
