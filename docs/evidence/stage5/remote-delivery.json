@@ -1,0 +1,46 @@
+{
+  "checked_at": "2026-10-10T09:42:28.688558+00:00",
+  "run_id": 38042146780,
+  "run_url": "https://github.com/Polarzen/net-monitor/actions/runs/38042146780",
+  "run_head": "e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+  "run_conclusion": "success",
+  "jobs": [
+    {
+      "name": "Windows x64 internal test package",
+      "conclusion": "success"
+    },
+    {
+      "name": "Full validation windows-2025",
+      "conclusion": "success",
+      "tests": "331 passed, 1 skipped in 8.02s"
+    },
+    {
+      "name": "Full validation windows-11-arm",
+      "conclusion": "success",
+      "tests": "331 passed, 1 skipped in 17.56s"
+    }
+  ],
+  "artifact_id": 11665468996,
+  "artifact_url": "https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996",
+  "artifact_name": "NetMonitor-windows-x64-internal-test-e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+  "ci_zip": "D:\\code\\net-monitor\\artifacts\\stage5\\actions-38042146780\\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test\\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip",
+  "ci_zip_bytes": 38757174,
+  "ci_zip_sha256": "a5cdc3566e29b24498e08f3e08809af67d69861f07e3e4c8abb42447acdd89d3",
+  "ci_directory_bytes": 98869201,
+  "ci_file_count": 303,
+  "manifest_hashes_checked": 302,
+  "crc_ok": true,
+  "pe_architecture": "0x8664",
+  "pe_subsystem": 2,
+  "ci_build_platform": "Windows-2025Server-10.0.26100-SP0",
+  "ci_built_at": "2026-10-10T09:40:19.681354+00:00",
+  "packaging_source_equal_to_local_tested_commit": true,
+  "ci_binary_desktop_test": "Not rerun; CI build and static checks are not the local ZIP desktop acceptance",
+  "local_tested_zip_source_commit": "56f049bf32a570d4e6aa16a6d94471a1df607a25",
+  "remaining_packaged_uac_etw": "Not verified; connection repair only resolved Git push",
+  "protected_staged_blob": "e05e54120fee12ef6abe8bbcde81c5ba5b4a0045",
+  "goal_md_sha256": "3c406e89c9f3a815d59715eb595111732f649d72f6260ee14bed507a05a87cef",
+  "artifact_expires_at": "2026-10-24T09:40:23Z",
+  "artifact_container_digest": "sha256:47cb11cfa5e9e40b32fe390bd67946cb65a1a83da7c3604e69a21977197c35d5",
+  "test_skip_reason": "tests/test_stage3a_ui.py:271: runner has no real system tray (both platforms)"
+}

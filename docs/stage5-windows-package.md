@@ -22,7 +22,9 @@
 D:\code\net-monitor\artifacts\stage5\NetMonitor-0.2.1.dev1-windows-x64-56f049bf32a5-test\NetMonitor-0.2.1.dev1-windows-x64-56f049bf32a5-test.zip
 ```
 
-同目录提供 `SHA256SUMS.txt`、`build-result.json`、`static-inspection.json` 和原始 `build.log`。最终 ZIP 在解压验证及退出后重新计算 SHA-256，结果一致。早期失败／中间版本的输出保留作诊断，**交付对象仅为上述 ZIP**。
+同目录提供 `SHA256SUMS.txt`、`build-result.json`、`static-inspection.json` 和原始 `build.log`。最终 ZIP 在解压验证及退出后重新计算 SHA-256，结果一致。早期失败／中间版本的输出保留作诊断，**本地桌面已实测的交付对象为上述 ZIP**。
+
+2026-10-10 17:42（香港时间）补充：Stage 5 分支已推送，三项 CI 作业均成功，并生成 [Actions 内部测试包 artifact](https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996)。该 artifact 是 `e0eafaa` 的独立 CI 构建，和上表本地实测包的字节、源码提交记录不同；具体校验与验收边界见下文“远端交付补验”。
 
 包内结构：
 
@@ -150,13 +152,49 @@ if ($LASTEXITCODE -ne 0) { throw 'Pinned dependency installation failed' }
 
 新增 x64 Actions 作业使用同一锁文件、spec 和 PowerShell 入口，上传 14 天内部测试 artifact；原 Windows x64／ARM64 回归矩阵保留。没有创建 Release、标签或合并 main。
 
-**推送失败，Stage 5 CI 未触发。** 首次出现 schannel TLS 握手失败；后续到达 GitHub 后被明确拒绝：
+**首次交付时推送失败，Stage 5 CI 未触发；此阻塞已在下述远端交付补验中解除。** 当时出现 schannel TLS 握手失败；后续到达 GitHub 后被明确拒绝：
 
 ```text
 refusing to allow an OAuth App to create or update workflow `.github/workflows/ci.yml` without `workflow` scope
 ```
 
-最后只读远端查询再次遇到 TLS 握手失败，无法进一步确认远端引用。没有绕过权限、更换认证或删掉所要求的工作流来强行推送；本地源码、提交和 ZIP 保留。CI 配置存在不等于 CI 成功。
+首次交付收尾的只读远端查询再次遇到 TLS 握手失败，当时无法进一步确认远端引用。没有绕过权限、更换认证或删掉所要求的工作流来强行推送；本地源码、提交和 ZIP 保留。此段为历史失败记录。
+
+### 远端交付补验（2026-10-10）
+
+用户确认连接已修复后，原有五个 Stage 5 提交成功推送至 `origin/feat/stage-5-windows-package`，远端 HEAD 核对为 `e0eafaa3200910fd5ae47eeff343401276fa1e8f`。没有重做实现或本地桌面验收，没有把 ZIP、EXE 或原有无关暂存内容纳入 Git。
+
+[CI 38042146780](https://github.com/Polarzen/net-monitor/actions/runs/38042146780) 已完成，最终结论为 **success**：
+
+| 作业 | 实际结果 |
+| --- | --- |
+| Windows x64 internal test package | 构建、静态检查和 artifact 上传成功 |
+| Full validation windows-2025 | 331 passed、1 skipped，8.02 秒 |
+| Full validation windows-11-arm | 331 passed、1 skipped，17.56 秒 |
+
+两平台的跳过项均为离屏 runner 没有真实系统托盘。这里的源码回归和打包静态检查不等于打包程序的原生 UAC 或真实 ETW 验收。
+
+已下载 [Actions artifact 11665468996](https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996)，核对其内部 ZIP 的 CRC、外部 `SHA256SUMS.txt`、302 个文件哈希、PE 架构、GUI 子系统和源码身份。该包未另行执行真实桌面操作，不将本地旧包的实测结论直接套用为该 CI 二进制的完整验收。
+
+GitHub 当前记录的 artifact 到期时间为 2026-10-24 17:40（香港时间）；本地下载副本保留在下述路径。GitHub artifact 容器的 digest 与其中产品 ZIP 的 SHA-256 是不同对象。
+
+| CI 产物 | 实际值 |
+| --- | --- |
+| 源码提交 | `e0eafaa3200910fd5ae47eeff343401276fa1e8f` |
+| ZIP 字节数 | `38,757,174` |
+| 完整目录字节数／文件数 | `98,869,201`／303 |
+| ZIP SHA-256 | `a5cdc3566e29b24498e08f3e08809af67d69861f07e3e4c8abb42447acdd89d3` |
+| 构建环境 | Windows Server 2025 x64，沿用锁定构建依赖 |
+
+已下载的 CI ZIP：
+
+```text
+D:\code\net-monitor\artifacts\stage5\actions-38042146780\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip
+```
+
+本地已实测包仍为上文 `56f049b` 的 ZIP，未替换或重建。核对 `56f049b..e0eafaa` 的产品源码、packaging、pyproject 和构建脚本差异为空。当前补充只更新文档及 [remote-delivery.json](evidence/stage5/remote-delivery.json)，使用 `[skip ci]` 避免为交付记录重复执行相同代码的测试；本节 CI 结论始终绑定 `e0eafaa`。
+
+推送与 artifact 缺失已解决；打包版管理员重启、真实 ETW、Micro/Card／托盘交互及干净机器验证仍保留原有未完成状态。连接修复没有证明这些桌面与采集项目通过。
 
 原有暂存 `docs/stage4-lean-core.md` 的 blob 始终为 `e05e54120fee12ef6abe8bbcde81c5ba5b4a0045`；未跟踪 `goal.md` SHA-256 为 `3c406e89c9f3a815d59715eb595111732f649d72f6260ee14bed507a05a87cef`。只按明确路径提交本轮文件，不纳入这些内容。ZIP、EXE、构建虚拟环境和缓存没有提交。
 
