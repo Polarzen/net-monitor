@@ -1,0 +1,82 @@
+name: 问题反馈 / Bug report
+description: 报告使用中遇到的问题；信息不完整或偶发问题也可以反馈。
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。可以先查看 [常见问题](https://github.com/Polarzen/net-monitor/blob/main/README.md#常见问题)；无需安装 Python、运行终端命令或准备诊断包。
+        **此处提交的内容会公开。** 请勿上传整个发行目录、完整 BUILD-INFO、私人日志或完整进程列表；截图只保留相关窗口，并遮挡私人路径、无关应用和浏览器内容。不要填写姓名、邮箱、IP、MAC、订阅地址或访问令牌。
+        如怀疑安全漏洞，请勿公开敏感利用细节或凭据，可以先只描述不含敏感信息的影响。
+  - type: input
+    id: version_or_download
+    attributes:
+      label: 产品版本或下载来源
+      description: 可查看 ZIP 文件名或 BUILD-INFO.json 中的 version；只需填写版本或公开下载链接，无法取得时可写“不确定”。
+      placeholder: 填写你实际使用的版本、下载来源，或“不确定”
+    validations:
+      required: true
+  - type: input
+    id: windows_architecture
+    attributes:
+      label: Windows 版本与系统架构
+      description: 可在“设置 → 系统 → 系统信息”查看 Windows 规格及系统类型，无需终端命令；不清楚的部分可写“不确定”。
+      placeholder: Windows 版本；系统类型（x64 / ARM64 / 不确定）
+    validations:
+      required: true
+  - type: textarea
+    id: problem_and_expected
+    attributes:
+      label: 实际问题和预期结果
+      description: 描述实际看到的现象，以及原本希望发生什么；不知道原因也可以提交。
+      placeholder: |
+        实际发生：
+        预期结果：
+    validations:
+      required: true
+  - type: textarea
+    id: steps_and_frequency
+    attributes:
+      label: 触发步骤及出现频率
+      description: 写下出现问题前的操作，以及每次、偶尔或仅一次。偶发问题可写“暂时不能稳定复现”。
+      placeholder: |
+        操作步骤或当时的情况：
+        出现频率：
+    validations:
+      required: true
+  - type: input
+    id: source_commit
+    attributes:
+      label: 源码提交（可选）
+      description: 如果方便，只复制 BUILD-INFO.json 中的 source_commit 值，不必上传整个文件。
+    validations:
+      required: false
+  - type: dropdown
+    id: view
+    attributes:
+      label: 问题发生时的视图（可选）
+      options:
+        - Micro（微型窗口）
+        - Card（应用卡片）
+        - Compact
+        - Detailed（详细窗口）
+        - 尚未出现窗口
+        - 不确定
+    validations:
+      required: false
+  - type: dropdown
+    id: administrator
+    attributes:
+      label: 当时是否已取得管理员权限（可选）
+      options:
+        - 已取得
+        - 未取得
+        - 不确定
+    validations:
+      required: false
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: 补充信息（可选）
+      description: 按需要填写显示缩放比例、错误原文、代理或 VPN 是否参与（无需配置内容），以及是否在某次更新后出现。可以附仅含相关窗口且已遮挡隐私的截图；不要求日志或附件。
+    validations:
+      required: false
