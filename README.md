@@ -1,234 +1,238 @@
 # Net Monitor
 
-Net Monitor 是一个面向 Windows 11 的轻量第三方应用网络活动监视器。它的核心问题不是“做另一个任务管理器”，而是让用户随时看一眼：**现在谁在联网、谁正在下载、谁正在上传、哪个应用最活跃。**
+Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器。它按应用显示上传、下载速率和本次运行期间的累计流量，帮助你了解当前哪个应用在联网，以及后台下载或上传是否仍在持续。
 
-当前阶段：**Stage 5 Windows x64 内部测试包已构建并实际启动，尚未完成发布验收**。
+默认的微型窗口占用 **220 × 112 Qt 逻辑像素**；需要更多信息时，可以展开应用卡片、切换 Compact 列表，或打开按应用和进程组织的详细窗口。
 
-实现、测试、同机离线 UI 性能记录和桌面验收状态见 [Stage 4 记录](docs/stage4-lightweight.md)。本轮精简默认界面并跳过隐藏视图的展示工作；保留已有监控能力和共享采集链路，不新增产品功能模块。
+**当前版本：`0.2.1.dev1`，Windows x64 内部测试版。** 已完成独立程序打包、本地 EXE 启动验证及 x64／ARM64 源码回归；打包版管理员重启、真实 ETW 和部分桌面交互仍未完成验收。程序未签名，尚未正式发布。具体边界见[验证状态](#验证状态与已知限制)。
 
-`0.2.1.dev1` 的最终 ZIP、SHA-256、准确构建命令和逐项结果见 [Stage 5 打包记录](docs/stage5-windows-package.md)。最终 EXE 已在开发机的独立中文路径、不同工作目录及不可写发行目录中运行，并验证迁移、Compact 恢复和程序菜单正常退出。打包版 UAC／真实 ETW、Micro/Card／托盘交互及干净机器测试仍未通过验收；Stage 4 历史证据不能代替这些项目。测试包未签名，不是正式发布。
+[下载测试包](https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996) · [使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [验收记录](docs/stage5-windows-package.md)
 
-## 产品形态
+## 主要功能
 
-新用户默认启动 **微型模式**；显示偏好可恢复上次选择的主模式。
+- **按应用观察网络活动**：查看上传、下载速率、活跃应用排行，以及应用下属的进程。
+- **微型窗口与应用卡片**：平时只显示一个应用；展开后查看短期曲线、Top 3 和本次累计。
+- **自动显示与固定关注**：自动选择活跃应用，也可以固定一个应用，避免显示对象随排行榜变化。
+- **详细窗口**：按应用／PID 展开、排序和筛选，单独查看本次监控累计；有流量的已退出应用仍保留累计记录。
+- **托盘与显示偏好**：隐藏主窗口后继续采集，保存主模式、窗口位置和微型窗口置顶偏好。
+- **区分零值与未知**：权限不足、采集不可用或数据过期时显示 `—`，不会用 `0 B/s` 代替未知流量。
 
-- 微型窗：固定 **220×112 Qt 逻辑像素**（不超过 240×140 上限），显示一个当前应用、上传/下载实时速率和前台/后台/状态未知；已确认全零时显示安静状态，未知速率显示 `—`。固定关注时保留关注对象，即使当前为 0 B/s。长名称省略，完整名称在 Tooltip 和卡片中提供。B 是字节，KiB/MiB 为 1024 进位，不是 bit/s。数字变化不改变窗体尺寸。
-- 展开卡片：悬停约 350 ms 预览，跨入卡片不立即收起；离开联合区域延迟收起。点击后保持，Esc 收起。显示完整名称、当前上下行、短期曲线、Top 3、固定关注及本次监控累计；完整路径和账户 key 放在名称 tooltip。`选择应用…` 不限于排行榜，沿用现有选择弹窗。
-- 微型窗不再放曲线或后台占比行，Network Spotlight 使用 tooltip；完整信息在卡片和已有详细窗口查看。短期历史仍为 60 秒、每应用最多 120 点、最多 32 应用，隐藏期间继续记录，未知值保留曲线断点。
-- Compact：原约 380 px 宽 Top 5 视图保留。微型窗右键菜单、卡片菜单或托盘可切回原 Compact；同一时刻只有一个主入口。
-- Detailed：复用同一详细窗口，保留 `application → PID` 树、原始数值排序、实时筛选和 **本次监控累计** 页签；上传和下载累计均为零的账户仅从视图隐藏，已退出且有流量的账户仍可查看，筛选不删除底层累计账户。
-- 固定关注绑定可信 application key，不绑定显示名称、PID 或排序位置。其他应用更快也不抢走对象；取消后恢复自动。本轮仅在当前运行期间保留关注。
-- Micro Presence 的前台状态来自 Win32 当前前台窗口的 HWND/PID 查询；它不新增进程扫描。foreground PID 只有在当前快照中与 `create_time != None` 的可信成员匹配时才显示“前台”；无法可靠关联时显示“状态未知”，不会伪装成“后台”。
-- 窗口置顶和固定关注是不同操作。置顶默认关闭，微型窗置顶不会强制 Detailed 置顶。自动刷新、自动选择与悬停预览不主动激活窗口；实际焦点行为仍需物理桌面验收。
+网络数据来自 Windows ETW；系统与进程信息由 psutil 提供。当前不提供限速、防火墙、流量拦截、网络加速或长期流量数据库。
 
-自动选择按原始上下行之和排序，稳定处理并列。首次有效数据立即选择；当前对象仍有流量时，挑战者持续领先约 2 秒后切换，当前归零则可立即换到有效候选。防抖只改变显示对象，不平滑速率或延长旧正速率；卡片 Top 3 始终按当前原始数值排序。
+## 下载与首次启动
 
-启动、权限不足、采集不可用、采样失败、数据过期、空闲、未运行与身份未知分别显示。可用数据停止更新约 4 秒后旧速率变为 `—`；已确认累计保留。`None` 不显示为 0，部分未知不声称全部应用空闲。缺失行或采样失败不能证明应用退出；可信账户的零关联进程数也会在存在未知身份时保守显示未知。
+### 运行要求
 
-Compact 的 Top 应用按原始数值排序：
+| 项目 | 要求 |
+| --- | --- |
+| 系统 | Windows 11 x64 |
+| 安装方式 | 解压完整目录后运行，无安装器 |
+| Python | 使用测试包无需另装 Python、pip 或 PySide6 |
+| 采集权限 | 真实按进程网络采集需要管理员权限 |
+| ARM64 | 已有源码回归，当前没有 ARM64 发行包 |
 
-```text
-activity_score = download_bytes_per_second + upload_bytes_per_second
-```
+### 获取测试包
 
-不会按 `"1 MB/s"`、`"900 KB/s"` 等格式化字符串排序。网络数据不可用时保持 `—`，不会把未知值当作 0。
+当前可下载的 [Actions artifact](https://github.com/Polarzen/net-monitor/actions/runs/38042146780/artifacts/11665468996) 对应提交 `e0eafaa`，包含产品 ZIP、`SHA256SUMS.txt` 和构建记录。下载可能需要登录 GitHub；该 artifact 当前到期时间为 **2026-10-24 17:40（香港时间）**。
 
-“当前联网”仍严格表示 GUI 约 2 秒测量窗口内有流量：
+1. 下载并解压 Actions artifact。
+2. 找到其中的 `NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip`，再将这个产品 ZIP **完整解压**。
+3. 打开解压后的 `NetMonitor` 文件夹，双击 `NetMonitor.exe`。
+4. 首次启动默认进入微型模式；之后按保存的显示偏好恢复主模式。
 
-```text
-upload rate > 0 OR download rate > 0
-```
+请保留 EXE、`_internal` 和其他随包文件，**不能只复制 `NetMonitor.exe`**。包内有[中文使用说明](packaging/使用说明.txt)；版本、源码提交和依赖信息在 `BUILD-INFO.json` 中。
 
-短 burst 在窗口内按真实采样时间计算平均速率，不是“本次 Session 曾经联网”，也不是伪造实时值。
-
-## 架构
-
-Stage 3D 保留 Stage 3C 冻结的 Stage 3B 内核，不为多个窗口各开一套采集器。运行时保持单数据源：
-
-```text
-ETW thread
-    ↓
-MonitorService
-    ↓
-SamplingWorker (QThread, ~500 ms)
-    ↓
-UiController / shared MonitorSnapshot
-    ├── MicroWindow / ApplicationCard (只读 UI 投影)
-    ├── CompactWindow (回退入口)
-    └── DetailWindow (原实时树 + 只读累计页签)
-```
-
-因此默认只有：
-
-- 一个 `MonitorService`
-- 一个 `SamplingWorker`
-- 一个 `WindowsProcessNetworkCollector`
-- 一个 ETW Session
-
-Detailed View 只消费 controller 已有的 snapshot，不创建第二个采集生命周期。
-
-Controller 按可见性分发，隐藏的 Micro、Compact、Detailed、Card 不接收展示更新。接收快照、选择防抖、关注状态、累计和短期历史照常维护；所有窗口恢复时先同步当前有效状态，再显示。过期或失败使用速率为 `None` 的展示快照，不会闪回旧正速率。前台身份在隐藏、模式切换或 PID 身份变化后失效，等既有 heartbeat 合法查询后才恢复，不在显示路径额外查询。
-
-Micro Presence 是 UI 投影：`UiController` 在既有约 500 ms heartbeat 中最多读取一次当前 foreground PID，再与 `MicroProjection` 已有 selected application 成员比较。查询包装器通过依赖注入测试；它不是线程、service、timer 或 collector。网络速率、application session、自动选择和固定关注都与前后台状态分离。
-
-## 网络采集
-
-真实按进程网络流量使用：
-
-- Windows ETW
-- `Microsoft-Windows-Kernel-Network`
-- TDH
-- `ctypes`
-
-实时 ETW 会话使用独立会话模式，避免并发或残留会话在启用同一 provider 时互相影响。
-
-系统与进程信息使用 `psutil`。项目不会用连接数、随机数或系统总流量平均分配来伪造按进程流量。
-
-应用可见性继续采用保守分类：
-
-```text
-SYSTEM      默认隐藏
-APPLICATION 默认显示
-UNKNOWN     默认显示
-```
-
-第三方应用按相同 executable 路径进行保守聚合。PID 子项仍保留 `(pid, create_time)` 身份，避免 PID reuse 回归。
-
-### 本次监控累计（沿用 Stage 3B 内核）
-
-应用会话累计只在当前 Net Monitor 进程生命周期内保留，不写 SQLite，也不跨重启恢复。可信身份是 `(pid, create_time)`；首次可信累计样本全额计入，之后每个方向只计入超过该方向高水位的增量。计数器回退或乱序不会被猜成新的 epoch，因此同一身份在重新超过旧高水位前可能漏计。`create_time` 缺失、网络行任一累计字段缺失或退休行 PID 与进程 PID 不一致时，整行不进入会话累计。
-
-进程退出时，ETW PID 桶在同一锁内原子取出并从活动桶删除，退休样本交给会话 tracker 后只消费一次。PID reuse 的旧身份只交接最后确认值，新身份从混合 PID 桶建立隔离基线；原子切点后的迟到事件不回猜给旧身份。身份和去重状态贯穿整个应用会话，内存增长来自已见身份与累计账户的有意保留。
-
-UI 直接消费 `MonitorSnapshot.application_session`，只按精确可信 key 关联；没有可证明的关联就显示“无可信累计”。不在 UI 积分速率、移动历史账户、合并同名账户或重复加账。首次归因的 key 不因路径元数据恢复而迁移，因而当前应用与旧匿名累计可能无法关联；旧账户仍独立保留在累计页签。历史分类缺失时保持未知，不臆造系统/第三方标签。
-
-“本次监控累计”不是从点击关注开始、今日流量、应用全部历史或运营商账单；也不保证代理、回环与虚拟网卡已按外网去重。`active_process_count` 只表示最近枚举关联的进程数，不是当前联网进程数；累计大于 0 不等于当前联网。无流量不表示下载完成、上传成功或任务失败。Compact/实时页的应用合计不等于整机总流量。原详细树的存活进程累计不能替代会话累计页签。
-
-## UI 设置与图标
-
-仅保存主模式、微型/Compact 窗口逻辑位置和微型置顶偏好；默认使用当前用户本地 `NetMonitor/ui.json`，损坏时安全回退。不保存流量历史、累计、访问记录或关注应用 key。窗口拖动与点击分开，按可用区域停靠、展开并恢复越界位置；不改变系统缩放，不创建桌面拦截层。
-
-图标只从可信本地可执行文件读取，失败显示本地通用图标；有界缓存包含失败项，阻塞 IO 在线程中处理，返回后校验 key，Qt 图像对象在 GUI 线程创建。不联网下载图标。CI 使用的测试字体不进入产品运行链路。
-
-## 启动方式
-
-### Windows x64 内部测试包
-
-完整解压测试 ZIP，保留 `NetMonitor/` 下全部文件，双击 `NetMonitor.exe`。不能只复制 EXE。包内有 Python、Qt 和 psutil 运行依赖；无需另装 Python。当前只完成开发机隔离目录验证，未做无 Python 的干净机器验证。
-
-配置继续写入 `%LOCALAPPDATA%\NetMonitor\ui.json`。构建来源见包内 `BUILD-INFO.json`；ZIP 外有 `SHA256SUMS.txt`，它是完整性校验，不是签名。
-
-### 开发运行
-
-保留控制台，方便调试日志：
+需要核对下载完整性时，在产品 ZIP 所在目录执行：
 
 ```powershell
-python -m net_monitor
+Get-FileHash -Algorithm SHA256 -LiteralPath .\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip
+Get-Content -LiteralPath .\SHA256SUMS.txt
 ```
 
-### 普通 GUI 启动
+比较两处哈希是否一致。这里校验的是内部产品 ZIP，不是外层 Actions artifact 压缩包；SHA-256 也不等于数字签名。产物大小、完整哈希、本地实测包与 CI 包的区别见 [Stage 5 打包记录](docs/stage5-windows-package.md)。
 
-安装项目后使用：
+若链接已过期，可到 [CI 运行列表](https://github.com/Polarzen/net-monitor/actions/workflows/ci.yml) 查找 Stage 5 分支成功运行中实际存在的 artifact，或按下文从源码构建。不要把 GitHub 的源码 ZIP 当作可直接运行的程序包。
+
+### 开始采集
+
+程序默认以普通权限启动，不自动要求提权。提示需要管理员权限时，展开应用卡片，或切换到 Compact，点击 **“以管理员身份重启”**，再由你决定是否接受 Windows 原生 UAC。
+
+权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。取消或启动失败时，现有实例应继续运行；打包版实际提权路径仍在待验证范围内。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
+
+## 使用方法
+
+以下描述当前已实现的操作方式；各项在打包 EXE 上的实测覆盖情况见后面的验证表。
+
+### 选择视图
+
+| 视图 | 如何打开 | 适合查看 |
+| --- | --- | --- |
+| 微型模式（Micro） | 默认启动；或主窗口右键菜单 →“微型模式” | 一个应用的上下行速率、前台／后台／未知状态 |
+| 应用卡片（Card） | 悬停微型窗口预览，或单击微型窗口打开 | 完整名称、短期曲线、Top 3、固定关注和本次累计 |
+| Compact | 主窗口右键菜单 →“原 Compact 模式”，也可从卡片“菜单”进入 | Top 5 活跃应用和整体状态 |
+| 详细窗口（Detailed） | 点击“详细信息”，或从主窗口右键／托盘菜单打开 | 应用与 PID 列表、排序筛选和“本次监控累计”页签 |
+
+微型窗本身不显示曲线，短期曲线位于应用卡片中。悬停预览后，将鼠标移出窗口和卡片区域会延迟收起；点击打开或与卡片交互后可保持展开，按 `Esc` 收起。拖动微型窗口可调整位置，长名称的完整信息可通过悬停提示查看。
+
+关闭详细窗口只关闭该视图，不结束主程序。Compact 顶部的“窗口”菜单也提供“微型模式”和“退出”。
+
+### 固定关注一个应用
+
+1. 打开应用卡片，点击 **“固定关注”**，关注当前应用。
+2. 要选择其他应用，点击 **“选择应用…”**，再点击列表中的目标；选择后会固定关注该应用。卡片 Top 3 中的应用也可点击关注。
+3. 点击 **“取消关注”**，或从主窗口右键菜单选择“取消固定关注”，恢复自动显示。
+
+固定关注后，其他应用更活跃也不会抢走显示对象。无法可靠识别身份的应用不能固定关注；关注状态仅在当前运行期间保留。
+
+**固定关注与窗口置顶是两件事**：前者决定看哪个应用，后者决定窗口是否盖在其他窗口上方。“前台／后台”描述应用状态，也不代表它是否被固定关注。
+
+### 隐藏、恢复与退出
+
+- **隐藏**：系统支持托盘时，关闭主窗口或选择“隐藏到托盘”，程序继续运行和采集。
+- **恢复**：右键系统托盘中的 Net Monitor 图标，选择“显示 Net Monitor”，恢复当前主模式；图标可能位于系统托盘的隐藏图标区域。
+- **退出**：选择托盘菜单、主窗口右键菜单或 Compact“窗口”菜单中的“退出”，结束本次监控。
+
+没有可用系统托盘时，关闭主窗口会结束应用。退出或重启后，本次累计从新会话重新开始。
+
+## 如何理解数据
+
+| 显示内容 | 含义 |
+| --- | --- |
+| 下载 / 上传 | 数据进入 / 离开应用的速率 |
+| `B/s`、`KiB/s`、`MiB/s` | 每秒字节数；KiB、MiB 按 1024 进位，不是 bit/s |
+| `0 B/s` | 当前有效采样确认没有流量 |
+| `—` | 数据未知、不可用或已过期；结合状态文字判断原因 |
+| 当前联网 | 最近约 2 秒测量窗口内有上传或下载流量 |
+| 本次监控累计 | 本次 Net Monitor 进程运行期间确认的流量，不跨重启保存 |
+
+界面约每 500 ms 更新，速率采用约 2 秒测量窗口，因此停止下载后可能短暂保留窗口内的平均速率。长时间没有有效更新时，旧速率会转为未知，而不是一直显示旧数字。
+
+累计大于零不代表应用当前仍在联网；已退出且有流量的应用仍可出现在累计页。上传和下载累计都为零的账户会从该视图隐藏，筛选不会删除已记录的累计。
+
+这些数据不是运营商账单，也不等于整机外网总流量。代理、回环、虚拟网卡、协议开销和测量窗口会影响与其他工具的对比；没有流量也不能证明某个下载任务已成功完成。
+
+## 配置与本地数据
+
+显示偏好保存在：
+
+```text
+%LOCALAPPDATA%\NetMonitor\ui.json
+```
+
+只保存主模式、窗口位置及微型窗口置顶偏好，不保存长期流量历史、累计或关注应用。图标从本地可执行文件读取，不联网下载；当前没有账号或云同步功能。
+
+配置不写入 EXE 或 `_internal`，移动整个程序目录后仍使用当前用户的配置。要重置界面偏好，先正常退出，再备份并删除 `ui.json`；缺失或损坏的配置会回退到默认值。删除程序目录不会同时删除用户配置。
+
+当前版本没有新增持久错误日志。未处理的启动异常沿用 PyInstaller 的错误对话框，请保留提示原文。
+
+## 常见问题
+
+| 现象 | 可以先检查 |
+| --- | --- |
+| 上传、下载一直为 `—` | 查看是否提示需要管理员权限、采集不可用或数据过期；不要把它当作零流量 |
+| 关闭窗口后程序仍在运行 | 主窗口通常隐藏到托盘；请使用菜单“退出”真正结束 |
+| 只复制 EXE 后启动失败，提示 DLL 或 Qt 插件缺失 | 重新完整解压产品 ZIP，保留全部依赖目录 |
+| 找不到窗口 | 从托盘选择“显示 Net Monitor”；需要重置位置时按配置章节处理 |
+| 累计与其他软件不同 | 确认比较的是同一应用、同一会话和同一时间范围，并考虑代理、回环及协议开销 |
+| 无法固定关注某个应用 | 该行可能缺少可靠身份，程序不会按同名应用或复用 PID 猜测对象 |
+| 系统提示未知发布者或安全告警 | 当前包未签名；核对来源并保留原始提示，不要通过关闭安全保护解决 |
+
+反馈问题可使用 [GitHub Issues](https://github.com/Polarzen/net-monitor/issues)，附上 Windows 版本／架构、`BUILD-INFO.json` 中的产品版本与源码提交、操作步骤及错误原文。截图前请遮挡无关的应用名称和私人路径。
+
+## 从源码运行
+
+需要 Windows、Git 和 Python **3.14 或更新版本**。当前验收及打包使用 Python **3.14.7**；构建 x64 测试包时还需匹配下节的精确版本和架构。
+
+以下示例为新检出目录，使用 PowerShell；当前 Stage 5 实现在 `feat/stage-5-windows-package` 分支：
 
 ```powershell
-net-monitor
+git clone --branch feat/stage-5-windows-package https://github.com/Polarzen/net-monitor.git
+Set-Location net-monitor
+py -3.14 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\net-monitor.exe
 ```
 
-`pyproject.toml` 使用 `[project.gui-scripts]` 生成 Windows GUI launcher。Windows 下该 launcher 使用 GUI subsystem，不分配普通控制台窗口。
-
-管理员重启仍只由用户点击触发。源码模式优先选择当前虚拟环境旁的 `pythonw.exe`，以 `-m net_monitor` 启动；打包模式直接重启当前绝对路径的 `NetMonitor.exe`，不传 Python 模块参数，并按 PyInstaller 规则重置独立启动环境。只有 `ShellExecuteW(..., "runas", ...)` 成功后当前实例才退出；如果 UAC 被拒绝或启动失败，当前程序继续运行。源码／打包分流和失败路径已有自动测试；打包版实际 UAC 未出现，不能据此声称管理员重启或 ETW 通过。
-
-## Tray 与关闭行为
-
-如果系统支持托盘：
-
-- 关闭当前主入口：隐藏到托盘，不停止采集。卡片关闭也不停止采集。
-- 关闭 Detailed：只关闭/隐藏详细窗口，不关闭 Service。
-- Tray `显示 Net Monitor`：恢复当前主模式，不强制回到 Compact。
-- Tray `详细信息`：复用同一个 Detailed 实例；如果已存在则 `show / raise / activate`。
-- Tray `退出`：停止 Worker，关闭 Service/Collector，停止 ETW Session，然后退出 QApplication。
-
-如果系统不支持托盘，关闭主窗口仍可正常结束应用，不会造成“程序关不掉”。Shutdown 是幂等的。
-
-## UI 与性能
-
-Stage 2D/2E 的性能原则保持不变：
-
-- 网络采样仍在 `SamplingWorker / QThread` 中执行。
-- 主线程不做 ETW 或 psutil 高成本采集。
-- Detailed 树继续使用既有增量同步，不使用 `clear()` + 全量重建。
-- 同一有效快照不会被 heartbeat 反复送到 Compact/Detailed；时间过期会生成新的展示状态。默认 Detailed 与 Compact 共享现有应用聚合结果，系统进程筛选仍按其原有语义计算。
-- Compact 的 Top 行在创建窗口时一次性构造，后续 snapshot 只更新文本和显隐，不在每次刷新重建 QWidget hierarchy。
-- 不在刷新周期重载 stylesheet、重新创建托盘图标或做无必要 metadata 扫描。
-- 采样频率继续约 500 ms，不改成 30/60 FPS UI timer。
-- GUI 进程速率使用约 2 秒窗口：窗口内有流量时，“当前联网”表示近期测量窗口观察到流量；短 burst 在窗口内按真实采样时间计算平均速率，不伪造实时值。默认 `WindowsProcessNetworkCollector` 的窗口为 `0.0`，保留原有速率行为；GUI 使用 `2.0`，累计 bytes、PID/`create_time` 身份和进程刷新周期不变。
-
-## 自动验证
-
-完整 CI 在以下 GitHub 托管环境运行 Python 3.14：
-
-- Windows Server 2025 x64 (`windows-2025`)
-- Windows 11 Enterprise ARM64 (`windows-11-arm`)
-
-执行：
+已有工作区可复用其虚拟环境，不必再次创建。GUI launcher 不分配普通控制台；需要控制台调试时运行：
 
 ```powershell
-python -m pytest -v
+.\.venv\Scripts\python.exe -m net_monitor
 ```
 
-继承的 Stage 3A 自动测试覆盖：
+源码和打包程序使用同一正式入口；源码提权使用当前环境的 `pythonw.exe -m net_monitor`，打包提权直接重启当前 `NetMonitor.exe`。开发依赖与打包依赖分开管理。
 
-- Compact 创建与小尺寸默认值
-- fake snapshot 消费
-- Top active apps 原始数值排序
-- 当前无网络活动 empty state
-- permission denied 与管理员按钮可见性
-- AVAILABLE 状态管理员按钮隐藏
-- Detailed application aggregation / PID children / raw sorting / system filter / active filter
-- Compact 与 Detailed 同一 snapshot
-- Detailed 单实例复用
-- 不创建第二个 MonitorService
-- Tray 无能力环境 smoke 与真实托盘环境条件测试
-- shutdown 幂等、detail close 不关闭 service、最终 exit 才关闭 service
-- `[project.gui-scripts]` 配置
-- Windows 安装后的 `net-monitor.exe` PE Subsystem 必须为 `IMAGE_SUBSYSTEM_WINDOWS_GUI`
+## 构建 Windows x64 测试包
 
-Stage 3C 另增可控单调时钟的选择/防抖/过期、精确 key 关注、未知状态、卡片与详细窗口单实例、模式切换与单 Worker、悬停联合区域、拖动、设置损坏、负坐标恢复、异步图标缓存、累计账户保留与大整数原始排序等测试。Stage 3D 增加 Presence 的 foreground/background/unknown 纯逻辑测试、220×112 默认尺寸与 240×140 上限、长名称 elide/Tooltip、quiet/固定关注 idle、状态文本和每次 heartbeat 至多一次 foreground 查询的约束测试。隐藏累计页签只接收引用，不重绘树；重复快照不增加流量。
+构建要求 **Windows 原生 CPython 3.14.7 x64**，采用 PyInstaller **onedir + windowed**。先提交已审阅的相关源码和构建输入；脚本会拒绝未提交的构建输入或不匹配的环境。
 
-CI 使用 real widgets + **fake snapshot** 生成 100% / 125% / 150% 渲染，并检查字体字形、微型尺寸、速率宽度/高度；失败先保存 PNG 和诊断。测试专用 Noto CJK 字体锁定上游提交和 Git blob、校验字节，不打包或上传字体。JUnit、布局、环境/完整 SHA 和精确源码归档作为短期产物。它们不是真实桌面截图或 ETW 流量证据。
+在上述新检出目录中，为构建创建独立环境：
 
-## ETW Experiment
+```powershell
+py -3.14 -m venv .venv-build-stage5
+.\.venv-build-stage5\Scripts\python.exe -m pip install --require-hashes -r .\packaging\requirements-windows-x64.lock
+.\tools\build_windows.ps1
+```
 
-ETW Experiment 继续在双平台执行：
+`py -3.14` 选择的解释器必须实际为 3.14.7 x64；可先用 `py -3.14 -c "import platform; print(platform.python_version(), platform.machine())"` 检查。已有构建环境时复用即可。
 
-- Windows Server 2025 x64
-- Windows 11 Enterprise ARM64
+默认输出到 `artifacts/stage5/NetMonitor-<版本>-windows-x64-<源码短 SHA>-test/`，包含 ZIP、外部校验文件和构建报告。重复构建同一提交不会覆盖旧目录，可使用 `-OutputRoot` 指定新的输出根目录。
 
-继续验证：
+锁文件固定 PyInstaller 6.22.3、hooks-contrib 2026.8、PySide6 6.11.2、psutil 7.2.2 及传递依赖的版本和哈希。完整复现步骤、许可证来源、失败修复和产物身份见 [Stage 5 打包记录](docs/stage5-windows-package.md)。构建目录、虚拟环境和二进制产物均不进入 Git。
 
-- Kernel Network provider
-- ETW unit tests
-- live loopback probe ×2
-- production collector probe ×2
-- same-session restart cleanup
-- standard local user permission behavior
+## 开发测试
 
-Stage 3C 和 Stage 3D 分支、UI/测试/辅助工具和工作流文件均纳入 branch/path triggers。每次 raw/production probe 独立传播原生命令退出码，不以第二次成功掩盖第一次失败；保留两平台、psutil 与真实子进程 PID 握手。CI 还比较冻结内核与精确 Stage 3B 基线的 diff。
+安装上文的开发依赖后，可执行完整源码测试。布局测试需要固定字体；以下 PowerShell 示例先准备字体，只在测试期间设置离屏环境，结束后恢复原值：
 
-## Windows 11 x64 桌面验收状态
+```powershell
+$testFontDirectory = Join-Path $env:TEMP 'net-monitor-test-fonts'
+.\.venv\Scripts\python.exe tools/layout_fonts.py --prepare $testFontDirectory
+if ($LASTEXITCODE -ne 0) { throw 'Test font preparation failed' }
+$previousQtPlatform = $env:QT_QPA_PLATFORM
+$previousLayoutFont = $env:NET_MONITOR_LAYOUT_FONT
+try {
+    $env:QT_QPA_PLATFORM = 'offscreen'
+    $env:NET_MONITOR_LAYOUT_FONT = Join-Path $testFontDirectory 'NotoSansCJKsc-Regular.otf'
+    .\.venv\Scripts\python.exe -m pytest -v -ra
+} finally {
+    $env:QT_QPA_PLATFORM = $previousQtPlatform
+    $env:NET_MONITOR_LAYOUT_FONT = $previousLayoutFont
+}
+```
 
-2026-10-10 已在 Codex 桌面宿主验证 Computer Use 连接、真实 Compact 截图及 Detailed 连续开关 20 次；旧 CLI native pipe 错误仍保留为历史记录。管理员权限下的真实 ETW 回环采集、累计账户保留和三个场景的进程资源测量已有新证据。Micro 工具窗口仍不能被当前 Computer Use 定位，Card、悬停、拖动、托盘恢复／退出等关键交互尚未完成，Stage 4 仍未全面通过。仅原生 UAC 决策由用户处理，不要求重复人工测试或额外切换 DPI、准备显示器。逐项结果和测量边界见 [Stage 4 记录](docs/stage4-lightweight.md)。
+首次准备字体需要联网，工具校验固定上游文件；测试字体不随产品分发。真实 GUI 验证不要使用 `offscreen` 或 `minimal` 平台。CI 的具体步骤见 [工作流](.github/workflows/ci.yml)。
 
-本机验证应针对上述桌面差异，先核对实际加载源码路径和精确 SHA；验证结论以本阶段记录和实际观测为准，不把历史记录或 CI fake snapshot 当作当前物理结果。小窗口不意味着更低内存或 CPU；无新的同机性能证据，不作 CPU/内存降低或长期无泄漏保证。
+## 验证状态与已知限制
 
-2026-09-16 的历史验收记录见 [Stage 3A 历史验收记录](docs/stage3a-acceptance-2026-09-16.md)。
+以下状态对应 2026-10-10 的 `0.2.1.dev1` 交付，不代表所有后续提交都已执行相同验证。
 
-### CPU 修复后的验收状态
+| 范围 | 当前结果 |
+| --- | --- |
+| CI x64 打包 | 成功，已上传 artifact |
+| CI x64／ARM64 源码回归 | 各 331 passed、1 skipped；跳过项需要真实托盘 |
+| 本地最终 EXE | 已验证启动、Compact／Detailed、中文及空格路径、不同 cwd、不可写发行目录、配置保存、目录迁移和程序菜单退出 |
+| CI 下载包 | 已验证 ZIP 完整性及文件哈希；未另行执行真实桌面操作 |
+| 打包版管理员重启／真实 ETW | 未完成；此前实际点击重启入口后未出现 UAC |
+| Micro/Card、关注、托盘交互 | 部分受 Computer Use 窗口定位限制，仍有未验证项 |
+| 干净 Windows 机器 | 未执行；当前实测来自开发机的隔离目录 |
 
-已修复 GUI 进程采集不请求 `status` 带来的 CPU 开销，以及 ETW 批次在半秒刷新下造成的交替零速率。默认 collector/service 的公开行为兼容；GUI 采用用户接受的约 2 秒窗口，UI 约 500 ms 刷新、进程 2 秒刷新、PID/`create_time` 身份和累计 bytes 保持不变。Stage 3A 的精确验证结果记录在验收文档；Stage 3B 本地合并的测试结果和未验证边界记录在 [Stage 3B 集成记录](docs/stage3b-integration-2026-09-17.md)。
+本地实测包来自 `56f049b`，CI 包来自 `e0eafaa`；两者产品与构建源码相同，但它们是分别构建的二进制，哈希不同。[本次 CI](https://github.com/Polarzen/net-monitor/actions/runs/38042146780) 成功不等于打包程序的真实采集已验收。Stage 4 的真实 ETW／资源测量证据也只对应其记录的源码版本。
 
-正式观察于 `2026-09-16 20:49:57–21:19:58+08` 完成 `1800.0012464s`、31 个连续样本；2 秒 collector probe 停流后约 `2.25s` 严格归零，GUI 观察中启动期外未再复现规律性双零，用户确认窗口、数据和托盘正常。该观察属于已验证的 Stage 3A 精确提交；该历史记录中的“待集成”不是当前状态：本轮基于远端 Stage 3B `09ff140dfa5c299840189fe02ede1b1cb95fd9cb` 续接 Stage 3C，当前验证以对应功能分支精确 SHA 的交付报告为准。
+## 技术与文档
 
-## Stage 3F 范围边界
+项目使用 Python、PySide6 和 psutil，通过 Windows ETW 的 `Microsoft-Windows-Kernel-Network` provider 与 TDH 获取按进程网络活动。多个视图共享同一采集链路；隐藏视图停止展示更新，采集、累计和有界短期历史继续维护。
 
-本阶段不提供网络加速、任务完成识别、动画宠物、流量控制，也不实现 SQLite、持久化历史数据库、时间线、AI 分析、域名/IP/GeoIP、限速、防火墙、Npcap、WinDivert、WFP、驱动、开机启动、自动更新、installer、账号或云同步。Stage 3F 的 Network Spotlight 为实时纯计算投影，不持久化。
+应用按可信身份聚合，保留 PID 与创建时间以区分进程复用；累计直接来自确认的数据，不通过 UI 对速率积分。实现细节和历史证据集中在以下文档：
+
+| 文档 | 内容 |
+| --- | --- |
+| [Stage 5 打包与交付](docs/stage5-windows-package.md) | 构建、版本、校验值、实际 EXE 验证及 CI artifact |
+| [Stage 4 轻量化与验收](docs/stage4-lightweight.md) | 隐藏刷新、真实桌面／ETW、资源测量及限制 |
+| [微型窗口设计](docs/stage3c-micro-widget.md) | 卡片、选择、关注、窗口和显示偏好 |
+| [短期速率历史](docs/stage3e-rate-history.md) | 有界历史、曲线及未知区间 |
+| [会话累计记录](docs/stage3b-integration-2026-09-17.md) | 累计语义、进程身份与集成边界 |
+
+## 许可与分发
+
+仓库当前没有项目顶层 `LICENSE` 文件，第三方组件说明不等于对项目源码授予开源许可证。包内包含 `THIRD-PARTY-NOTICES.txt` 和 `licenses/`；来源记录见 [第三方说明](packaging/THIRD-PARTY-NOTICES.txt)。
+
+本版用于内部测试，完整再分发审查尚未完成，不能据此认定已经适合公开正式发行。
