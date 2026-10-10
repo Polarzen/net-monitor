@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10T14:32:55.528733+00:00",
+  "scope": "pre-publication evidence and preservation checks; GitHub merge result is recorded in PR",
+  "base_commit": "82ba3a1f21f240e114a112d2b94800ef3b285696",
+  "task_branch": "chore/pid-fix-runtime-handoff",
+  "original_workspace": {
+    "branch": "feat/stage-5-windows-package",
+    "head": "06c71ed4fab338533531f0033e837b8e513ace9e",
+    "unchanged": {
+      "branch": true,
+      "head": true,
+      "status": true,
+      "index": true,
+      "staged": true,
+      "unstaged": true
+    },
+    "protected_file_sha256": {
+      "docs/stage4-lean-core.md": "48419ba1d11de8495b39d9b5964c416a576e8fefd691ae3201c38205d87bb0f0",
+      "goal.md": "3c406e89c9f3a815d59715eb595111732f649d72f6260ee14bed507a05a87cef",
+      "AGENTS.md": "2e0bbb8918f00d71e37a85f7d7c5150e7556af532b2942f990f52382fc3e7033"
+    }
+  },
+  "old_package_sha256": {
+    "dev1_56f049bf32a5": "8304662d2fa61da592fb99729911f3fa9949723e791d3b75f237f6f63d0a9362",
+    "dev2_2b6db24173a1": "b63547f20e0f09418cdd1194d93be05650ec92c3ef53c6f46c8f634e5c27e795"
+  },
+  "user_preference_bytes_unchanged": true,
+  "target_process_absent": true,
+  "load_or_observer_started": false,
+  "private_raw_ignored": true,
+  "product_tests_build_workflow_changes": false,
+  "local_full_regression_rerun": false,
+  "validation": [
+    "Exact original workspace branch, HEAD, index, staged and unstaged diffs match saved baseline",
+    "Protected files and historical ZIP hashes match",
+    "Target process absent and user preference byte-identical",
+    "Tracked diff restricted to README and Stage 5 document; new evidence limited to this subtree",
+    "Private raw directory is ignored by Git"
+  ]
+}

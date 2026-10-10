@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "decision": "candidate_runtime_confirmation_incomplete",
+  "decision_basis": "Physical Escape interrupted Computer Use during launch; user explicitly chose to stop runtime confirmation and retain candidate. No subsequent UI automation, elevation, load or resource observer was run.",
+  "package_ref": "package.json",
+  "normal_process": {
+    "checked_at": "2026-10-10T14:21:03.096891+00:00",
+    "exe_path": "%TEMP%\\NetMonitor-CI-82ba3a1-pid-runtime-20261010\\NetMonitor\\NetMonitor.exe",
+    "pid": 57848,
+    "create_time": 1791641810.896024,
+    "token_elevated": false,
+    "qt_qpa_platform": null,
+    "qt_plugin_path": "Packaged _internal/PySide6/plugins",
+    "desktop_capture": "none",
+    "visible_mode": "unverified; saved preference was compact, not proof of actual visible mode",
+    "permission_ui": "unverified"
+  },
+  "workflow": {
+    "launch": "Process existence, executable path and identity verified after interrupted launch",
+    "elevation": "not_attempted",
+    "capture_status": "unverified",
+    "load": "not_started",
+    "load_phases_observed": [],
+    "load_bytes": null,
+    "rates_directions": "unverified",
+    "cumulative_monotonicity": "unverified",
+    "idle_two_samples": "not_observed",
+    "explicit_zero_rate": "not_observed",
+    "retired_account_behavior": "unverified",
+    "real_os_pid_reuse": "not_attempted",
+    "sampling_errors_or_hangs": "not_assessed; no product regression reproduced"
+  },
+  "resources": {
+    "status": "not_measured",
+    "reason": "User stopped runtime confirmation before visible mode and real capture state were verified; ordinary process presence is not an active-capture resource observation",
+    "logical_processors": 32,
+    "warmup_seconds": null,
+    "valid_interval_count": 0,
+    "sample_duration_seconds": null,
+    "system_process_scale": null,
+    "cpu_mean_p95_max": null,
+    "working_set_statistics": null,
+    "private_bytes_statistics": null,
+    "threads_statistics": null,
+    "handles_statistics": null,
+    "raw_samples": [],
+    "comparison": "No same-condition baseline; no relative performance or no-regression claim"
+  },
+  "cleanup": {
+    "checked_at": "2026-10-10T14:28:38.591743+00:00",
+    "target_pid": 57848,
+    "target_create_time": 1791641810.896024,
+    "target_identity_absent": true,
+    "netmonitor_processes_remaining": 0,
+    "exit_method": "User reported completed Window > Exit; agent did not operate or observe the menu",
+    "load_started": false,
+    "observer_started": false,
+    "forced_termination": false,
+    "etw_session_cleanup": "unverified; no reliable session name; no trace sessions enumerated or stopped",
+    "preference_bytes_unchanged": true
+  },
+  "classification": {
+    "package_acquisition": "passed",
+    "computer_use": "interrupted_by_user_Escape; not classified as connection failure or product defect",
+    "native_permission_interaction": "not_attempted",
+    "evidence": "insufficient_for_runtime_acceptance",
+    "reproduced_product_regressions": []
+  },
+  "prior_tests": "PID reuse and uncertainty behavior are controlled automated regressions from the historical CI cited in package.json; they do not prove real OS PID reuse or this EXE runtime behavior",
+  "history": "Old 2b6db24 package retained with known PID attribution defect, no longer default recommendation; no new build or version increment"
+}
