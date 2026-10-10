@@ -2,9 +2,11 @@
 
 Net Monitor 是一个面向 Windows 11 的轻量第三方应用网络活动监视器。它的核心问题不是“做另一个任务管理器”，而是让用户随时看一眼：**现在谁在联网、谁正在下载、谁正在上传、哪个应用最活跃。**
 
-当前阶段：**Stage 4 轻量化收尾（开发分支，尚未完成发布验收）**。
+当前阶段：**Stage 5 Windows x64 内部测试包已构建并实际启动，尚未完成发布验收**。
 
 实现、测试、同机离线 UI 性能记录和桌面验收状态见 [Stage 4 记录](docs/stage4-lightweight.md)。本轮精简默认界面并跳过隐藏视图的展示工作；保留已有监控能力和共享采集链路，不新增产品功能模块。
+
+`0.2.1.dev1` 的最终 ZIP、SHA-256、准确构建命令和逐项结果见 [Stage 5 打包记录](docs/stage5-windows-package.md)。最终 EXE 已在开发机的独立中文路径、不同工作目录及不可写发行目录中运行，并验证迁移、Compact 恢复和程序菜单正常退出。打包版 UAC／真实 ETW、Micro/Card／托盘交互及干净机器测试仍未通过验收；Stage 4 历史证据不能代替这些项目。测试包未签名，不是正式发布。
 
 ## 产品形态
 
@@ -110,6 +112,12 @@ UI 直接消费 `MonitorSnapshot.application_session`，只按精确可信 key �
 
 ## 启动方式
 
+### Windows x64 内部测试包
+
+完整解压测试 ZIP，保留 `NetMonitor/` 下全部文件，双击 `NetMonitor.exe`。不能只复制 EXE。包内有 Python、Qt 和 psutil 运行依赖；无需另装 Python。当前只完成开发机隔离目录验证，未做无 Python 的干净机器验证。
+
+配置继续写入 `%LOCALAPPDATA%\NetMonitor\ui.json`。构建来源见包内 `BUILD-INFO.json`；ZIP 外有 `SHA256SUMS.txt`，它是完整性校验，不是签名。
+
 ### 开发运行
 
 保留控制台，方便调试日志：
@@ -128,7 +136,7 @@ net-monitor
 
 `pyproject.toml` 使用 `[project.gui-scripts]` 生成 Windows GUI launcher。Windows 下该 launcher 使用 GUI subsystem，不分配普通控制台窗口。
 
-管理员重启仍只由用户点击触发。提权重启会优先选择当前虚拟环境旁的 `pythonw.exe`，并以 `-m net_monitor` 启动，不写死任何本地路径，也不会出现“普通启动无 console、管理员重启又弹 console”的设计回退。只有 `ShellExecuteW(..., "runas", ...)` 成功后当前实例才退出；如果 UAC 被拒绝或启动失败，当前程序继续运行。
+管理员重启仍只由用户点击触发。源码模式优先选择当前虚拟环境旁的 `pythonw.exe`，以 `-m net_monitor` 启动；打包模式直接重启当前绝对路径的 `NetMonitor.exe`，不传 Python 模块参数，并按 PyInstaller 规则重置独立启动环境。只有 `ShellExecuteW(..., "runas", ...)` 成功后当前实例才退出；如果 UAC 被拒绝或启动失败，当前程序继续运行。源码／打包分流和失败路径已有自动测试；打包版实际 UAC 未出现，不能据此声称管理员重启或 ETW 通过。
 
 ## Tray 与关闭行为
 

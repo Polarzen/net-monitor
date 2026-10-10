@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-10T07:09:25.097698+00:00",
+  "source_commit": "7b9945c0424cc2717204b2ab487f12a2ed44ec08",
+  "zip_sha256": "018d24581fe5db25c9512ccb007b6cd5fd4ef8577ddd98248daf86d91af0c38a",
+  "extracted_to": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor",
+  "verified_manifest_files": 310,
+  "pid": 46912,
+  "create_time": 1791616165.0077755,
+  "cwd": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\其他 工作目录",
+  "isolated_localappdata": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\用户配置",
+  "configuration": "missing; default Micro expected",
+  "stage": "launched; not yet a desktop pass",
+  "external_check": {
+    "at": "2026-10-10T07:10:01.893887+00:00",
+    "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\NetMonitor.exe",
+    "threads": 9,
+    "working_set_bytes": 80289792,
+    "relevant_loaded_modules": [
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\python3.dll",
+      "C:\\Windows\\System32\\icuuc.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\python314.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\Qt6Gui.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\Qt6Core.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\QtGui.pyd",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\Qt6Widgets.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\QtWidgets.pyd",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\QtCore.pyd",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\plugins\\platforms\\qwindows.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\shiboken6\\MSVCP140.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\shiboken6\\shiboken6.abi3.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\plugins\\styles\\qmodernwindowsstyle.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\MSVCP140_2.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\MSVCP140_1.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\PySide6\\pyside6.abi3.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\shiboken6\\VCRUNTIME140_1.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\NetMonitor\\_internal\\shiboken6\\Shiboken.pyd"
+    ],
+    "tool_window_candidates": [],
+    "startup_error_dialog": false,
+    "limitation": "Micro still not returned by Computer Use; no visual pass claimed"
+  }
+}

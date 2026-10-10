@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-10T06:58:56.507391+00:00",
+  "source_commit": "c620a9751aa43f372b63a1c9a1af2e4968441b72",
+  "zip_sha256": "0269779974a87ec5c06a690b5ac4bbbc9cd8d6432f4fac17c8bf549c1e2efc4b",
+  "extracted_to": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 c620a9751aa4\\NetMonitor",
+  "verified_manifest_files": 357,
+  "pid": 2584,
+  "create_time": 1791615536.4025416,
+  "executable": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 c620a9751aa4\\NetMonitor\\NetMonitor.exe",
+  "cwd": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 c620a9751aa4\\其他 工作目录",
+  "isolated_localappdata": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 c620a9751aa4\\用户配置",
+  "removed_environment": {},
+  "configuration": "missing; default Micro expected",
+  "stage": "launched; not yet a desktop pass"
+}

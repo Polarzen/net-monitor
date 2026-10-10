@@ -1,0 +1,42 @@
+{
+  "source_commit": "56f049bf32a570d4e6aa16a6d94471a1df607a25",
+  "zip_sha256": "8304662d2fa61da592fb99729911f3fa9949723e791d3b75f237f6f63d0a9362",
+  "extracted_to": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor",
+  "verified_manifest_files": 302,
+  "cwd": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\工作 目录",
+  "isolated_localappdata": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\用户 配置",
+  "configuration": "Compact preference; final ZIP",
+  "at": "2026-10-10T07:24:39.072542+00:00",
+  "pid": 7128,
+  "create_time": 1791617078.98634,
+  "distribution_write_probe": "PermissionError",
+  "readonly_acl_scope": "only this disposable extracted directory",
+  "runtime_check": {
+    "at": "2026-10-10T07:25:37.225028+00:00",
+    "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\NetMonitor.exe",
+    "runtime_modules_from_bundle_only": true,
+    "runtime_module_paths": [
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\python3.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\Qt6Gui.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\Qt6Widgets.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\Qt6Core.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\QtWidgets.pyd",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\QtGui.pyd",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\QtCore.pyd",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\python314.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\plugins\\platforms\\qwindows.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\shiboken6\\MSVCP140.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\MSVCP140_2.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\shiboken6\\shiboken6.abi3.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\plugins\\styles\\qmodernwindowsstyle.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\pyside6.abi3.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\PySide6\\MSVCP140_1.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\shiboken6\\VCRUNTIME140_1.dll",
+      "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\NetMonitor\\_internal\\shiboken6\\Shiboken.pyd"
+    ],
+    "working_set_bytes": 98967552,
+    "threads": 14,
+    "ordinary_permission_ui": true,
+    "readonly_directory_startup": true
+  }
+}

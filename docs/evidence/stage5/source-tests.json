@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-10",
+  "python": "3.14.7 x64",
+  "runtime_dependencies": {"PySide6": "6.11.2", "psutil": "7.2.2"},
+  "product_changes": ["src/net_monitor/__init__.py", "src/net_monitor/app.py", "src/net_monitor/core/elevation.py"],
+  "initial_full_run": {
+    "command": ".venv/Scripts/python.exe -m pytest -q -ra -p no:cacheprovider",
+    "environment": {"QT_QPA_PLATFORM": "offscreen"},
+    "result": "1 failed, 328 passed, 1 skipped in 11.36s",
+    "failure": "Existing fake-renderer test lacked its required pinned font environment; no product correctness assertion failed"
+  },
+  "font_configured_full_run": {
+    "result": "329 passed, 1 skipped in 11.71s",
+    "environment": {"QT_QPA_PLATFORM": "offscreen", "NET_MONITOR_LAYOUT_FONT": "existing verified temporary NotoSansCJKsc-Regular.otf"}
+  },
+  "intermediate_build_regression": {
+    "result": "1 failed, 17 passed",
+    "failure": "SystemRoot key lookup failed after copying the Windows environment to a plain dict",
+    "repair": "Support normalized SYSTEMROOT key; focused recheck 18 passed in 0.61s"
+  },
+  "final_full_run": {
+    "command": ".venv/Scripts/python.exe -m pytest -q -ra -p no:cacheprovider",
+    "environment": {"QT_QPA_PLATFORM": "offscreen", "NET_MONITOR_LAYOUT_FONT": "existing verified temporary NotoSansCJKsc-Regular.otf"},
+    "result": "331 passed, 1 skipped in 13.77s",
+    "skip": "tests/test_stage3a_ui.py:271: runner has no real system tray",
+    "source_state": "56f049b implementation, run immediately before committing",
+    "scope": "Source regression; not packaged EXE desktop/ETW acceptance"
+  },
+  "license_text_integrity": {"files_checked": 131, "all_upstream_sha256_match": true},
+  "protected_staged_blob": "e05e54120fee12ef6abe8bbcde81c5ba5b4a0045",
+  "test_fonts_in_distribution": false
+}

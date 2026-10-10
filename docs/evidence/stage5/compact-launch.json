@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-10T07:10:46.030235+00:00",
+  "pid": 52844,
+  "create_time": 1791616245.9474635,
+  "executable": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\迁移 NetMonitor\\NetMonitor.exe",
+  "cwd": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\其他 工作目录",
+  "isolated_localappdata": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor Stage5 中文验收 7b9945c0424c\\Compact 配置",
+  "configuration": "existing Compact preference",
+  "bundle_moved": true,
+  "source_commit": "7b9945c0424cc2717204b2ab487f12a2ed44ec08",
+  "zip_sha256": "018d24581fe5db25c9512ccb007b6cd5fd4ef8577ddd98248daf86d91af0c38a"
+}

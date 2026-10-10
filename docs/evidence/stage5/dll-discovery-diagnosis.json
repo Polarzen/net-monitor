@@ -1,0 +1,41 @@
+{
+  "initial_source_commit": "c620a9751aa43f372b63a1c9a1af2e4968441b72",
+  "failure": "QtWidgets DLL load: procedure not found",
+  "evidence": "original Analysis-00.toc resolved icuuc.dll from host poppler tool directory; native Qt loads Windows System32 ICU",
+  "packaged_icu": {
+    "sha256": "39aec884c7124d673d75b38cca7b44ac1909d9633d8366a812a6e1c269d74bdf",
+    "missing_import_count": 20,
+    "missing_imports": [
+      "ucnv_open",
+      "ucnv_close",
+      "UCNV_FROM_U_CALLBACK_SUBSTITUTE",
+      "UCNV_TO_U_CALLBACK_SUBSTITUTE",
+      "ucnv_reset",
+      "ucnv_getMaxCharSize",
+      "ucnv_getName",
+      "ucnv_getToUCallBack",
+      "ucnv_getFromUCallBack",
+      "ucnv_setToUCallBack",
+      "ucnv_setFromUCallBack",
+      "ucnv_cbToUWriteUChars",
+      "ucnv_toUnicode",
+      "ucnv_cbFromUWriteUChars",
+      "ucnv_toUCountPending",
+      "ucnv_fromUCountPending",
+      "ucnv_getStandardName",
+      "ucnv_getAvailableName",
+      "ucnv_countAvailable",
+      "ucnv_fromUnicode"
+    ]
+  },
+  "system_icu": {
+    "sha256": "59d134ddc15ae0594f0a328979f8201662fc82634ddb7c537b156e7cf871f5eb",
+    "missing_import_count": 0,
+    "missing_imports": []
+  },
+  "repair": "subprocess-only PATH restricted to pinned Python and Windows; spec rejects DLL sources outside pinned environments and Windows",
+  "initial_exe_error_dialog_closed_via_computer_use": true,
+  "initial_result": "build passed; runtime startup failed; not a deliverable",
+  "intermediate_build_error": "3cbc4f1 used mixed-case SystemRoot in copied Windows environment; fixed normalized-key lookup in 7b9945c",
+  "focused_regression": "18 passed, 2026-10-10"
+}

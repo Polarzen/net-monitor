@@ -1,0 +1,21 @@
+Window: "Unhandled exception in script", App: NetMonitor.exe.
+	0 对话框 Unhandled exception in script Secondary Actions: Raise
+		1 图像
+		2 文本 Failed to execute script 'entry' due to unhandled exception: DLL load failed while importing QtWidgets: 找不到指定的程序。
+		3 编辑 Failed to execute script 'entry' due to unhandled exception: DLL load failed while importing QtWidgets: 找不到指定的程序。 Value: Traceback (most recent call last): File "entry.py", line 2, in <module> File "pyimod02_importers.py", line 457, in exec_module File "net_monitor\app.py", line 5, in <module> ImportError: DLL load failed while importing QtWidgets: 找不到指定的程序。
+			4 滚动条 (disabled, settable, float) 垂直滚动条 Value: 0 ID: NonClientVerticalScrollBar
+				5 按钮 (disabled) 上一行 ID: UpButton
+				6 按钮 (disabled) 下一行 ID: DownButton
+			7 滚动条 (settable, float) 水平滚动条 Value: 0 ID: NonClientHorizontalScrollBar
+				8 按钮 左移一列 ID: UpButton
+				9 缩略图 位置 ID: ScrollbarThumb
+				10 按钮 向右翻页 ID: DownPageButton
+				11 按钮 右移一列 ID: DownButton
+			12 缩略图 (disabled)
+		13 按钮 Close ID: 1
+		14 标题栏 (settable, string) Value: Unhandled exception in script
+			15 菜单栏 系统 ID: MenuBar
+				16 菜单项 系统
+			17 按钮 关闭
+
+The focused UI element is 0 对话框 Unhandled exception in script Secondary Actions: Raise.

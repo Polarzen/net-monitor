@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "product": "Net Monitor",
+  "version": "0.2.1.dev1",
+  "status": "internal-test",
+  "source_commit": "56f049bf32a570d4e6aa16a6d94471a1df607a25",
+  "source_inputs_dirty": false,
+  "configuration": {
+    "packaging/NetMonitor.spec": "4eee2b9e2c9b631ec37deec34e2be8eda10276c1b573b4eb2470badfbe83527f",
+    "packaging/requirements-windows-x64.lock": "0ac8353722c59c1b607f926dcdeb7b1e0f12dfc2b82b687243684189e20d8a73"
+  },
+  "python": "3.14.7",
+  "dependencies": {
+    "altgraph": "0.17.5",
+    "packaging": "26.3",
+    "pefile": "2024.8.26",
+    "psutil": "7.2.2",
+    "pyinstaller": "6.22.3",
+    "pyinstaller-hooks-contrib": "2026.8",
+    "PySide6": "6.11.2",
+    "PySide6_Addons": "6.11.2",
+    "PySide6_Essentials": "6.11.2",
+    "pywin32-ctypes": "0.2.3",
+    "setuptools": "84.0.0",
+    "shiboken6": "6.11.2"
+  },
+  "build_platform": "Windows-11-10.0.26200-SP0",
+  "architecture": "x64",
+  "built_at": "2026-10-10T07:21:53.349196+00:00",
+  "mode": "onedir/windowed",
+  "signed": false,
+  "file_inventory": "FILE-MANIFEST.json",
+  "license_review": "component notices included; public redistribution review incomplete",
+  "clean_machine_test": "not performed by build; see acceptance record",
+  "source_input_count": 189
+}
