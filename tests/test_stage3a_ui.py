@@ -7,6 +7,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 
 from net_monitor.core.models import (
@@ -22,6 +23,7 @@ import net_monitor.ui.controller as controller_module
 from net_monitor.ui.compact_window import CompactWindow
 from net_monitor.ui.controller import UiController
 from net_monitor.ui.tray import TrayController
+from net_monitor.ui.theme import DARK_STYLESHEET
 
 
 class FakeService:
@@ -130,6 +132,32 @@ def test_compact_permission_denied_is_not_rendered_as_zero() -> None:
     assert window._upload_value.text() == "—"
     assert visible_row_names(window) == []
     window.close()
+
+
+@pytest.mark.parametrize("width", [340, 380])
+def test_compact_permission_message_fits_with_restart_button(width: int) -> None:
+    window = make_compact()
+    window.setStyleSheet(DARK_STYLESHEET)
+    window.apply_snapshot(make_snapshot(ProcessNetworkStatus.PERMISSION_DENIED))
+    window.resize(width, 360)
+    window.show()
+    qapp().processEvents()
+    try:
+        assert window.width() <= width
+        message = window._permission_text
+        flags = int(message.alignment()) | int(
+            Qt.TextFlag.TextWordWrap if message.wordWrap() else Qt.TextFlag.TextSingleLine
+        )
+        text_bounds = message.fontMetrics().boundingRect(
+            message.contentsRect(), flags, message.text()
+        )
+        assert message.contentsRect().contains(text_bounds)
+        button = window._restart_button
+        assert button.isVisible() and button.isEnabled()
+        assert not message.geometry().intersects(button.geometry())
+        assert window._permission_frame.rect().contains(button.geometry())
+    finally:
+        window.close()
 
 
 def test_compact_always_on_top_toggle_updates_state() -> None:

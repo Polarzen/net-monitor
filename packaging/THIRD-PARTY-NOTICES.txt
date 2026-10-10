@@ -1,4 +1,4 @@
-Net Monitor 0.2.1.dev1 — third-party components, internal test build
+Net Monitor 0.2.1.dev2 — third-party components, internal test build
 
 This notice does not grant a new license for Net Monitor's own source code.
 The repository currently has no project LICENSE file. Public redistribution

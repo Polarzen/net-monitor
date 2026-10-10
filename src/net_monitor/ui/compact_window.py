@@ -129,6 +129,7 @@ class CompactWindow(QMainWindow):
         permission_layout = QHBoxLayout(self._permission_frame)
         permission_layout.setContentsMargins(10, 8, 10, 8)
         self._permission_text = QLabel("需要管理员权限才能读取按进程网络流量")
+        self._permission_text.setWordWrap(True)
         self._restart_button = QPushButton("以管理员身份重启")
         self._restart_button.setObjectName("accentButton")
         self._restart_button.clicked.connect(self._restart_with_elevation)

@@ -1,4 +1,4 @@
-Net Monitor 0.2.1.dev1 — Windows 11 x64 内部测试版（未签名）
+Net Monitor 0.2.1.dev2 — Windows 11 x64 内部测试版（未签名）
 
 请先解压整个 ZIP，保留 NetMonitor 目录内的全部文件，再双击 NetMonitor.exe。
 不能单独复制 EXE；不需要另外安装 Python、pip 或 PySide6。
