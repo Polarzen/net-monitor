@@ -51,4 +51,3 @@ def save_csv(path: str, payload: bytes) -> None:
     finally:
         if target.isOpen():
             target.cancelWriting()
-
