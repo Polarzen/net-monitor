@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-10T11:04:15.363870+00:00",
+  "original_pid": 61952,
+  "original_create_time": 1791630012.8958185,
+  "original_pid_exists": false,
+  "current_NetMonitor_processes": [
+    {
+      "pid": 56508,
+      "name": "NetMonitor.exe",
+      "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\NetMonitor\\NetMonitor.exe",
+      "create_time": 1791630179.940374
+    }
+  ],
+  "exit_cause": "Not observed; do not classify as normal exit or restart success",
+  "exe_hash_unchanged": true,
+  "desktop_interruption": "Computer Use reported physical Escape; app input stopped; awaiting explicit resumption",
+  "internal_admin_restart_attempted_by_agent": false,
+  "detailed_interaction": "Click issued and second returned window observed; accessibility observation interrupted before verification/close",
+  "resolved_at": "2026-10-10",
+  "resolution": "User authorized resume; confirmed app internal restart and accepted UAC; elevated token verified. See runtime-results.json."
+}

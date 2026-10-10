@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-10T11:00:12.984069+00:00",
+  "zip": "D:\\code\\net-monitor\\artifacts\\stage5\\actions-38042146780\\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test\\NetMonitor-0.2.1.dev1-windows-x64-e0eafaa32009-test.zip",
+  "zip_bytes": 38757174,
+  "zip_sha256": "a5cdc3566e29b24498e08f3e08809af67d69861f07e3e4c8abb42447acdd89d3",
+  "source_commit": "e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+  "version": "0.2.1.dev1",
+  "extracted_directory": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\NetMonitor",
+  "manifest_files_verified": 302,
+  "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\NetMonitor\\NetMonitor.exe",
+  "exe_sha256": "023411e31a026a50309823ac4af1907e398a9505495f7f7b22099a5e010b547b",
+  "pid": 61952,
+  "create_time": 1791630012.8958185,
+  "elevated": false,
+  "token_information_class": "TokenElevation (20), read-only query",
+  "cwd": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\working-directory",
+  "isolated_localappdata": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\isolated-user",
+  "initialization": "Preseeded Compact in isolated preferences, not a mouse mode-switch claim",
+  "removed_environment_names": [],
+  "prior_NetMonitor_processes": [],
+  "git_head": "aca0afa7ad2072ad3e626e007eb6a00153f56918"
+}

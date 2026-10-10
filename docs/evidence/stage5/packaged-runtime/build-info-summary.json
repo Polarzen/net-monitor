@@ -1,0 +1,39 @@
+{
+  "file_sha256": "841827295e8f25285f5ed0b287c8a69d332288067d06c59df320155b5de0fa6c",
+  "metadata": {
+    "schema_version": 1,
+    "product": "Net Monitor",
+    "version": "0.2.1.dev1",
+    "status": "internal-test",
+    "source_commit": "e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+    "source_inputs_dirty": false,
+    "configuration": {
+      "packaging/NetMonitor.spec": "8b3151099ab747f58854b1034a1360bd60739ee34d6bc35e53443e3b2757117d",
+      "packaging/requirements-windows-x64.lock": "0ac8353722c59c1b607f926dcdeb7b1e0f12dfc2b82b687243684189e20d8a73"
+    },
+    "python": "3.14.7",
+    "dependencies": {
+      "altgraph": "0.17.5",
+      "packaging": "26.3",
+      "pefile": "2024.8.26",
+      "psutil": "7.2.2",
+      "pyinstaller": "6.22.3",
+      "pyinstaller-hooks-contrib": "2026.8",
+      "PySide6": "6.11.2",
+      "PySide6_Addons": "6.11.2",
+      "PySide6_Essentials": "6.11.2",
+      "pywin32-ctypes": "0.2.3",
+      "setuptools": "84.0.0",
+      "shiboken6": "6.11.2"
+    },
+    "build_platform": "Windows-2025Server-10.0.26100-SP0",
+    "architecture": "x64",
+    "built_at": "2026-10-10T09:40:19.681354+00:00",
+    "mode": "onedir/windowed",
+    "signed": false,
+    "file_inventory": "FILE-MANIFEST.json",
+    "license_review": "component notices included; public redistribution review incomplete",
+    "clean_machine_test": "not performed by build; see acceptance record"
+  },
+  "input_hash_count": 189
+}

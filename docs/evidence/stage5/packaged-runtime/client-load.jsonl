@@ -1,0 +1,5 @@
+{"kind": "identity", "at": "2026-10-10T11:12:15.093064+00:00", "pid": 63912, "create_time": 1791630734.7280102, "exe": "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe", "role": "client"}
+{"kind": "traffic_started", "at": "2026-10-10T11:13:01.925707+00:00", "maximum_frames": 240, "upload_per_frame": 65536, "download_per_frame": 131072}
+{"kind": "traffic_finished", "at": "2026-10-10T11:16:26.163762+00:00", "sent": 13369344, "received": 26738688}
+{"kind": "server_exit", "at": "2026-10-10T11:19:26.254083+00:00", "exit_code": 0}
+{"kind": "exit", "at": "2026-10-10T11:19:26.254838+00:00"}

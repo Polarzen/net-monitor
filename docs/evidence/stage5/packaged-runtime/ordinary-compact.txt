@@ -1,0 +1,30 @@
+Window: "Net Monitor", App: NetMonitor.exe.
+	0 窗口 (settable, string) Net Monitor Secondary Actions: Raise ID: QApplication.CompactWindow
+		1 标题栏 (settable, string) Value: Net Monitor
+			2 菜单栏 系统 ID: MenuBar
+				3 菜单项 系统
+			4 按钮 最小化
+			5 按钮 最大化
+			6 按钮 关闭
+		7 组 (settable, string) ID: QApplication.CompactWindow.QWidget
+			8 文本 Net Monitor ID: QApplication.CompactWindow.QWidget.titleLabel
+			9 文本 需要管理员权限 ID: QApplication.CompactWindow.QWidget.statusWarning
+			10 自定义 (settable, string) ID: QApplication.CompactWindow.QWidget.metricCard
+				11 文本 下载 ID: QApplication.CompactWindow.QWidget.metricCard.metricCaption
+				12 文本 — ID: QApplication.CompactWindow.QWidget.metricCard.metricValue
+			13 自定义 (settable, string) ID: QApplication.CompactWindow.QWidget.metricCard
+				14 文本 上传 ID: QApplication.CompactWindow.QWidget.metricCard.metricCaption
+				15 文本 — ID: QApplication.CompactWindow.QWidget.metricCard.metricValue
+			16 文本 当前联网应用数未知 ID: QApplication.CompactWindow.QWidget.secondaryLabel
+			17 自定义 (settable, string) ID: QApplication.CompactWindow.QWidget.emptyCard
+				18 文本 需要管理员权限才能读取按进程网络流量 ID: QApplication.CompactWindow.QWidget.emptyCard.QLabel
+				19 按钮 (settable, string) 以管理员身份重启 ID: QApplication.CompactWindow.QWidget.emptyCard.accentButton
+			20 按钮 (settable, string) 详细信息 ID: QApplication.CompactWindow.QWidget.accentButton
+			21 复选框 (settable, string) 总在最前：关 ID: QApplication.CompactWindow.QWidget.QPushButton
+		22 菜单栏 (settable, string) ID: QApplication.CompactWindow.QMenuBar
+			23 菜单项 (settable, string) 窗口 ID: QApplication.CompactWindow.QMenuBar.QAction
+
+Document text: ```
+下载
+—
+```

@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-10T11:22:19.689660+00:00",
+  "source_commit": "e0eafaa3200910fd5ae47eeff343401276fa1e8f",
+  "zip_sha256": "a5cdc3566e29b24498e08f3e08809af67d69861f07e3e4c8abb42447acdd89d3",
+  "exe_sha256": "023411e31a026a50309823ac4af1907e398a9505495f7f7b22099a5e010b547b",
+  "admin_restart": {
+    "outcome": "passed with user-operated button and native UAC",
+    "user_report": "应用内重启并接受 UAC",
+    "old_pid": 61952,
+    "old_create_time": 1791630012.8958185,
+    "old_exited": true,
+    "new_pid": 56508,
+    "new_create_time": 1791630179.940374,
+    "same_distribution": true,
+    "elevated": true,
+    "token_query": "OpenProcess QUERY_LIMITED_INFORMATION; OpenProcessToken TOKEN_QUERY; GetTokenInformation TokenElevation",
+    "native_return_code": "not exposed by production UI",
+    "agent_clicked_restart": false,
+    "direct_windows_run_as": "not needed, not tested",
+    "native_cancel": "not tested; source tests only"
+  },
+  "desktop": {
+    "micro_visibility": "not listed by list_windows or list_apps",
+    "compact_switch": "user operated after Micro could not be targeted",
+    "elevated_accessibility": "only outer window and title bar",
+    "agent_detail_click": "no second window appeared",
+    "agent_window_menu_click": "no menu appeared",
+    "input_boundary": "suspected Windows privilege boundary; not proven a product defect",
+    "detailed_open_and_cumulative_tab": "user operated; tool read real screenshots",
+    "isolated_preferences": "ordinary launch only; elevated launch apparently used normal user profile"
+  },
+  "load": {
+    "scope": "127.0.0.1 TCP, disposable S/R bytes, no external traffic",
+    "client_pid": 63912,
+    "client_create_time": 1791630734.7280102,
+    "server_pid": 47048,
+    "server_create_time": 1791630735.1903183,
+    "active_start": "2026-10-10T11:13:01.925707+00:00",
+    "active_end": "2026-10-10T11:16:26.163762+00:00",
+    "frames": 204,
+    "client_sent": 13369344,
+    "client_received": 26738688,
+    "maximum_frames": 240,
+    "max_active_seconds_about": 240,
+    "initial_gate_max_seconds": 120,
+    "idle_max_seconds": 180,
+    "helper_reuse": "measure_stage4_live.receive_exact and utc only; no source observer or collector probe",
+    "client_exited": true,
+    "server_exited": true,
+    "exit_records": "client-load.jsonl, server-load.jsonl"
+  },
+  "ui_observations": [
+    {
+      "phase": "before traffic",
+      "surface": "Compact",
+      "observation": "load programs not in current networking list; this is not proof of explicit zero"
+    },
+    {
+      "phase": "active",
+      "surface": "Compact",
+      "client_download_KBps": 63.71,
+      "client_upload_KBps": 31.86,
+      "server_download_KBps": 31.86,
+      "server_upload_KBps": 63.71,
+      "mapping": "by executable display name; no PID child interaction"
+    },
+    {
+      "phase": "active later",
+      "surface": "Detailed current applications",
+      "client_download_KBps": 127.62,
+      "client_upload_KBps": 63.81,
+      "client_download_bytes": 19398656,
+      "client_upload_bytes": 9699328,
+      "server_download_KBps": 63.81,
+      "server_upload_KBps": 127.62,
+      "server_download_bytes": 9699328,
+      "server_upload_bytes": 19398656,
+      "displayed_process_count_each": 1,
+      "captured_before": "2026-10-10T11:16:24.702Z"
+    },
+    {
+      "phase": "idle, processes alive",
+      "surface": "Detailed cumulative",
+      "at": "2026-10-10T11:17:33.307Z",
+      "client_download_bytes": 26738688,
+      "client_upload_bytes": 13369344,
+      "server_download_bytes": 13369344,
+      "server_upload_bytes": 26738688,
+      "displayed_process_count_each": 1,
+      "displayed_presence": "最近枚举有进程",
+      "liveness_basis": "GUI presence plus load exit timestamps; later psutil check missed idle and raised NoSuchProcess"
+    },
+    {
+      "phase": "after load exit",
+      "surface": "Detailed cumulative",
+      "at": "2026-10-10T11:21:12.467Z",
+      "client_download_bytes": 26738688,
+      "client_upload_bytes": 13369344,
+      "server_download_bytes": 13369344,
+      "server_upload_bytes": 26738688,
+      "displayed_process_count_each": 0,
+      "displayed_presence": "未运行"
+    }
+  ],
+  "conclusions": {
+    "packaged_real_ETW": "passed for observed loopback application groups",
+    "directions_and_positive_rates": "passed at application-group level",
+    "cumulative_growth": "passed",
+    "idle_to_post_exit_totals": "unchanged across observed samples",
+    "two_separate_idle_samples": "not obtained",
+    "explicit_zero_vs_unknown": "not observed; cumulative page has no rates",
+    "PID_child_and_create_time_in_GUI": "blocked by privileged input; load identities known externally, app groups each displayed one process",
+    "account_retention_after_exit": "passed",
+    "hidden_collection_restore": "blocked by input boundary",
+    "Micro_Card_hover_click_Escape_drag_focus": "blocked; Micro untargetable and sky has no hover API",
+    "selection_follow_unfollow": "blocked by input boundary",
+    "tray_restore": "not tested",
+    "normal_application_exit": "passed: user reports Compact window menu Exit; original elevated PID no longer exists; not a tray-click exit",
+    "own_ETW_session_cleanup": "unverified: production session UUID not exposed; no other sessions queried or stopped",
+    "restart_capture": "not tested"
+  },
+  "privacy": {
+    "published": "only relevant numerical observations and load identity logs; no full personal process list",
+    "private_raw_directory": "artifacts/stage5/packaged-runtime-raw (Git ignored)",
+    "raw_files": [
+      {
+        "name": "active-detailed.png",
+        "sha256": "12cd0778102e56aac01df7a8604e729b79585af5a4e60f59ad12f279867a8652"
+      },
+      {
+        "name": "bounded_load.py",
+        "sha256": "691048f2fe5764b9ddef392def0aca07af0bce934638cf92877b1a9084ea13b8"
+      },
+      {
+        "name": "client-load.jsonl",
+        "sha256": "306d2127927605ba4d7868d1be0cf733677404575038f2af19b5cf6237bc8149"
+      },
+      {
+        "name": "exited-accounts.png",
+        "sha256": "67ca306fe7a8dabdcdee357873fa2880a92a785aa9d4540bf06c5e8ab4ddf911"
+      },
+      {
+        "name": "idle-1.png",
+        "sha256": "a88d75b0b24b58e5d6a9e6f6f14271128ce827d4176a1b99903738cff62d0ea4"
+      },
+      {
+        "name": "load-errors.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "load-launch-errors.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "server-load.jsonl",
+        "sha256": "17db25fb2fa2bb4134bfc42d30ad9590aba7925bf3c5d099b567428e5397bf15"
+      }
+    ]
+  },
+  "product_changes": false,
+  "rebuild": false,
+  "source_test_basis": "CI 38042146780 at e0eafaa; x64 and ARM64 each 331 passed, 1 skipped; no full rerun",
+  "normal_exit": {
+    "at": "2026-10-10T11:23:07.034237+00:00",
+    "pid": 56508,
+    "create_time": 1791630179.940374,
+    "exists": false,
+    "entry": "window menu, operated by user"
+  },
+  "preferences_cleanup": {
+    "restored_mode": "micro",
+    "basis": "pre-test normal profile read",
+    "other_fields_preserved": true,
+    "previous_mode": "compact"
+  },
+  "ordinary_reversible_check": {
+    "at": "2026-10-10T11:23:07.052920+00:00",
+    "pid": 57732,
+    "create_time": 1791631387.039096,
+    "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\NetMonitor-CI-e0eafaa-runtime-20261010\\NetMonitor\\NetMonitor.exe",
+    "purpose": "finish tool-operated Detailed open/close and normal menu exit only; no ETW claim",
+    "detailed_open_close": "passed, Computer Use actual click and verified DetailWindow then Compact only",
+    "window_menu_exit": "passed, Computer Use actual menu Exit then exact PID absent",
+    "checked_at": "2026-10-10T11:27:03.850621+00:00",
+    "process_exists": false
+  },
+  "remaining_load_processes": []
+}
