@@ -1,0 +1,67 @@
+[
+  {
+    "file": "Mesa-11.2.2-LICENSE.txt",
+    "url": "https://archive.mesa3d.org/older-versions/11.x/11.2.2/mesa-11.2.2.tar.xz",
+    "archive_member": "docs/license.html",
+    "sha256": "ebcf20771132668c08290ce893427362deb0653cf213c60582b16d459bc3b4db"
+  },
+  {
+    "file": "Mesa-11.2.2-Khronos.txt",
+    "url": "https://archive.mesa3d.org/older-versions/11.x/11.2.2/mesa-11.2.2.tar.xz",
+    "archive_member": "include/GL/glext.h",
+    "sha256": "eb016b36cd87193adb1e8174b58ea025bd37e02ce43783241c690b19a338aac0"
+  },
+  {
+    "file": "Mesa-11.2.2-Boost.txt",
+    "url": "https://archive.mesa3d.org/older-versions/11.x/11.2.2/mesa-11.2.2.tar.xz",
+    "archive_member": "include/c11/threads_win32.h",
+    "sha256": "dbfea1307d5e28282cf68487acae3b509d0329e189f410e9b084b7cc747f734e"
+  },
+  {
+    "file": "zlib-ng-2.2.4-LICENSE.txt",
+    "url": "https://github.com/zlib-ng/zlib-ng/blob/2.2.4/LICENSE.md",
+    "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee"
+  },
+  {
+    "file": "xz-5.2.5-COPYING.txt",
+    "url": "https://github.com/tukaani-project/xz/blob/v5.2.5/COPYING",
+    "sha256": "bcb02973ef6e87ea73d331b3a80df7748407f17efdb784b61b47e0e610d3bb5c"
+  },
+  {
+    "file": "mpdecimal-4.0.0-LICENSE.txt",
+    "url": "https://github.com/python/cpython-source-deps/blob/mpdecimal-4.0.0/COPYRIGHT.txt",
+    "sha256": "2713324211652ce4a60e6e21e54f9dc3004299e591b0933a352f1a89c5fb53c2"
+  },
+  {
+    "file": "LLVM-3.6.2-COPYRIGHT.regex.txt",
+    "url": "https://github.com/llvm/llvm-project/blob/llvmorg-3.6.2/llvm/lib/Support/COPYRIGHT.regex",
+    "sha256": "8fce62c1390f1b2c8a761c9729b68665fd826d25893638a63edf93d15bed0540"
+  },
+  {
+    "file": "LLVM-3.6.2-LICENSE.txt",
+    "url": "https://github.com/llvm/llvm-project/blob/llvmorg-3.6.2/llvm/LICENSE.TXT",
+    "sha256": "e3bc36440fc927c62d5cc24efeefe225a14d4e34ffeb0c92e430625cce9ee444"
+  },
+  {
+    "file": "LLVM-3.6.2-MD5.cpp.txt",
+    "url": "https://github.com/llvm/llvm-project/blob/llvmorg-3.6.2/llvm/lib/Support/MD5.cpp",
+    "sha256": "9c36a7e46f73550183225a3e58fdfca40cc4014b569e75db9ab26b9bca9ff083"
+  },
+  {
+    "file": "LLVM-3.6.2-MD5.h.txt",
+    "url": "https://github.com/llvm/llvm-project/blob/llvmorg-3.6.2/llvm/include/llvm/Support/MD5.h",
+    "sha256": "12658632eb53eee7f1f40fd0310635b0b4da9bbd2c917dd0906e5d5797f7d987"
+  },
+  {
+    "file": "Microsoft-VC-Runtime-2022-LICENSE.txt",
+    "url": "https://visualstudio.microsoft.com/wp-content/uploads/2021/09/Visual-C-Runtime-2015-2022-License-1.docx",
+    "format": "Plain text extracted from original Word document paragraphs",
+    "sha256": "2dd434a15fb5f9d28c33211a5af471eb719acba5db65e5103e0db95e7869a2fb"
+  },
+  {
+    "file": "Microsoft-VC-Runtime-2026-LICENSE.txt",
+    "url": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx",
+    "format": "Plain text extracted from original Word document paragraphs",
+    "sha256": "c15f0776c632b97bc3b01dbc3090ae347bb406235ae7132601bbaba91624e4fc"
+  }
+]

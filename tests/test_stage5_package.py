@@ -116,7 +116,7 @@ def test_single_version_source_and_thin_entry():
     project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
     assert project['project']['dynamic'] == ['version']
     assert project['tool']['setuptools']['dynamic']['version']['attr'] == 'net_monitor.__version__'
-    assert __version__ == "0.2.1.dev2"
+    assert __version__ == "0.2.1.dev3"
     tree = ast.parse((root / "packaging/entry.py").read_text(encoding="utf-8"))
     imports = [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)]
     assert imports == ["net_monitor.app"]
@@ -145,3 +145,43 @@ def test_qt_hook_keeps_required_plugins_and_official_dependency_results(monkeypa
     assert result['binaries'] == binaries[:4]
     assert result['hiddenimports'] == ['PySide6.QtCore']
     assert result['datas'] == [('data', '.')]
+
+
+def test_release_channel_and_rendered_identity(tmp_path):
+    from tools.build_windows import package_name, render_notice
+    commit = "123456789abcdef0123456789abcdef0123456789a"
+    for channel, suffix in (("internal-test", "test"), ("public-prerelease", "prerelease")):
+        assert package_name("0.2.1.dev3", commit, channel).endswith(
+            f"windows-x64-123456789abc-{suffix}")
+        for name in ("使用说明.txt", "THIRD-PARTY-NOTICES.txt"):
+            render_notice(name, tmp_path, "0.2.1.dev3", commit, channel)
+            text = (tmp_path / name).read_text(encoding="utf-8")
+            assert "0.2.1.dev3" in text and commit in text and channel in text
+            assert "@VERSION@" not in text and "@SOURCE_COMMIT@" not in text
+            assert "0.2.1.dev2" not in text
+
+
+def test_invalid_release_channel_fails_before_environment_or_files(monkeypatch, tmp_path):
+    from tools import build_windows
+    monkeypatch.setattr(build_windows, "check_environment",
+                        lambda: pytest.fail("must reject channel before starting a build"))
+    with pytest.raises(ValueError, match="Unsupported release channel"):
+        build_windows.build(tmp_path / "output", channel="stable-by-mistake")
+    assert not (tmp_path / "output").exists()
+
+
+def test_lgpl_wrappers_are_collected_outside_the_executable():
+    root = Path(__file__).resolve().parents[1]
+    tree = ast.parse((root / "packaging/NetMonitor.spec").read_text(encoding="utf-8"))
+    analysis = next(n for n in ast.walk(tree) if isinstance(n, ast.Call)
+                    and isinstance(n.func, ast.Name) and n.func.id == "Analysis")
+    mode = next(k.value for k in analysis.keywords if k.arg == "module_collection_mode")
+    assert ast.literal_eval(mode) == {"PySide6": "py", "shiboken6": "py"}
+
+
+def test_additional_license_sources_match_shipped_text():
+    import hashlib
+    import json
+    root = Path(__file__).resolve().parents[1] / "packaging/licenses"
+    for record in json.loads((root / "additional-sources.json").read_text(encoding="utf-8")):
+        assert hashlib.sha256((root / record["file"]).read_bytes()).hexdigest() == record["sha256"]

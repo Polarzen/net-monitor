@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "version": "6.11.2",
+  "materials": [
+    {
+      "file": "qtbase-6.11.2-source.tar.gz",
+      "git_commit": "ef55f427f2c8b410d34f8a7681020a3000cf6866",
+      "git_tag": "v6.11.2",
+      "origin": "git@github.com:qt/qtbase.git",
+      "archive_format": "git archive from exact upstream tag commit (not a Qt release-server tarball)",
+      "bytes": 67696176,
+      "sha256": "37eab455b79a0889242bdb048cf78f0dcb698b94c055b729f3c16472631e1546",
+      "files": 22856,
+      "git_submodules": 0,
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/qtbase-6.11.2-source.tar.gz"
+    },
+    {
+      "file": "pyside-setup-6.11.2-source.tar.gz",
+      "git_commit": "24627cd36e1593adf22eb1f2950e4248e7bcc1ec",
+      "git_tag": "v6.11.2",
+      "origin": "git@github.com:pyside/pyside-setup.git",
+      "archive_format": "git archive from exact upstream tag commit (not a Qt release-server tarball)",
+      "bytes": 21042244,
+      "sha256": "930d443f53b9e7d506947c7a546e1422e1b705ebccb85c080f11379d16dde6b8",
+      "files": 4600,
+      "git_submodules": 0,
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/pyside-setup-6.11.2-source.tar.gz"
+    },
+    {
+      "file": "qtsvg-everywhere-src-6.11.2.tar.xz",
+      "upstream": "https://download.qt.io/official_releases/qt/6.11/6.11.2/submodules/qtsvg-everywhere-src-6.11.2.tar.xz",
+      "version": "6.11.2",
+      "bytes": 2341860,
+      "sha256": "d594337feca84c26fb67fe87b85e6a5c12fda404b611d905f9d138210c311876",
+      "files": 641,
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/qtsvg-everywhere-src-6.11.2.tar.xz"
+    },
+    {
+      "file": "qtimageformats-everywhere-src-6.11.2.tar.xz",
+      "upstream": "https://download.qt.io/official_releases/qt/6.11/6.11.2/submodules/qtimageformats-everywhere-src-6.11.2.tar.xz",
+      "version": "6.11.2",
+      "bytes": 2050424,
+      "sha256": "cecd8900f34b6550076309bc94f62f828008b633a4239e0a08c86788f41001f8",
+      "files": 564,
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/qtimageformats-everywhere-src-6.11.2.tar.xz"
+    }
+  ]
+}

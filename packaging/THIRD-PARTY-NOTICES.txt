@@ -1,56 +1,73 @@
-Net Monitor 0.2.1.dev2 — third-party components, internal test build
+Net Monitor @VERSION@ — third-party components
+Build channel: @CHANNEL@
+Application source: @SOURCE_COMMIT@
 
-This notice does not grant a new license for Net Monitor's own source code.
-The repository currently has no project LICENSE file. Public redistribution
-authorization and a complete redistribution review have not been established.
+Third-party licenses and copyright notices remain in force. This notice does
+not select a new license for Net Monitor's own code or claim a Qt commercial
+license. Exact shipped files/hashes: FILE-MANIFEST.json. Actual binary origins:
+licenses/binary-origins.json. Original wheel texts/metadata are preserved in
+licenses/<distribution>/ and licenses/installed-components.json.
 
-Runtime components:
-- CPython 3.14.7: Python Software Foundation License and incorporated notices.
-  Text: licenses/Python-LICENSE.txt; source: https://github.com/python/cpython/tree/v3.14.7
-- PySide6 / PySide6_Essentials / PySide6_Addons / shiboken6 6.11.2:
-  installed metadata declares LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only.
-  Official PyPI wheels offer open-source and commercial licensing alternatives.
-  The wheel's included commercial notice is preserved; it does not establish
-  that this project has purchased a commercial license.
-  Source: https://github.com/pyside/pyside-setup/tree/v6.11.2
-  Texts: licenses/pyside-setup/LICENSES/ and licenses/<distribution>/.
-- Qt 6.11.2: dynamically linked Qt DLLs and plugins selected by official hooks.
-  Exact DLL/plugin inventory: FILE-MANIFEST.json. QtCore, QtGui, QtWidgets and
-  the Windows platform plugin are mandatory; other collected modules/plugins
-  are identified by their file names in that manifest.
-  Sources: https://github.com/qt/qtbase/tree/v6.11.2
-           https://github.com/qt/qtsvg/tree/v6.11.2
-           https://github.com/qt/qtimageformats/tree/v6.11.2
-  License texts and third-party attribution records are in the corresponding
-  licenses/ directories. These records retain component versions, copyright,
-  license identifiers and upstream references. They are an upstream superset,
-  so their presence is not a claim that every listed component is compiled in.
-- psutil 7.2.2: BSD-3-Clause; text: licenses/psutil/LICENSE.
-  Source: https://github.com/giampaolo/psutil/tree/release-7.2.2
-- PyInstaller 6.22.3 bootloader: GPL with the distribution exception included
-  in licenses/pyinstaller/COPYING.txt. PyInstaller is a build tool; it is not
-  imported by Net Monitor. Source: https://github.com/pyinstaller/pyinstaller/tree/v6.22.3
-- Microsoft C/C++ runtime files, if listed in FILE-MANIFEST.json, retain their
-  Microsoft ownership. Redistribution rights must be checked against the
-  applicable Microsoft runtime terms before public distribution.
-- OpenSSL 3.5.7 (reported by the CPython 3.14.7 runtime): Apache-2.0;
-  text: licenses/OpenSSL-LICENSE.txt.
-  Source: https://github.com/openssl/openssl/tree/openssl-3.5.7
-- libffi 3.4.4 (CPython v3.14.7 PCbuild/python.props dependency): MIT-style;
-  text: licenses/libffi-LICENSE.txt.
-  Source: https://github.com/libffi/libffi/tree/v3.4.4
+RUNTIME COMPONENTS
 
-The unused qpdf image plugin and Qt virtual-keyboard plugin are excluded during
-Qt dependency analysis. This app does not load PDF documents or QML keyboards;
-ordinary Windows input, raster/SVG icons and the Windows platform plugin remain.
+CPython 3.14.7 — python314.dll, python3.dll, stdlib modules/PYD files and Python
+archive. PSF license and incorporated notices: licenses/Python-LICENSE.txt,
+copied from the actual interpreter. Source:
+https://github.com/python/cpython/tree/v3.14.7
+Compiled dependencies follow v3.14.7 PCbuild/python.props and the pinned runtime:
+bzip2 1.0.8 (_bz2), liblzma/XZ 5.2.5 (_lzma), mpdecimal 4.0.0 (_decimal),
+Zstandard 1.5.7 (_zstd), zlib 1.3.1 / zlib-ng 2.2.4 (compression), libffi 3.4.4
+(_ctypes), OpenSSL 3.5.7 (_ssl/_hashlib, libssl-3.dll, libcrypto-3.dll).
+Texts in licenses/: Python-LICENSE.txt, xz-5.2.5-COPYING.txt,
+mpdecimal-4.0.0-LICENSE.txt, zlib-ng-2.2.4-LICENSE.txt, libffi-LICENSE.txt,
+OpenSSL-LICENSE.txt. SQLite/Tcl and other uncollected optional modules are not
+runtime claims. liblzma is the public-domain library, not the XZ CLI tools.
 
-Build-only dependencies (not automatically runtime components) and exact
-versions are recorded in BUILD-INFO.json. This includes hooks-contrib,
-setuptools, packaging, pefile, altgraph and pywin32-ctypes.
+PySide6 / shiboken6 6.11.2 — _internal/PySide6 and _internal/shiboken6 Python
+wrappers, QtCore/Gui/Widgets/Network extensions, pyside6.abi3.dll, Shiboken.pyd
+and shiboken6.abi3.dll. Qt 6.11.2 — Qt6Core/Gui/Widgets/Network/Svg DLLs and
+plugins for Windows/minimal/offscreen/Direct2D platforms, raster/SVG formats,
+SVG icons, styles, touch, TLS/network information. This distribution uses the
+LGPL-3.0-only route for these Qt/PySide libraries. Full LGPLv3/GPLv3 texts,
+copyright and third-party attribution are in licenses/{qtbase,qtsvg,
+qtimageformats,pyside-setup}/. Dynamic libraries AND LGPL Python wrappers are
+replaceable; see licenses/REDISTRIBUTION.txt. Version-matched source archives
+accompany the Release (licenses/release-sources.json), including shiboken.
+Wheel commercial notices are retained as received, not claimed as our grant.
+PySide6_Addons metadata is recorded, but only collected runtime files ship.
+The upstream attribution files cover bundled codecs, font/text, compression
+and other Qt third-party code; they are a superset, not an assertion that every
+optional feature was compiled. Unused Qt PDF and virtual keyboard stay excluded.
 
-License provenance and SHA-256: licenses/sources.json.
-Installed wheel metadata/text inventory: licenses/installed-components.json.
-Qt/PySide source availability, relinking/replacement and all applicable LGPL
-or other redistribution obligations still require release review. No claim of
-complete legal clearance or suitability for public release is made by this
-internal test package. SHA-256 is an integrity checksum, not a code signature.
+Mesa 11.2.2 with LLVM 3.6.2 — _internal/PySide6/opengl32sw.dll from the official
+PySide wheel. Version strings were inspected. Mesa uses MIT-style terms with
+Khronos headers and Boost-licensed C11 thread emulation. LLVM uses the Illinois/
+NCSA license. Credits include Brian Paul, Khronos Group, yohhoy, LLVM Team,
+Henry Spencer and University of California (regex), Alexander Peslyak (MD5).
+Texts: licenses/Mesa-11.2.2-*.txt and licenses/LLVM-3.6.2-*.txt. Sources:
+https://archive.mesa3d.org/older-versions/11.x/11.2.2/
+https://github.com/llvm/llvm-project/tree/llvmorg-3.6.2
+
+psutil 7.2.2 — psutil/_psutil_windows.pyd and Python modules; BSD-3-Clause.
+Text: licenses/psutil/LICENSE. Source:
+https://github.com/giampaolo/psutil/tree/release-7.2.2
+
+PyInstaller 6.22.3 bootloader in NetMonitor.exe — GPL with distribution exception
+in licenses/pyinstaller/COPYING.txt. The unmodified bootloader permits frozen
+application distribution under that exception. Source:
+https://github.com/pyinstaller/pyinstaller/tree/v6.22.3
+Build-only hooks-contrib, altgraph, packaging, pefile, setuptools and
+pywin32-ctypes versions appear in BUILD-INFO.json, not as app module claims.
+
+Microsoft Visual C/C++ runtime — VCRUNTIME140.dll / VCRUNTIME140_1.dll at
+_internal root come with CPython 3.14.7 (14.51.36247.0 in the inspected build).
+MSVCP140.dll, MSVCP140_1.dll, MSVCP140_2.dll, VCRUNTIME140.dll and
+VCRUNTIME140_1.dll beneath PySide6/shiboken6 come from the official 6.11.2 wheels
+(14.44.35211.0 in inspected wheels). They retain Microsoft ownership and are
+passed through unmodified. See binary-origins.json for each build's exact bytes.
+Original runtime EULAs: licenses/Microsoft-VC-Runtime-{2022,2026}-LICENSE.txt.
+These EULAs are not the developer redistribution grant; REDISTRIBUTION.txt
+identifies that basis and the CPython Windows pass-through conditions.
+
+License provenance: licenses/sources.json and licenses/additional-sources.json.
+SHA-256 is an integrity check, not a signature or a legal certification.
