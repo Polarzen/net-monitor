@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-10T05:02:04.881268+00:00",
+  "scope": "Independent loopback client preflight only; no ETW/GUI acceptance claim",
+  "exit_code": 0,
+  "elapsed_seconds": 15.41940459999023,
+  "server_errors": [],
+  "stderr": "",
+  "phases": [
+    {
+      "kind": "identity",
+      "at": "2026-10-10T05:01:49.850974+00:00",
+      "pid": 15356,
+      "create_time": 1791608509.4978318
+    },
+    {
+      "kind": "traffic_finished",
+      "at": "2026-10-10T05:01:56.865982+00:00",
+      "sent": 524288,
+      "received": 1048576
+    },
+    {
+      "kind": "idle_finished",
+      "at": "2026-10-10T05:02:04.866212+00:00"
+    }
+  ],
+  "qualified_client_preflight": true
+}

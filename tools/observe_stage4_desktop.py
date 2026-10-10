@@ -71,6 +71,8 @@ def main() -> int:
                   python=sys.executable, source=net_monitor.__file__,
                   elevated=bool(ctypes.windll.shell32.IsUserAnAdmin()),
                   qt_platform=app.platformName(),
+                  rate_window_seconds=getattr(controller.service._process_network_collector,
+                                              "_rate_window_seconds", None),
                   source_sha256={str(p.relative_to(root)).replace("\\", "/"):
                                  hashlib.sha256(p.read_bytes()).hexdigest()
                                  for p in sorted((root / "src").rglob("*.py"))},

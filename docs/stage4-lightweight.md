@@ -249,3 +249,15 @@ Card 全程隐藏；Detailed 场景中 Micro 和 Compact 均隐藏。三个场�
 开始时暂存的 `docs/stage4-lean-core.md`（blob `e05e54120fee12ef6abe8bbcde81c5ba5b4a0045`）与未跟踪 `goal.md` 继续保留，不纳入本轮交付。
 
 当前结论仍为**部分验收完成，尚不能标记 Stage 4 全面通过，也不能宣布已具备合并与打包条件**。Micro/Card、悬停焦点、真实托盘恢复／退出和真实关注行为仍需可定位该类窗口的桌面工具能力；GUI 停流后的速率窗口及恢复后的当前历史也未完成。缺少第二显示器、没有物理拔插或额外 DPI 切换不作为当前阻塞。
+
+### 停流补验准备与当前阻塞
+
+主批次证据已提交为 `23b46e416c0cb0e994ae53382d8002bbc430c735` 并推送到同一分支；其 [CI](https://github.com/Polarzen/net-monitor/actions/runs/38025126277) 的 Windows x64、ARM64 作业均成功。完整日志下载连接被拒绝，因此没有据此追加未经读取的测试数量。
+
+为补齐真实 GUI 的停流窗口证据，新增独立 [verify_stage4_gui_drain.py](../tools/verify_stage4_gui_drain.py)：等待正确负载身份及两次零基线后，发送双向 512 KiB / 1 MiB 回环流量，保留负载空闲 8 秒，GUI 最长运行约 80 秒。观察入口额外记录实际 `rate_window_seconds`；判定检查真实 2 秒配置、正速率、空闲尾段双向归零且累计稳定、退出后账户保留、正常关闭及自有会话清理。仍不注入快照或桌面输入，不改变产品采样和累计规则。
+
+该工具语法与帮助入口检查通过；普通权限预检拒绝运行且未创建输出目录。独立负载预检实际完成，发送 524,288 字节、接收 1,048,576 字节，空闲 8 秒后正常退出，总时长 15.42 秒，见 [client preflight](evidence/stage4/desktop-acceptance/2026-10-10/gui-drain-client-preflight.json)。这只验证负载脚本，不是 GUI/ETW 停流验收通过。
+
+随后一次原生提权启动返回 `ShellExecuteW=5`，没有生成 GUI 诊断输出或留下对应子进程，见 [启动记录](evidence/stage4/desktop-acceptance/2026-10-10/gui-drain-launch-attempt1.json)。这是启动阶段结果，不是新的 ETW error 5；尚未收到此次 UAC 的用户反馈，未自动重复触发。启动记录中的脚本哈希描述该次尝试版本；此后仅补强了独立工具的判定检查，尚无真实运行结果。
+
+当前无法独立推进的条件为：Computer Use 仍缺少可定位 Micro/Card 的接口能力，GUI 停流补验还需要用户确认原生安全提示的实际处理情况。保留已完成证据及待续工具，不重新执行同样的窗口定位失败，不以准备工作或绿色 CI 替代缺失的真实验收。
