@@ -27,7 +27,19 @@
   },
   "desktop_automation": {
     "status": "blocked",
-    "error": "Computer Use native pipe is unavailable: failed to connect native pipe: 系统找不到指定的文件。 (os error 2)"
+    "error": "Computer Use native pipe is unavailable: failed to connect native pipe: 系统找不到指定的文件。 (os error 2)",
+    "latest_recheck": {
+      "at": "2026-10-10T02:04:30.518662+00:00",
+      "source_head": "bb7f81d8e699e49944e13847d988bca609fed971",
+      "user_authorized": true,
+      "attempts": 2,
+      "kernel_reset_before_second_attempt": true,
+      "operation": "sky.list_windows()",
+      "result": "Computer Use native pipe is unavailable: failed to connect native pipe: 系统找不到指定的文件。 (os error 2)",
+      "windows_observed": false,
+      "desktop_checks_executed": false,
+      "responsibility": "Ordinary desktop checks stay assigned to Computer Use; only necessary UAC or physical-device actions need user participation."
+    }
   },
   "physical_desktop_verified": false,
   "system_scale_changed": false,
