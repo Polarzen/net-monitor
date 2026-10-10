@@ -68,7 +68,7 @@ def build_environment() -> dict[str, str]:
     # DLL analysis must not discover unrelated SDK/host DLLs via inherited PATH.
     # In particular, non-system ICU DLLs can have the same name but incompatible
     # symbols. Qt hooks discover their own wheel directories independently.
-    windows = Path(env["SystemRoot"])
+    windows = Path(env.get("SystemRoot") or env["SYSTEMROOT"])
     env["PATH"] = os.pathsep.join(str(p) for p in (
         Path(sys.executable).parent, Path(sys.base_prefix), Path(sys.base_prefix) / "DLLs",
         windows / "System32", windows,
