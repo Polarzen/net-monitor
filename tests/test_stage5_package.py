@@ -120,3 +120,16 @@ def test_single_version_source_and_thin_entry():
     tree = ast.parse((root / "packaging/entry.py").read_text(encoding="utf-8"))
     imports = [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)]
     assert imports == ["net_monitor.app"]
+
+
+def test_build_search_path_excludes_host_sdks_without_changing_parent(monkeypatch, tmp_path):
+    from tools.build_windows import build_environment
+    monkeypatch.setenv("PATH", "unrelated-sdk-with-incompatible-icu")
+    monkeypatch.setenv("SystemRoot", str(tmp_path / "Windows"))
+    monkeypatch.setenv("QT_PLUGIN_PATH", "unrelated-qt")
+    monkeypatch.setenv("PYTHONPATH", "unrelated-python")
+    env = build_environment()
+    assert "unrelated" not in env["PATH"]
+    assert str(tmp_path / "Windows" / "System32") in env["PATH"]
+    assert "QT_PLUGIN_PATH" not in env and "PYTHONPATH" not in env
+    assert os.environ["PATH"] == "unrelated-sdk-with-incompatible-icu"

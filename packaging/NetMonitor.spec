@@ -1,5 +1,7 @@
 # Windows x64 only. Official PyInstaller Qt hooks select the used Qt modules.
 import ast
+import os
+import sys
 from pathlib import Path
 from PyInstaller.utils.win32.versioninfo import (
     VSVersionInfo, FixedFileInfo, StringFileInfo, StringTable, StringStruct,
@@ -26,6 +28,12 @@ version_info = VSVersionInfo(
 a = Analysis([str(root / "packaging/entry.py")], pathex=[str(root / "src")],
              binaries=[], datas=[], hiddenimports=[], hookspath=[],
              hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False)
+# Fail closed if dependency discovery escaped the pinned environment and Windows.
+allowed_binary_roots = [Path(sys.prefix).resolve(), Path(sys.base_prefix).resolve(),
+                        Path(os.environ["SystemRoot"]).resolve()]
+for destination, source, kind in a.binaries:
+    if not any(Path(source).resolve().is_relative_to(p) for p in allowed_binary_roots):
+        raise RuntimeError(f"Unexpected binary source for {destination}: {source}")
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="NetMonitor",
           debug=False, bootloader_ignore_signals=False, strip=False, upx=False,

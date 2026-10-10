@@ -61,6 +61,22 @@ def check_environment() -> dict[str, str]:
     return versions
 
 
+def build_environment() -> dict[str, str]:
+    env = os.environ.copy()
+    for key in ("PYTHONPATH", "PYTHONHOME", "QT_QPA_PLATFORM", "QT_SCALE_FACTOR", "QT_SCREEN_SCALE_FACTORS", "QT_QPA_FONTDIR", "QT_PLUGIN_PATH", "NET_MONITOR_LAYOUT_FONT"):
+        env.pop(key, None)
+    # DLL analysis must not discover unrelated SDK/host DLLs via inherited PATH.
+    # In particular, non-system ICU DLLs can have the same name but incompatible
+    # symbols. Qt hooks discover their own wheel directories independently.
+    windows = Path(env["SystemRoot"])
+    env["PATH"] = os.pathsep.join(str(p) for p in (
+        Path(sys.executable).parent, Path(sys.base_prefix), Path(sys.base_prefix) / "DLLs",
+        windows / "System32", windows,
+    ))
+    env["PYTHONIOENCODING"] = "utf-8"
+    return env
+
+
 def inspect_distribution(folder: Path, version: str) -> dict:
     import pefile
     exe = folder / "NetMonitor.exe"
@@ -155,10 +171,7 @@ def build(output_root: Path) -> dict:
     command = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean",
                "--workpath", str(work / "pyinstaller"), "--distpath", str(work / "dist"),
                str(ROOT / "packaging/NetMonitor.spec")]
-    env = os.environ.copy()
-    for key in ("PYTHONPATH", "PYTHONHOME", "QT_QPA_PLATFORM", "QT_SCALE_FACTOR", "QT_SCREEN_SCALE_FACTORS", "QT_QPA_FONTDIR", "NET_MONITOR_LAYOUT_FONT"):
-        env.pop(key, None)
-    env["PYTHONIOENCODING"] = "utf-8"
+    env = build_environment()
     log = destination / "build.log"
     with log.open("w", encoding="utf-8") as stream:
         result = subprocess.run(command, cwd=ROOT, env=env, stdout=stream, stderr=subprocess.STDOUT)
