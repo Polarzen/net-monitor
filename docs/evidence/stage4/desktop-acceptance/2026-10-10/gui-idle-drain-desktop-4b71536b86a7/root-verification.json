@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "verified_at": "2026-10-10T05:59:24.911738+00:00",
+  "audited_head": "7eb030303bc9c47690bd8d491975a17765910dba",
+  "method": "Independent reread of gui.jsonl, load.jsonl and result.json; compare runtime source hashes with workspace; query actual PID/create_time after run",
+  "source_files_matched": 48,
+  "source_files_total": 48,
+  "source_mismatches": [],
+  "product_diff_from_612ebe5": [],
+  "sample_count": 64,
+  "snapshot_count_first_last": [1, 160],
+  "snapshot_count_strictly_increasing": true,
+  "maximum_log_gap_seconds": 1.522112,
+  "all_available": true,
+  "active_identity_matches": true,
+  "application_keys": ["5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5"],
+  "monotonic_counters": true,
+  "traffic_finished_at": "2026-10-10T05:55:10.905425+00:00",
+  "idle_finished_at": "2026-10-10T05:55:18.905656+00:00",
+  "first_full_cumulative_at": "2026-10-10T05:55:13.674460+00:00",
+  "first_zero_at": "2026-10-10T05:55:15.182263+00:00",
+  "first_zero_after_traffic_seconds": 4.276838,
+  "first_zero_after_first_full_cumulative_seconds": 1.507803,
+  "idle_zero_samples": 3,
+  "final_account": {
+    "upload_bytes": 524288,
+    "download_bytes": 1048576,
+    "active_process_count": 0
+  },
+  "final_network_row": null,
+  "recorded_gui_exit_code": 0,
+  "recorded_shutdown_complete": true,
+  "recorded_worker_running": false,
+  "recorded_session_query_after_exit": 4201,
+  "forced_cleanup": false,
+  "original_processes_still_present": {
+    "gui_40352_create_time_1791611701.6144228": false,
+    "load_22988_create_time_1791611701.3128707": false,
+    "observer_33828_create_time_1791611700.9757452": false
+  },
+  "limitations": [
+    "Native elevated GUI loopback data-path evidence, not new Computer Use interaction evidence",
+    "2-second configured rate window is not a measured 2-second end-to-end wall-clock bound",
+    "Detailed became visible after the idle interval, then hidden; no corresponding Computer Use action was recorded",
+    "Controller timed shutdown is not a tray-click exit",
+    "No new resource benchmark or product source change",
+    "Raw SHA-256 values describe original working-tree bytes; Git newline conversion may change text-file bytes on checkout"
+  ],
+  "raw_sha256": {
+    "errors.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gui.jsonl": "0a0e09f2419f532dec8298adee643e37340df39adf35d184792a47d5c9c0e24a",
+    "load.jsonl": "122eaee6506fd6a7c14c026a801f148543760b25fda6270611b120344f7d7792",
+    "result.json": "1a409a14ba88054908a5a73e5732b5f7bcfc7a959632f7a0501bc1fa1fad1e30"
+  },
+  "helper_sha256": {
+    "tools/observe_stage4_desktop.py": "1529c7e7fd85b087a0e7da411710c0ff923fa44a42ce1ca2f9a85f60645ee441",
+    "tools/verify_stage4_gui_drain.py": "ba59ed68e85fffe89596b649e1982b0ae3d0ad97e1df907221136d6180dbad89",
+    "tools/launch_stage4_gui_drain.cmd": "95be95e542663be7a89bc1610d0a3f49d0a869bf5cffa3888b8a1f868a1c7156"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "started_at": "2026-10-10T05:27:52.614357+00:00",
+  "finished_at": "2026-10-10T05:29:55.062690+00:00",
+  "api": "ShellExecuteExW",
+  "success": false,
+  "last_error": 1223,
+  "error_text": "操作已被用户取消。",
+  "hInstApp": 5,
+  "coinit_hresult": 0,
+  "flags": [
+    "SEE_MASK_NOCLOSEPROCESS",
+    "SEE_MASK_NOASYNC"
+  ],
+  "structure_size": 112,
+  "previous_attempt_user_feedback": "User reports no system prompt was seen",
+  "output_dir": "D:\\code\\net-monitor\\docs\\evidence\\stage4\\desktop-acceptance\\2026-10-10\\gui-idle-drain-attempt2",
+  "launcher_pid": null
+}
