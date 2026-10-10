@@ -157,7 +157,7 @@ jobs:
         run: git status --short
 
   package-x64:
-    name: Windows x64 internal test package
+    name: Windows x64 pre-release candidate
     runs-on: windows-2025
     timeout-minutes: 20
     steps:
@@ -175,12 +175,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build and inspect onedir package
         shell: pwsh
-        run: ./tools/build_windows.ps1
-      - name: Upload internal test package and build evidence
+        run: ./tools/build_windows.ps1 -Channel public-prerelease
+      - name: Upload pre-release candidate and build evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: NetMonitor-windows-x64-internal-test-${{ github.sha }}
+          name: NetMonitor-windows-x64-prerelease-${{ github.sha }}
           retention-days: 14
           path: |
             artifacts/stage5/**/*.zip

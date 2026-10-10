@@ -1,0 +1,73 @@
+Library replacement and distribution information — Net Monitor dev3
+
+Qt / PySide / shiboken
+
+This package uses LGPLv3 for the collected Qt/PySide/shiboken libraries. Full
+LGPLv3 and GPLv3 texts are included. Their copyrights and upstream terms apply.
+This package places no restriction on modifying the LGPL portions or reverse
+engineering the combined work to debug such modifications, as LGPLv3 requires.
+
+Matching Qt 6.11.2 qtbase, qtsvg, qtimageformats and pyside-setup (with shiboken)
+source archives are provided on the same versioned Release. Exact asset names,
+SHA-256, upstream tags/commits and links: release-sources.json. qtbase and
+pyside-setup archives come from exact upstream Git tag commits. Build scripts
+and bundled third-party sources are retained; no project library patch is
+applied. Git metadata/export-ignored Git control files are not build inputs.
+Upstream instructions are included; also see:
+https://doc.qt.io/qtforpython-6.11/building_from_source/index.html
+
+To install an interface-compatible modified library:
+1. Exit Net Monitor and back up the whole extracted application directory.
+2. Build matching sources for Windows x64, Python 3.14 ABI and Qt/PySide 6.11.2
+   compatible interfaces using upstream Windows MSVC/CMake/Ninja instructions.
+3. Replace appropriate files in _internal/PySide6 and _internal/shiboken6:
+   Qt6*.dll, pyside6.abi3.dll/shiboken6.abi3.dll, *.pyd, plugins and Python
+   wrappers. LGPL wrappers are external .py files, not exclusively embedded
+   in the EXE. Keep compatible plugin layout/dependencies. Microsoft runtime
+   files retain their separate terms and must remain unmodified.
+4. Double-click NetMonitor.exe. No product signature or manifest enforcement
+   blocks modified libraries. Keep modified files separate from the official
+   ZIP; your modified directory will naturally differ from published hashes.
+
+No key, activation, service or device lock is needed for compatible modified
+libraries. Incompatible ABIs may fail to load; that does not alter LGPL rights.
+Packaging checks external wrappers; not every possible modified Qt build was
+exercised. Application rebuild inputs are at the commit in BUILD-INFO.json;
+this document does not assign a license to the application's own source.
+
+Microsoft components
+
+The unchanged DLLs come from pinned CPython and official PySide/shiboken wheels,
+not arbitrary SDK/host paths. binary-origins.json records source-relative paths
+and hashes; FILE-MANIFEST.json records delivered bytes. Included original
+runtime EULAs govern use of those Microsoft components. LGPL permissions above
+apply to LGPL code, not Microsoft code.
+
+Developer redistribution is governed by Microsoft's Distributable Code lists
+and the applicable licensed Visual Studio/Build Tools terms:
+https://learn.microsoft.com/en-us/visualstudio/releases/2022/redistribution
+https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution
+https://visualstudio.microsoft.com/license-terms/vs2026-ga-diagnostic-buildtools/
+https://visualstudio.microsoft.com/license-terms/vs2022-ga-diagnosticbuildtools/
+The lists permit designated unmodified VC runtime files with a program for a
+validly licensed Visual Studio/Build Tools user, subject to those terms; they
+do not license preview/debug nonredistributables. The preparation environment
+has Visual Studio Build Tools and Community installed; CI uses the official
+Windows runner image. This is not a claim to a paid license or legal certification.
+
+The actual CPython Windows LICENSE.txt also specifies Microsoft pass-through
+conditions. Preserve Microsoft notices; do not imply endorsement, distribute
+Microsoft code for non-Microsoft platforms, or include it in malicious/deceptive/
+unlawful programs. Downstream distributors and users must comply with applicable
+Microsoft terms and protect that code accordingly. These conditions apply only
+to Microsoft code; CPython and other libraries retain their own licenses.
+This application adds network-monitoring functionality; the DLLs are not offered
+as a standalone Microsoft product. No Microsoft source, debug runtime or installer
+is included. Further redistribution must satisfy the developer terms, not merely
+cite the runtime EULA.
+
+Other components
+
+Preserve their notices and license texts. Versions and sources are in the
+THIRD-PARTY-NOTICES.txt inventory. LGPL sources are actual Release assets, not
+a promise to respond later. No MIT/GPL license is newly assigned to Net Monitor.

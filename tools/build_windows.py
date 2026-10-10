@@ -1,4 +1,4 @@
-"""Build a committed Windows x64 internal-test package; never imported by the app."""
+"""Build a committed Windows x64 test or public pre-release package."""
 from __future__ import annotations
 
 import argparse
@@ -38,6 +38,13 @@ def source_version() -> str:
     tree = ast.parse((ROOT / "src/net_monitor/__init__.py").read_text(encoding="utf-8"))
     return next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
                 and any(isinstance(t, ast.Name) and t.id == "__version__" for t in n.targets))
+
+
+def package_name(version: str, commit: str, channel: str) -> str:
+    suffixes = {"internal-test": "test", "public-prerelease": "prerelease"}
+    if channel not in suffixes:
+        raise ValueError(f"Unsupported release channel: {channel}")
+    return f"NetMonitor-{version}-windows-x64-{commit[:12]}-{suffixes[channel]}"
 
 
 def check_environment() -> dict[str, str]:
@@ -104,9 +111,13 @@ def inspect_distribution(folder: Path, version: str) -> dict:
         raise RuntimeError("EXE manifest must use asInvoker with no UI access")
     if strings.get("ProductVersion") != version or strings.get("FileVersion") != version:
         raise RuntimeError("PE version disagrees with source")
+    release, development = version.split(".dev")
+    if numeric_version != [*(int(part) for part in release.split(".")), int(development)]:
+        raise RuntimeError("PE numeric version disagrees with source")
     required = ["_internal/python314.dll", "_internal/PySide6/plugins/platforms/qwindows.dll",
                 "_internal/PySide6/Qt6Core.dll", "_internal/PySide6/Qt6Gui.dll",
-                "_internal/PySide6/Qt6Widgets.dll"]
+                "_internal/PySide6/Qt6Widgets.dll", "_internal/PySide6/__init__.py",
+                "_internal/shiboken6/__init__.py"]
     missing = [name for name in required if not (folder / name).is_file()]
     if missing:
         raise RuntimeError(f"Missing runtime files: {missing}")
@@ -154,17 +165,25 @@ def collect_licenses(folder: Path, versions: dict) -> None:
     records.append({"component": "CPython", "version": platform.python_version(),
                     "license_files": ["licenses/Python-LICENSE.txt"]})
     write_json(license_root / "installed-components.json", records)
-    shutil.copyfile(ROOT / "packaging/THIRD-PARTY-NOTICES.txt", folder / "THIRD-PARTY-NOTICES.txt")
 
 
-def build(output_root: Path) -> dict:
+def render_notice(name: str, folder: Path, version: str, commit: str, channel: str) -> None:
+    text = (ROOT / "packaging" / name).read_text(encoding="utf-8")
+    for token, value in {"@VERSION@": version, "@SOURCE_COMMIT@": commit,
+                         "@CHANNEL@": channel}.items():
+        text = text.replace(token, value)
+    (folder / name).write_text(text, encoding="utf-8")
+
+
+def build(output_root: Path, *, channel: str = "internal-test") -> dict:
+    package_name(source_version(), "", channel)  # Reject invalid metadata before mutation.
     versions = check_environment()
     changes = git("status", "--porcelain", "--untracked-files=all", "--", *INPUTS)
     if changes:
         raise RuntimeError("Commit reviewed build inputs first; unrelated staged work is allowed:\n" + changes)
     commit = git("rev-parse", "HEAD")
     version = source_version()
-    name = f"NetMonitor-{version}-windows-x64-{commit[:12]}-test"
+    name = package_name(version, commit, channel)
     output_root = output_root.resolve()
     destination = output_root / name
     # New directory per commit: never delete or replace a pre-existing user output.
@@ -175,6 +194,7 @@ def build(output_root: Path) -> dict:
                "--workpath", str(work / "pyinstaller"), "--distpath", str(work / "dist"),
                str(ROOT / "packaging/NetMonitor.spec")]
     env = build_environment()
+    env["NET_MONITOR_BINARY_ORIGINS"] = str(work / "binary-origins.json")
     log = destination / "build.log"
     with log.open("w", encoding="utf-8") as stream:
         result = subprocess.run(command, cwd=ROOT, env=env, stdout=stream, stderr=subprocess.STDOUT)
@@ -184,13 +204,15 @@ def build(output_root: Path) -> dict:
     shutil.copytree(work / "dist/NetMonitor", folder)
     inspection = inspect_distribution(folder, version)
     collect_licenses(folder, versions)
-    shutil.copyfile(ROOT / "packaging/使用说明.txt", folder / "使用说明.txt")
+    shutil.copyfile(work / "binary-origins.json", folder / "licenses/binary-origins.json")
+    for notice in ("使用说明.txt", "THIRD-PARTY-NOTICES.txt"):
+        render_notice(notice, folder, version, commit, channel)
     source_files = git("ls-files", "--", *INPUTS).splitlines()
     if git("rev-parse", "HEAD") != commit or git("status", "--porcelain", "--untracked-files=all", "--", *INPUTS):
         raise RuntimeError("Build inputs changed during compilation; no ZIP produced")
     build_info = {
         "schema_version": 1, "product": "Net Monitor", "version": version,
-        "status": "internal-test", "source_commit": commit, "source_inputs_dirty": False,
+        "status": channel, "source_commit": commit, "source_inputs_dirty": False,
         "source_sha256": {p: sha256(ROOT / p) for p in source_files},
         "configuration": {p: sha256(ROOT / p) for p in ("packaging/NetMonitor.spec", "packaging/requirements-windows-x64.lock")},
         "python": platform.python_version(), "dependencies": versions,
@@ -198,7 +220,9 @@ def build(output_root: Path) -> dict:
         "built_at": datetime.now(timezone.utc).isoformat(),
         "mode": "onedir/windowed", "signed": False,
         "file_inventory": "FILE-MANIFEST.json",
-        "license_review": "component notices included; public redistribution review incomplete",
+        "license_review": "see THIRD-PARTY-NOTICES.txt and licenses/REDISTRIBUTION.txt; release acceptance is recorded separately",
+        "corresponding_sources": "licenses/release-sources.json",
+        "binary_origins": "licenses/binary-origins.json",
         "clean_machine_test": "not performed by build; see acceptance record",
     }
     write_json(folder / "BUILD-INFO.json", build_info)
@@ -227,9 +251,11 @@ def build(output_root: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, default=ROOT / "artifacts/stage5")
+    parser.add_argument("--channel", choices=("internal-test", "public-prerelease"),
+                        default="internal-test")
     args = parser.parse_args()
     try:
-        print(json.dumps(build(args.output_root), ensure_ascii=False, indent=2))
+        print(json.dumps(build(args.output_root, channel=args.channel), ensure_ascii=False, indent=2))
         return 0
     except Exception as error:
         print(f"Build failed: {error}", file=sys.stderr)
