@@ -6,6 +6,8 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 **当前版本：`0.2.1.dev2`，Windows x64 内部测试版。** 修复了 Compact 默认宽度下权限说明被裁切的问题，已在新 CI EXE 中复验，并完成 Detailed 查看、管理员启动和短时回环活动到空闲的试用。完整桌面交互与退出会话清理仍有未验证项。程序未签名，尚未正式发布。具体边界见[验证状态](#验证状态与已知限制)。
 
+主分支用于继续有限范围内部开发和试用。Stage 5 内部测试包已交付，并完成一次实际问题修复；主分支整合不扩大桌面验收结论。下方下载入口继续指向已经实际试用的 `2b6db24` dev2 包。PR 和 main CI 自动生成的新包属于各自提交的构建检查产物，未额外进行桌面复验，不继承旧包的实测记录；其提交、CI 和独立 ZIP 校验值见对应运行及整合 PR。
+
 [下载测试包](https://github.com/Polarzen/net-monitor/actions/runs/38051119145/artifacts/11668988603) · [使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [验收记录](docs/stage5-windows-package.md)
 
 ## 主要功能
@@ -51,7 +53,7 @@ Get-Content -LiteralPath .\SHA256SUMS.txt
 
 比较两处哈希是否一致。这里校验的是内部产品 ZIP，不是外层 Actions artifact 压缩包；SHA-256 也不等于数字签名。产物大小、完整哈希、本地实测包与 CI 包的区别见 [Stage 5 打包记录](docs/stage5-windows-package.md)。
 
-若链接已过期，可到 [CI 运行列表](https://github.com/Polarzen/net-monitor/actions/workflows/ci.yml) 查找 Stage 5 分支成功运行中实际存在的 artifact，或按下文从源码构建。不要把 GitHub 的源码 ZIP 当作可直接运行的程序包。
+若链接已过期，可到 [CI 运行列表](https://github.com/Polarzen/net-monitor/actions/workflows/ci.yml) 查找成功运行中实际存在的 artifact，或按下文从源码构建。其他提交生成的包不等于上述已实测包；请核对各自来源和验证范围。不要把 GitHub 的源码 ZIP 当作可直接运行的程序包。
 
 ### 开始采集
 
@@ -143,10 +145,10 @@ Get-Content -LiteralPath .\SHA256SUMS.txt
 
 需要 Windows、Git 和 Python **3.14 或更新版本**。当前验收及打包使用 Python **3.14.7**；构建 x64 测试包时还需匹配下节的精确版本和架构。
 
-以下示例为新检出目录，使用 PowerShell；当前 Stage 5 实现在 `feat/stage-5-windows-package` 分支：
+以下示例从主分支 `main` 创建新检出目录，使用 PowerShell；整合 PR 合并前，完整 Stage 5 源码仍以 `feat/stage-5-windows-package` 分支为准：
 
 ```powershell
-git clone --branch feat/stage-5-windows-package https://github.com/Polarzen/net-monitor.git
+git clone --branch main https://github.com/Polarzen/net-monitor.git
 Set-Location net-monitor
 py -3.14 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
