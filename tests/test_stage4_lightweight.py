@@ -190,8 +190,10 @@ def test_same_snapshot_deduplicates_trees_but_time_still_expires(make_controller
     c.projection.clock.now = 4
     c._heartbeat_refresh()
     assert len(compact) == counts[0] + 1
-    assert len(tree) == counts[1] + 1
+    assert len(tree) == counts[1] == 0  # Hidden live tab does not render stale data either.
     assert c.compact_window._upload_value.text() == '—'
+    detail.tabs.setCurrentWidget(detail.live_page)
+    assert len(tree) == 1  # Restore once from the effective (stale) snapshot.
     assert detail._upload_label.text().endswith('—')
     assert all(item.text(3) == '—' for item in detail.session_view._items.values())
     assert len(c._rate_history._series[application_key(data.processes[0])]) == 1

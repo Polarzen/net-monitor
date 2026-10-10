@@ -1,12 +1,17 @@
 """Session totals for the card and a read-only, incremental account tab."""
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QLabel, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QCheckBox, QFileDialog, QHBoxLayout, QLabel, QLineEdit,
+                               QMessageBox, QPushButton, QTreeWidget, QTreeWidgetItem,
+                               QVBoxLayout, QWidget)
 
 from net_monitor.core.models import MonitorSnapshot
 from net_monitor.ui.micro_model import SESSION_CAPTION, SESSION_EXPLANATION, WidgetFrame, format_bytes
 from net_monitor.ui.session_model import SessionRow, session_rows
+from net_monitor.ui.session_export import save_csv, session_csv
 
 
 def label(text: str = "") -> QLabel:
@@ -92,6 +97,16 @@ class SessionView(QWidget):
         super().__init__()
         self.summary = label("暂无可信累计账户")
         self.source_label = label("启动中")
+        self.search = QLineEdit()
+        self.search.setPlaceholderText("搜索累计账户：应用名称、路径或账户标识")
+        self.search.setAccessibleName("搜索累计账户")
+        self.search.setClearButtonEnabled(True)
+        self.include_identity = QCheckBox("导出包含路径和账户标识")
+        self.include_identity.setToolTip("默认不导出这些字段。勾选后可能包含用户名等私人信息，分享前请检查。")
+        self.export_button = QPushButton("导出 CSV…")
+        self.export_button.setEnabled(False)
+        self.export_button.setToolTip("保存点击时当前搜索结果的已确认累计；不会清零，也不会自动上传。")
+        self.export_status = label()
         self.tree = QTreeWidget()
         self.tree.setColumnCount(6)
         self.tree.setHeaderLabels(["应用 / 账户", "本次下载 (B)", "本次上传 (B)",
@@ -108,11 +123,60 @@ class SessionView(QWidget):
         layout = QVBoxLayout(self)
         layout.addWidget(self.summary)
         layout.addWidget(self.source_label)
+        controls = QHBoxLayout()
+        controls.addWidget(self.search, 1)
+        controls.addWidget(self.include_identity)
+        controls.addWidget(self.export_button)
+        layout.addLayout(controls)
         layout.addWidget(self.tree, 1)
+        layout.addWidget(self.export_status)
         layout.addWidget(note)
         self._snapshot: MonitorSnapshot | None = None
         self._items: dict[str, SessionItem] = {}
         self._rendered: tuple | None = None
+        self._rows: tuple[SessionRow, ...] = ()
+        self.search.textChanged.connect(self._filter_rows)
+        self.export_button.clicked.connect(self._export_csv)
+
+    def _filter_rows(self) -> None:
+        query = self.search.text().strip().casefold()
+        visible = 0
+        for row in self._rows:
+            account = row.account
+            matches = not query or any(query in text.casefold() for text in
+                                       (account.name, account.executable or "", account.key))
+            self._items[account.key].setHidden(not matches)
+            visible += matches
+        total = len(self._rows)
+        set_text(self.summary, (f"显示 {visible} / {total} 个有流量累计账户（含已退出账户）"
+                               if total else "本次监控尚无已确认流量"))
+        self.export_button.setEnabled(visible > 0)
+
+    def _export_csv(self) -> None:
+        if self._snapshot is None:
+            return
+        self._flush()
+        by_key = {row.account.key: row for row in self._rows}
+        rows = tuple(by_key[item.key] for index in range(self.tree.topLevelItemCount())
+                     if not (item := self.tree.topLevelItem(index)).isHidden())
+        if not rows:
+            return
+        # Freeze data, options and time before entering the native dialog's event loop.
+        payload = session_csv(rows, exported_at=datetime.now(timezone.utc).isoformat(),
+                              source_status=self._snapshot.process_network_state.status.value,
+                              include_identity=self.include_identity.isChecked())
+        path, _ = QFileDialog.getSaveFileName(self, "导出本次监控累计", "NetMonitor-session.csv",
+                                             "CSV 文件 (*.csv)")
+        if not path:
+            set_text(self.export_status, "已取消导出；累计数据未改变。")
+            return
+        try:
+            save_csv(path, payload)
+        except OSError as exc:
+            set_text(self.export_status, "导出失败；累计数据未改变。")
+            QMessageBox.warning(self, "导出失败", f"无法保存 CSV，请检查目标位置。\n{exc}")
+            return
+        set_text(self.export_status, f"已导出 {len(rows)} 个账户（点击导出时的快照）。")
 
     def apply_snapshot(self, snapshot: MonitorSnapshot) -> None:
         self._snapshot = snapshot
@@ -131,10 +195,6 @@ class SessionView(QWidget):
         token = (rows, snapshot.process_network_state)
         if token == self._rendered:
             return
-        if len(rows) == 0:
-            set_text(self.summary, "本次监控尚无已确认流量")
-        else:
-            set_text(self.summary, f"{len(rows)} 个有流量累计账户（含已退出账户；不套用实时筛选）")
         set_text(self.source_label, "进程状态来自最近一次枚举；累计大于 0 不代表当前联网。"
                  if snapshot.process_network_state.available else
                  (snapshot.process_network_state.message or "当前采集数据不可用；保留已确认累计，进程状态未知。"))
@@ -158,6 +218,8 @@ class SessionView(QWidget):
                 else:
                     item.update_row(row)
             self._rendered = token
+            self._rows = rows
+            self._filter_rows()
         finally:
             self.tree.setSortingEnabled(sorting)
             if sorting:
