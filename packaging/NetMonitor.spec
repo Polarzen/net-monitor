@@ -26,7 +26,7 @@ version_info = VSVersionInfo(
     ])]), VarFileInfo([VarStruct("Translation", [1033, 1200])])],
 )
 a = Analysis([str(root / "packaging/entry.py")], pathex=[str(root / "src")],
-             binaries=[], datas=[], hiddenimports=[], hookspath=[],
+             binaries=[], datas=[], hiddenimports=[], hookspath=[str(root / "packaging/hooks")],
              hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False)
 # Fail closed if dependency discovery escaped the pinned environment and Windows.
 allowed_binary_roots = [Path(sys.prefix).resolve(), Path(sys.base_prefix).resolve(),

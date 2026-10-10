@@ -33,6 +33,16 @@ Runtime components:
 - Microsoft C/C++ runtime files, if listed in FILE-MANIFEST.json, retain their
   Microsoft ownership. Redistribution rights must be checked against the
   applicable Microsoft runtime terms before public distribution.
+- OpenSSL 3.5.7 (reported by the CPython 3.14.7 runtime): Apache-2.0;
+  text: licenses/OpenSSL-LICENSE.txt.
+  Source: https://github.com/openssl/openssl/tree/openssl-3.5.7
+- libffi 3.4.4 (CPython v3.14.7 PCbuild/python.props dependency): MIT-style;
+  text: licenses/libffi-LICENSE.txt.
+  Source: https://github.com/libffi/libffi/tree/v3.4.4
+
+The unused qpdf image plugin and Qt virtual-keyboard plugin are excluded during
+Qt dependency analysis. This app does not load PDF documents or QML keyboards;
+ordinary Windows input, raster/SVG icons and the Windows platform plugin remain.
 
 Build-only dependencies (not automatically runtime components) and exact
 versions are recorded in BUILD-INFO.json. This includes hooks-contrib,

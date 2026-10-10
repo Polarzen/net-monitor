@@ -133,3 +133,15 @@ def test_build_search_path_excludes_host_sdks_without_changing_parent(monkeypatc
     assert str(tmp_path / "Windows" / "System32") in env["PATH"]
     assert "QT_PLUGIN_PATH" not in env and "PYTHONPATH" not in env
     assert os.environ["PATH"] == "unrelated-sdk-with-incompatible-icu"
+
+
+def test_qt_hook_keeps_required_plugins_and_official_dependency_results(monkeypatch):
+    import runpy
+    binaries = [(name, "plugins") for name in
+                ("qwindows.dll", "qsvg.dll", "qico.dll", "qjpeg.dll", "qpdf.dll", "qtvirtualkeyboardplugin.dll")]
+    monkeypatch.setitem(sys.modules, "PyInstaller.utils.hooks.qt", SimpleNamespace(
+        add_qt6_dependencies=lambda filename: (["PySide6.QtCore"], binaries, [("data", ".")])))
+    result = runpy.run_path(str(Path(__file__).resolve().parents[1] / "packaging/hooks/hook-PySide6.QtGui.py"))
+    assert result['binaries'] == binaries[:4]
+    assert result['hiddenimports'] == ['PySide6.QtCore']
+    assert result['datas'] == [('data', '.')]

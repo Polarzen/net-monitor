@@ -645,6 +645,16 @@
       "file": "qtsvg/LICENSES/LicenseRef-Qt-Commercial.txt",
       "source_url": "https://github.com/qt/qtsvg/blob/v6.11.2/LICENSES/LicenseRef-Qt-Commercial.txt",
       "sha256": "9b1f50aae6267f9d5e0ceb6775ee86450262c25ec7c0573e151fe5d3f18a4700"
+    },
+    {
+      "file": "OpenSSL-LICENSE.txt",
+      "source_url": "https://github.com/openssl/openssl/blob/openssl-3.5.7/LICENSE.txt",
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+    },
+    {
+      "file": "libffi-LICENSE.txt",
+      "source_url": "https://github.com/libffi/libffi/blob/v3.4.4/LICENSE",
+      "sha256": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388"
     }
   ]
 }

@@ -118,6 +118,9 @@ def inspect_distribution(folder: Path, version: str) -> dict:
             forbidden.append(name)
     if forbidden:
         raise RuntimeError(f"Forbidden distribution content: {forbidden}")
+    unused_plugins = [n for n in files if Path(n).name.lower() in {"qpdf.dll", "qtvirtualkeyboardplugin.dll", "qt6pdf.dll", "qt6virtualkeyboard.dll"}]
+    if unused_plugins:
+        raise RuntimeError(f"Unused PDF/virtual-keyboard dependencies collected: {unused_plugins}")
     return {"machine": hex(architecture), "subsystem": subsystem, "manifest": manifests[0],
             "version_strings": strings, "numeric_version": numeric_version,
             "required_runtime_files": required, "forbidden_files": forbidden,
