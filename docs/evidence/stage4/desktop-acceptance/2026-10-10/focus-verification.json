@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-10T04:41:24.786089+00:00",
+  "scope": "ordinary permission Micro refresh only; hover not exercised",
+  "editor_identity": {
+    "at": "2026-10-10T04:38:23.800305+00:00",
+    "kind": "identity",
+    "pid": 50788,
+    "create_time": 1791607102.893191,
+    "qt_platform": "windows"
+  },
+  "gui_identity": {
+    "at": "2026-10-10T04:38:26.849320+00:00",
+    "kind": "identity",
+    "pid": 19804,
+    "create_time": 1791607103.9142494,
+    "python": "D:\\code\\net-monitor\\.venv\\Scripts\\pythonw.exe",
+    "source": "D:\\code\\net-monitor\\src\\net_monitor\\__init__.py",
+    "elevated": false,
+    "qt_platform": "windows",
+    "instrumentation": "existing heartbeat observer; temporary preferences; Compact title only"
+  },
+  "first_input_at": "2026-10-10T04:39:02.823Z",
+  "observation_end": "2026-10-10T04:41:23.802167+00:00",
+  "observed_seconds": 140.50504,
+  "foreground_poll_count": 279,
+  "every_foreground_poll_was_editor": true,
+  "final_text": "Stage4 focus A; Stage4 focus B; Stage4 focus C.",
+  "gui_snapshots_first_last": [
+    75,
+    352
+  ],
+  "gui_permission_states": [
+    "permission_denied"
+  ],
+  "micro_only_visible": true,
+  "method": "Standalone disposable QPlainTextEdit. Separate 500ms read-only GetForegroundWindow/GetWindowThreadProcessId polling; each Computer Use input deliberately activates editor, so intervening polls establish focus persistence. No other foreground process titles or identities saved.",
+  "attempt1": "Editor timed out after 90s before CU text input; foreground pid error not a passing input result."
+}

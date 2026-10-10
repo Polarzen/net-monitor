@@ -1,0 +1,3547 @@
+{
+  "scene": "detail",
+  "started_at": "2026-10-10T04:24:27.518061+00:00",
+  "original_qt_overrides": {},
+  "load_identity": {
+    "pid": 19408,
+    "create_time": 1791606267.1506696
+  },
+  "load": "160 x 64KiB upload / 128KiB download at 1Hz; 127.0.0.1",
+  "cpu_convention": "100% = one logical processor; machine percent = CPU / logical_processors",
+  "logical_processors": 32,
+  "observer_pid": 8780,
+  "warmup_seconds": 30,
+  "samples": [
+    {
+      "at": "2026-10-10T04:25:00.033169+00:00",
+      "elapsed": 1.001549000007799,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98115584,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 399,
+      "accounts": 162,
+      "snapshot_count": 61,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:24:59.222356+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 1835008,
+        "download_bytes": 3538944,
+        "upload_bytes_per_second": 64736.731184836404,
+        "download_bytes_per_second": 64736.731184836404
+      },
+      "load_account": {
+        "upload_bytes": 1835008,
+        "download_bytes": 3538944,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:01.042797+00:00",
+      "elapsed": 2.0111775000113994,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98115584,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 64,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:00.715787+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 1966080,
+        "download_bytes": 3932160,
+        "upload_bytes_per_second": 78787.78504037247,
+        "download_bytes_per_second": 157575.57008074495
+      },
+      "load_account": {
+        "upload_bytes": 1966080,
+        "download_bytes": 3932160,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:02.054573+00:00",
+      "elapsed": 3.0229550000221934,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98115584,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 64,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:00.715787+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 1966080,
+        "download_bytes": 3932160,
+        "upload_bytes_per_second": 78787.78504037247,
+        "download_bytes_per_second": 157575.57008074495
+      },
+      "load_account": {
+        "upload_bytes": 1966080,
+        "download_bytes": 3932160,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:03.067893+00:00",
+      "elapsed": 4.036275200021919,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98115584,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 400,
+      "accounts": 162,
+      "snapshot_count": 67,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:02.226250+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2031616,
+        "download_bytes": 4063232,
+        "upload_bytes_per_second": 65265.41936173364,
+        "download_bytes_per_second": 130530.83872346728
+      },
+      "load_account": {
+        "upload_bytes": 2031616,
+        "download_bytes": 4063232,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:04.080046+00:00",
+      "elapsed": 5.048428000009153,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98115584,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 400,
+      "accounts": 162,
+      "snapshot_count": 69,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:03.233803+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2097152,
+        "download_bytes": 4194304,
+        "upload_bytes_per_second": 64719.517976739095,
+        "download_bytes_per_second": 129439.03595347819
+      },
+      "load_account": {
+        "upload_bytes": 2097152,
+        "download_bytes": 4194304,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:05.091772+00:00",
+      "elapsed": 6.060152499994729,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98115584,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 71,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:04.248368+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2097152,
+        "download_bytes": 4194304,
+        "upload_bytes_per_second": 32254.073272449266,
+        "download_bytes_per_second": 64508.14654489853
+      },
+      "load_account": {
+        "upload_bytes": 2097152,
+        "download_bytes": 4194304,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:06.103282+00:00",
+      "elapsed": 7.071663000009721,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98119680,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 73,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:05.254717+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2228224,
+        "download_bytes": 4456448,
+        "upload_bytes_per_second": 64650.759774298,
+        "download_bytes_per_second": 129301.519548596
+      },
+      "load_account": {
+        "upload_bytes": 2228224,
+        "download_bytes": 4456448,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:07.129422+00:00",
+      "elapsed": 8.09780220000539,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98119680,
+      "private_bytes": 53997568,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 75,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:06.276230+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2293760,
+        "download_bytes": 4587520,
+        "upload_bytes_per_second": 97541.55182865505,
+        "download_bytes_per_second": 195083.1036573101
+      },
+      "load_account": {
+        "upload_bytes": 2293760,
+        "download_bytes": 4587520,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:08.140883+00:00",
+      "elapsed": 9.109263400023337,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 77,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:07.284597+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2359296,
+        "download_bytes": 4718592,
+        "upload_bytes_per_second": 64578.38648009728,
+        "download_bytes_per_second": 129156.77296019456
+      },
+      "load_account": {
+        "upload_bytes": 2359296,
+        "download_bytes": 4718592,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:09.154142+00:00",
+      "elapsed": 10.122524600010365,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 80,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:08.799145+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2490368,
+        "download_bytes": 4980736,
+        "upload_bytes_per_second": 65435.13827827766,
+        "download_bytes_per_second": 130870.27655655533
+      },
+      "load_account": {
+        "upload_bytes": 2490368,
+        "download_bytes": 4980736,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:10.167120+00:00",
+      "elapsed": 11.135504600009881,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 82,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:09.843914+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2555904,
+        "download_bytes": 5111808,
+        "upload_bytes_per_second": 64513.02026299237,
+        "download_bytes_per_second": 129026.04052598475
+      },
+      "load_account": {
+        "upload_bytes": 2555904,
+        "download_bytes": 5111808,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:11.192313+00:00",
+      "elapsed": 12.160693700017873,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 84,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:10.847192+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2621440,
+        "download_bytes": 5242880,
+        "upload_bytes_per_second": 63918.65664295327,
+        "download_bytes_per_second": 127837.31328590654
+      },
+      "load_account": {
+        "upload_bytes": 2621440,
+        "download_bytes": 5242880,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:12.204558+00:00",
+      "elapsed": 13.172938100004103,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 86,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:11.850674+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2686976,
+        "download_bytes": 5373952,
+        "upload_bytes_per_second": 64676.69571901842,
+        "download_bytes_per_second": 129353.39143803684
+      },
+      "load_account": {
+        "upload_bytes": 2686976,
+        "download_bytes": 5373952,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:13.224815+00:00",
+      "elapsed": 14.193195800005924,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 88,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:12.863566+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2818048,
+        "download_bytes": 5505024,
+        "upload_bytes_per_second": 96418.10997818722,
+        "download_bytes_per_second": 128557.4799709163
+      },
+      "load_account": {
+        "upload_bytes": 2818048,
+        "download_bytes": 5505024,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:14.250653+00:00",
+      "elapsed": 15.219034300011117,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 90,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:13.877323+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2883584,
+        "download_bytes": 5636096,
+        "upload_bytes_per_second": 96653.51082127586,
+        "download_bytes_per_second": 128871.34776170114
+      },
+      "load_account": {
+        "upload_bytes": 2883584,
+        "download_bytes": 5636096,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:15.262328+00:00",
+      "elapsed": 16.23070810001809,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 162,
+      "snapshot_count": 90,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:13.877323+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2883584,
+        "download_bytes": 5636096,
+        "upload_bytes_per_second": 96653.51082127586,
+        "download_bytes_per_second": 128871.34776170114
+      },
+      "load_account": {
+        "upload_bytes": 2883584,
+        "download_bytes": 5636096,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:16.274228+00:00",
+      "elapsed": 17.24260840000352,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98435072,
+      "private_bytes": 54321152,
+      "threads": 16,
+      "handles": 394,
+      "processes": 400,
+      "accounts": 162,
+      "snapshot_count": 93,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:15.403417+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 2883584,
+        "download_bytes": 5767168,
+        "upload_bytes_per_second": 32601.559259314312,
+        "download_bytes_per_second": 130406.23703725725
+      },
+      "load_account": {
+        "upload_bytes": 2883584,
+        "download_bytes": 5767168,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:17.287285+00:00",
+      "elapsed": 18.255666300014127,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98480128,
+      "private_bytes": 54362112,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 162,
+      "snapshot_count": 96,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:16.901234+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3014656,
+        "download_bytes": 6029312,
+        "upload_bytes_per_second": 64612.7611782505,
+        "download_bytes_per_second": 129225.522356501
+      },
+      "load_account": {
+        "upload_bytes": 3014656,
+        "download_bytes": 6029312,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:18.306421+00:00",
+      "elapsed": 19.27480199999991,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98480128,
+      "private_bytes": 54362112,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 162,
+      "snapshot_count": 96,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:16.901234+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3014656,
+        "download_bytes": 6029312,
+        "upload_bytes_per_second": 64612.7611782505,
+        "download_bytes_per_second": 129225.522356501
+      },
+      "load_account": {
+        "upload_bytes": 3014656,
+        "download_bytes": 6029312,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:19.327308+00:00",
+      "elapsed": 20.295688700018218,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 162,
+      "snapshot_count": 99,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:18.394573+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3080192,
+        "download_bytes": 6160384,
+        "upload_bytes_per_second": 26273.522782805834,
+        "download_bytes_per_second": 52547.04556561167
+      },
+      "load_account": {
+        "upload_bytes": 3080192,
+        "download_bytes": 6160384,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:20.340857+00:00",
+      "elapsed": 21.309236600005534,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 405,
+      "accounts": 163,
+      "snapshot_count": 101,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:19.432501+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3211264,
+        "download_bytes": 6422528,
+        "upload_bytes_per_second": 97484.15822978369,
+        "download_bytes_per_second": 194968.31645956737
+      },
+      "load_account": {
+        "upload_bytes": 3211264,
+        "download_bytes": 6422528,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:21.353165+00:00",
+      "elapsed": 22.32154730000184,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 104,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:20.906519+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3342336,
+        "download_bytes": 6684672,
+        "upload_bytes_per_second": 65167.78247903936,
+        "download_bytes_per_second": 130335.56495807871
+      },
+      "load_account": {
+        "upload_bytes": 3342336,
+        "download_bytes": 6684672,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:22.366076+00:00",
+      "elapsed": 23.334457300021313,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 106,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:21.944840+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3407872,
+        "download_bytes": 6815744,
+        "upload_bytes_per_second": 98065.79817621819,
+        "download_bytes_per_second": 196131.59635243638
+      },
+      "load_account": {
+        "upload_bytes": 3407872,
+        "download_bytes": 6815744,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:23.378211+00:00",
+      "elapsed": 24.346592800022336,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 106,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:21.944840+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3407872,
+        "download_bytes": 6815744,
+        "upload_bytes_per_second": 98065.79817621819,
+        "download_bytes_per_second": 196131.59635243638
+      },
+      "load_account": {
+        "upload_bytes": 3407872,
+        "download_bytes": 6815744,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:24.391279+00:00",
+      "elapsed": 25.359659700014163,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 109,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:23.429705+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3407872,
+        "download_bytes": 6815744,
+        "upload_bytes_per_second": 32635.677015471945,
+        "download_bytes_per_second": 65271.35403094389
+      },
+      "load_account": {
+        "upload_bytes": 3407872,
+        "download_bytes": 6815744,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:25.403962+00:00",
+      "elapsed": 26.37234349999926,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 111,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:24.463134+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3473408,
+        "download_bytes": 6946816,
+        "upload_bytes_per_second": 32439.841804158164,
+        "download_bytes_per_second": 64879.68360831633
+      },
+      "load_account": {
+        "upload_bytes": 3473408,
+        "download_bytes": 6946816,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:26.416109+00:00",
+      "elapsed": 27.38449120000587,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 113,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:25.465261+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3538944,
+        "download_bytes": 7077888,
+        "upload_bytes_per_second": 64305.081771208046,
+        "download_bytes_per_second": 128610.16354241609
+      },
+      "load_account": {
+        "upload_bytes": 3538944,
+        "download_bytes": 7077888,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:27.429095+00:00",
+      "elapsed": 28.3974753000075,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98541568,
+      "private_bytes": 54431744,
+      "threads": 16,
+      "handles": 394,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 115,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:26.481151+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3670016,
+        "download_bytes": 7340032,
+        "upload_bytes_per_second": 97172.77288103953,
+        "download_bytes_per_second": 194345.54576207907
+      },
+      "load_account": {
+        "upload_bytes": 3670016,
+        "download_bytes": 7340032,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:28.441883+00:00",
+      "elapsed": 29.41026289999718,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98476032,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 117,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:27.493108+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3670016,
+        "download_bytes": 7340032,
+        "upload_bytes_per_second": 64719.361389495796,
+        "download_bytes_per_second": 129438.72277899159
+      },
+      "load_account": {
+        "upload_bytes": 3670016,
+        "download_bytes": 7340032,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:29.453921+00:00",
+      "elapsed": 30.422301500017056,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98476032,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 120,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:28.989564+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3801088,
+        "download_bytes": 7602176,
+        "upload_bytes_per_second": 65188.36349471687,
+        "download_bytes_per_second": 130376.72698943374
+      },
+      "load_account": {
+        "upload_bytes": 3801088,
+        "download_bytes": 7602176,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:30.473502+00:00",
+      "elapsed": 31.44188200001372,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98476032,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 122,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:30.001316+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3932160,
+        "download_bytes": 7864320,
+        "upload_bytes_per_second": 97735.57964200295,
+        "download_bytes_per_second": 195471.1592840059
+      },
+      "load_account": {
+        "upload_bytes": 3932160,
+        "download_bytes": 7864320,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:31.486085+00:00",
+      "elapsed": 32.45446570002241,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98476032,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 124,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:31.041411+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3997696,
+        "download_bytes": 7995392,
+        "upload_bytes_per_second": 97659.79206508023,
+        "download_bytes_per_second": 195319.58413016045
+      },
+      "load_account": {
+        "upload_bytes": 3997696,
+        "download_bytes": 7995392,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:32.499525+00:00",
+      "elapsed": 33.46790720001445,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98476032,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 124,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:31.041411+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3997696,
+        "download_bytes": 7995392,
+        "upload_bytes_per_second": 97659.79206508023,
+        "download_bytes_per_second": 195319.58413016045
+      },
+      "load_account": {
+        "upload_bytes": 3997696,
+        "download_bytes": 7995392,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:33.512209+00:00",
+      "elapsed": 34.480590699997265,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98484224,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 127,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:32.519832+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 3997696,
+        "download_bytes": 7995392,
+        "upload_bytes_per_second": 32557.373328889375,
+        "download_bytes_per_second": 65114.74665777875
+      },
+      "load_account": {
+        "upload_bytes": 3997696,
+        "download_bytes": 7995392,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:34.531678+00:00",
+      "elapsed": 35.50006099999882,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98484224,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 129,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:33.537173+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4063232,
+        "download_bytes": 8126464,
+        "upload_bytes_per_second": 26119.965875446636,
+        "download_bytes_per_second": 52239.93175089327
+      },
+      "load_account": {
+        "upload_bytes": 4063232,
+        "download_bytes": 8126464,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:35.542863+00:00",
+      "elapsed": 36.51124500000151,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98488320,
+      "private_bytes": 54333440,
+      "threads": 13,
+      "handles": 392,
+      "processes": 403,
+      "accounts": 163,
+      "snapshot_count": 131,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:34.571552+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4194304,
+        "download_bytes": 8388608,
+        "upload_bytes_per_second": 97536.0837823438,
+        "download_bytes_per_second": 195072.1675646876
+      },
+      "load_account": {
+        "upload_bytes": 4194304,
+        "download_bytes": 8388608,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:36.568910+00:00",
+      "elapsed": 37.53729160001967,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98484224,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 134,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:36.077371+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4325376,
+        "download_bytes": 8650752,
+        "upload_bytes_per_second": 64769.79598292237,
+        "download_bytes_per_second": 129539.59196584474
+      },
+      "load_account": {
+        "upload_bytes": 4325376,
+        "download_bytes": 8650752,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:37.579533+00:00",
+      "elapsed": 38.5479142999975,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 136,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:37.089985+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4390912,
+        "download_bytes": 8781824,
+        "upload_bytes_per_second": 96884.96945067482,
+        "download_bytes_per_second": 193769.93890134964
+      },
+      "load_account": {
+        "upload_bytes": 4390912,
+        "download_bytes": 8781824,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:38.591092+00:00",
+      "elapsed": 39.55947350000497,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 138,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:38.123390+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4456448,
+        "download_bytes": 8912896,
+        "upload_bytes_per_second": 63402.527151631955,
+        "download_bytes_per_second": 126805.05430326391
+      },
+      "load_account": {
+        "upload_bytes": 4456448,
+        "download_bytes": 8912896,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:39.603920+00:00",
+      "elapsed": 40.572307499998715,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 138,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:38.123390+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4456448,
+        "download_bytes": 8912896,
+        "upload_bytes_per_second": 63402.527151631955,
+        "download_bytes_per_second": 126805.05430326391
+      },
+      "load_account": {
+        "upload_bytes": 4456448,
+        "download_bytes": 8912896,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:40.617429+00:00",
+      "elapsed": 41.58581040002173,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 141,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:39.620942+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4521984,
+        "download_bytes": 9043968,
+        "upload_bytes_per_second": 64652.32873819136,
+        "download_bytes_per_second": 129304.65747638272
+      },
+      "load_account": {
+        "upload_bytes": 4521984,
+        "download_bytes": 9043968,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:41.630549+00:00",
+      "elapsed": 42.598929900006624,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 143,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:40.669239+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4587520,
+        "download_bytes": 9043968,
+        "upload_bytes_per_second": 64676.81380222271,
+        "download_bytes_per_second": 64676.81380222271
+      },
+      "load_account": {
+        "upload_bytes": 4587520,
+        "download_bytes": 9043968,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:42.643753+00:00",
+      "elapsed": 43.612133800023,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 145,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:41.673058+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4653056,
+        "download_bytes": 9306112,
+        "upload_bytes_per_second": 64068.961728511036,
+        "download_bytes_per_second": 128137.92345702207
+      },
+      "load_account": {
+        "upload_bytes": 4653056,
+        "download_bytes": 9306112,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:43.663643+00:00",
+      "elapsed": 44.63202360001742,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98492416,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 147,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:42.702379+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4653056,
+        "download_bytes": 9306112,
+        "upload_bytes_per_second": 31853.972555444074,
+        "download_bytes_per_second": 127415.8902217763
+      },
+      "load_account": {
+        "upload_bytes": 4653056,
+        "download_bytes": 9306112,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:44.676275+00:00",
+      "elapsed": 45.64465510001173,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98504704,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 149,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:43.743292+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4784128,
+        "download_bytes": 9568256,
+        "upload_bytes_per_second": 63822.164275715775,
+        "download_bytes_per_second": 127644.32855143155
+      },
+      "load_account": {
+        "upload_bytes": 4784128,
+        "download_bytes": 9568256,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:45.711095+00:00",
+      "elapsed": 46.679475700017065,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98508800,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 151,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:44.761594+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4849664,
+        "download_bytes": 9568256,
+        "upload_bytes_per_second": 95932.37891490254,
+        "download_bytes_per_second": 127909.83855320339
+      },
+      "load_account": {
+        "upload_bytes": 4849664,
+        "download_bytes": 9568256,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:46.723386+00:00",
+      "elapsed": 47.69177020000643,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 153,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:45.771340+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 4915200,
+        "download_bytes": 9830400,
+        "upload_bytes_per_second": 64791.57717401976,
+        "download_bytes_per_second": 129583.15434803952
+      },
+      "load_account": {
+        "upload_bytes": 4915200,
+        "download_bytes": 9830400,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:47.748967+00:00",
+      "elapsed": 48.717347199999494,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 156,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:47.269153+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5046272,
+        "download_bytes": 10092544,
+        "upload_bytes_per_second": 64932.92571260652,
+        "download_bytes_per_second": 129865.85142521304
+      },
+      "load_account": {
+        "upload_bytes": 5046272,
+        "download_bytes": 10092544,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:48.762850+00:00",
+      "elapsed": 49.73123060000944,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 158,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:48.279656+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5111808,
+        "download_bytes": 10092544,
+        "upload_bytes_per_second": 64838.294563980766,
+        "download_bytes_per_second": 64838.294563980766
+      },
+      "load_account": {
+        "upload_bytes": 5111808,
+        "download_bytes": 10092544,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:49.775347+00:00",
+      "elapsed": 50.74372670002049,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54333440,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 161,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:49.771361+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5177344,
+        "download_bytes": 10354688,
+        "upload_bytes_per_second": 65475.94219205873,
+        "download_bytes_per_second": 130951.88438411745
+      },
+      "load_account": {
+        "upload_bytes": 5177344,
+        "download_bytes": 10354688,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:50.788027+00:00",
+      "elapsed": 51.7564057999989,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54333440,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 163,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:50.785793+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5242880,
+        "download_bytes": 10485760,
+        "upload_bytes_per_second": 52516.39945496618,
+        "download_bytes_per_second": 157549.19836489856
+      },
+      "load_account": {
+        "upload_bytes": 5242880,
+        "download_bytes": 10485760,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:51.801499+00:00",
+      "elapsed": 52.769884300010744,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 165,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:51.787852+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5308416,
+        "download_bytes": 10616832,
+        "upload_bytes_per_second": 65399.9648037664,
+        "download_bytes_per_second": 130799.9296075328
+      },
+      "load_account": {
+        "upload_bytes": 5308416,
+        "download_bytes": 10616832,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:52.814567+00:00",
+      "elapsed": 53.78294860001188,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 167,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:52.799177+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5308416,
+        "download_bytes": 10616832,
+        "upload_bytes_per_second": 32590.743832925913,
+        "download_bytes_per_second": 65181.487665851826
+      },
+      "load_account": {
+        "upload_bytes": 5308416,
+        "download_bytes": 10616832,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:53.828348+00:00",
+      "elapsed": 54.79672900002333,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 169,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:53.801781+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5439488,
+        "download_bytes": 10878976,
+        "upload_bytes_per_second": 65132.74688025375,
+        "download_bytes_per_second": 130265.4937605075
+      },
+      "load_account": {
+        "upload_bytes": 5439488,
+        "download_bytes": 10878976,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:54.842184+00:00",
+      "elapsed": 55.81056520002312,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 169,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:53.801781+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5439488,
+        "download_bytes": 10878976,
+        "upload_bytes_per_second": 65132.74688025375,
+        "download_bytes_per_second": 130265.4937605075
+      },
+      "load_account": {
+        "upload_bytes": 5439488,
+        "download_bytes": 10878976,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:55.855107+00:00",
+      "elapsed": 56.82349420001265,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 172,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:55.313491+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5570560,
+        "download_bytes": 11141120,
+        "upload_bytes_per_second": 64907.69352647901,
+        "download_bytes_per_second": 129815.38705295802
+      },
+      "load_account": {
+        "upload_bytes": 5570560,
+        "download_bytes": 11141120,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:56.869086+00:00",
+      "elapsed": 57.83746670000255,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 175,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:56.832734+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5636096,
+        "download_bytes": 11272192,
+        "upload_bytes_per_second": 64418.158143414534,
+        "download_bytes_per_second": 128836.31628682907
+      },
+      "load_account": {
+        "upload_bytes": 5636096,
+        "download_bytes": 11272192,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:57.898408+00:00",
+      "elapsed": 58.866788900020765,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 177,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:57.840118+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5701632,
+        "download_bytes": 11403264,
+        "upload_bytes_per_second": 64653.54378090587,
+        "download_bytes_per_second": 129307.08756181174
+      },
+      "load_account": {
+        "upload_bytes": 5701632,
+        "download_bytes": 11403264,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:58.917615+00:00",
+      "elapsed": 59.8859969000041,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 177,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:57.840118+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5701632,
+        "download_bytes": 11403264,
+        "upload_bytes_per_second": 64653.54378090587,
+        "download_bytes_per_second": 129307.08756181174
+      },
+      "load_account": {
+        "upload_bytes": 5701632,
+        "download_bytes": 11403264,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:25:59.930243+00:00",
+      "elapsed": 60.898624699999345,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 180,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:25:59.334956+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5832704,
+        "download_bytes": 11665408,
+        "upload_bytes_per_second": 64708.84942616459,
+        "download_bytes_per_second": 129417.69885232918
+      },
+      "load_account": {
+        "upload_bytes": 5832704,
+        "download_bytes": 11665408,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:00.943015+00:00",
+      "elapsed": 61.91139620001195,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 182,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:00.364370+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5898240,
+        "download_bytes": 11796480,
+        "upload_bytes_per_second": 65223.647214779805,
+        "download_bytes_per_second": 130447.29442955961
+      },
+      "load_account": {
+        "upload_bytes": 5898240,
+        "download_bytes": 11796480,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:01.963238+00:00",
+      "elapsed": 62.93161970001529,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 185,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:01.885337+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5963776,
+        "download_bytes": 11927552,
+        "upload_bytes_per_second": 64575.51986155512,
+        "download_bytes_per_second": 129151.03972311024
+      },
+      "load_account": {
+        "upload_bytes": 5963776,
+        "download_bytes": 11927552,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:02.975746+00:00",
+      "elapsed": 63.94412630001898,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 185,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:01.885337+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 5963776,
+        "download_bytes": 11927552,
+        "upload_bytes_per_second": 64575.51986155512,
+        "download_bytes_per_second": 129151.03972311024
+      },
+      "load_account": {
+        "upload_bytes": 5963776,
+        "download_bytes": 11927552,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:03.994288+00:00",
+      "elapsed": 64.96266849999665,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 188,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:03.396632+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6094848,
+        "download_bytes": 12189696,
+        "upload_bytes_per_second": 65455.29362278736,
+        "download_bytes_per_second": 130910.58724557472
+      },
+      "load_account": {
+        "upload_bytes": 6094848,
+        "download_bytes": 12189696,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:05.007101+00:00",
+      "elapsed": 65.97548190000816,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 190,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:04.424504+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6160384,
+        "download_bytes": 12320768,
+        "upload_bytes_per_second": 64164.43075361048,
+        "download_bytes_per_second": 128328.86150722096
+      },
+      "load_account": {
+        "upload_bytes": 6160384,
+        "download_bytes": 12320768,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:06.020088+00:00",
+      "elapsed": 66.98846980000963,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 193,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:05.917323+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6225920,
+        "download_bytes": 12451840,
+        "upload_bytes_per_second": 64309.53359170856,
+        "download_bytes_per_second": 128619.06718341712
+      },
+      "load_account": {
+        "upload_bytes": 6225920,
+        "download_bytes": 12451840,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:07.033897+00:00",
+      "elapsed": 68.00228010001592,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 193,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:05.917323+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6225920,
+        "download_bytes": 12451840,
+        "upload_bytes_per_second": 64309.53359170856,
+        "download_bytes_per_second": 128619.06718341712
+      },
+      "load_account": {
+        "upload_bytes": 6225920,
+        "download_bytes": 12451840,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:08.063537+00:00",
+      "elapsed": 69.03191770002013,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 196,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:07.409748+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6356992,
+        "download_bytes": 12713984,
+        "upload_bytes_per_second": 78471.29450466417,
+        "download_bytes_per_second": 156942.58900932834
+      },
+      "load_account": {
+        "upload_bytes": 6356992,
+        "download_bytes": 12713984,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:09.077513+00:00",
+      "elapsed": 70.04589380000834,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 198,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:08.425756+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6422528,
+        "download_bytes": 12845056,
+        "upload_bytes_per_second": 78809.60174555612,
+        "download_bytes_per_second": 157619.20349111225
+      },
+      "load_account": {
+        "upload_bytes": 6422528,
+        "download_bytes": 12845056,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:10.090936+00:00",
+      "elapsed": 71.05931630000123,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 200,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:09.472526+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6488064,
+        "download_bytes": 12976128,
+        "upload_bytes_per_second": 64606.442505491934,
+        "download_bytes_per_second": 129212.88501098387
+      },
+      "load_account": {
+        "upload_bytes": 6488064,
+        "download_bytes": 12976128,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:11.103807+00:00",
+      "elapsed": 72.07218700001249,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 203,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:10.963872+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6553600,
+        "download_bytes": 13107200,
+        "upload_bytes_per_second": 64551.52151838076,
+        "download_bytes_per_second": 129103.04303676152
+      },
+      "load_account": {
+        "upload_bytes": 6553600,
+        "download_bytes": 13107200,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:12.125345+00:00",
+      "elapsed": 73.09372689999873,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 205,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:11.977423+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6619136,
+        "download_bytes": 13238272,
+        "upload_bytes_per_second": 65197.893504379594,
+        "download_bytes_per_second": 130395.78700875919
+      },
+      "load_account": {
+        "upload_bytes": 6619136,
+        "download_bytes": 13238272,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:13.137285+00:00",
+      "elapsed": 74.10566630001995,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 207,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:12.981300+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6684672,
+        "download_bytes": 13369344,
+        "upload_bytes_per_second": 64584.83332538464,
+        "download_bytes_per_second": 129169.66665076929
+      },
+      "load_account": {
+        "upload_bytes": 6684672,
+        "download_bytes": 13369344,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:14.152179+00:00",
+      "elapsed": 75.12056040001335,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 209,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:13.996891+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6750208,
+        "download_bytes": 13500416,
+        "upload_bytes_per_second": 64539.71335335611,
+        "download_bytes_per_second": 129079.42670671221
+      },
+      "load_account": {
+        "upload_bytes": 6750208,
+        "download_bytes": 13500416,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:15.166633+00:00",
+      "elapsed": 76.13501500000712,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 405,
+      "accounts": 163,
+      "snapshot_count": 211,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:15.014216+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6815744,
+        "download_bytes": 13631488,
+        "upload_bytes_per_second": 65191.23938980659,
+        "download_bytes_per_second": 130382.47877961319
+      },
+      "load_account": {
+        "upload_bytes": 6815744,
+        "download_bytes": 13631488,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:16.180075+00:00",
+      "elapsed": 77.14845670000068,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98557952,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 405,
+      "accounts": 163,
+      "snapshot_count": 211,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:15.014216+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6815744,
+        "download_bytes": 13631488,
+        "upload_bytes_per_second": 65191.23938980659,
+        "download_bytes_per_second": 130382.47877961319
+      },
+      "load_account": {
+        "upload_bytes": 6815744,
+        "download_bytes": 13631488,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:17.201455+00:00",
+      "elapsed": 78.16983610001625,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 405,
+      "accounts": 163,
+      "snapshot_count": 214,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:16.488197+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 6946816,
+        "download_bytes": 13893632,
+        "upload_bytes_per_second": 78847.95552440277,
+        "download_bytes_per_second": 157695.91104880554
+      },
+      "load_account": {
+        "upload_bytes": 6946816,
+        "download_bytes": 13893632,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:18.222504+00:00",
+      "elapsed": 79.19088480001665,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 217,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:18.004112+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7012352,
+        "download_bytes": 14024704,
+        "upload_bytes_per_second": 52540.88441811686,
+        "download_bytes_per_second": 105081.76883623372
+      },
+      "load_account": {
+        "upload_bytes": 7012352,
+        "download_bytes": 14024704,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:19.236362+00:00",
+      "elapsed": 80.20474460002151,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 219,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:19.020379+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7077888,
+        "download_bytes": 14155776,
+        "upload_bytes_per_second": 65015.1119260002,
+        "download_bytes_per_second": 130030.2238520004
+      },
+      "load_account": {
+        "upload_bytes": 7077888,
+        "download_bytes": 14155776,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:20.250469+00:00",
+      "elapsed": 81.21885210002074,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 221,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:20.028269+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7143424,
+        "download_bytes": 14286848,
+        "upload_bytes_per_second": 64785.74223282814,
+        "download_bytes_per_second": 129571.48446565628
+      },
+      "load_account": {
+        "upload_bytes": 7143424,
+        "download_bytes": 14286848,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:21.277610+00:00",
+      "elapsed": 82.24599170000874,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 223,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:21.048581+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7208960,
+        "download_bytes": 14417920,
+        "upload_bytes_per_second": 64898.09713354415,
+        "download_bytes_per_second": 129796.1942670883
+      },
+      "load_account": {
+        "upload_bytes": 7208960,
+        "download_bytes": 14417920,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:22.290310+00:00",
+      "elapsed": 83.25869080002303,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 223,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:21.048581+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7208960,
+        "download_bytes": 14417920,
+        "upload_bytes_per_second": 64898.09713354415,
+        "download_bytes_per_second": 129796.1942670883
+      },
+      "load_account": {
+        "upload_bytes": 7208960,
+        "download_bytes": 14417920,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:23.304355+00:00",
+      "elapsed": 84.27273620001506,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 226,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:22.528374+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7274496,
+        "download_bytes": 14548992,
+        "upload_bytes_per_second": 32414.324068941074,
+        "download_bytes_per_second": 64828.64813788215
+      },
+      "load_account": {
+        "upload_bytes": 7274496,
+        "download_bytes": 14548992,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:24.324776+00:00",
+      "elapsed": 85.29315640000277,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 228,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:23.539601+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7405568,
+        "download_bytes": 14811136,
+        "upload_bytes_per_second": 65466.15415986927,
+        "download_bytes_per_second": 130932.30831973854
+      },
+      "load_account": {
+        "upload_bytes": 7405568,
+        "download_bytes": 14811136,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:25.338217+00:00",
+      "elapsed": 86.30659900000319,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 230,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:24.559171+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7471104,
+        "download_bytes": 14942208,
+        "upload_bytes_per_second": 97990.34271213289,
+        "download_bytes_per_second": 195980.68542426577
+      },
+      "load_account": {
+        "upload_bytes": 7471104,
+        "download_bytes": 14942208,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:26.351488+00:00",
+      "elapsed": 87.3198687999975,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 233,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:26.035583+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7536640,
+        "download_bytes": 15073280,
+        "upload_bytes_per_second": 52241.74737870811,
+        "download_bytes_per_second": 104483.49475741622
+      },
+      "load_account": {
+        "upload_bytes": 7536640,
+        "download_bytes": 15073280,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:27.364880+00:00",
+      "elapsed": 88.33326080002007,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 235,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:27.066638+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7602176,
+        "download_bytes": 15204352,
+        "upload_bytes_per_second": 52538.799433251355,
+        "download_bytes_per_second": 105077.59886650271
+      },
+      "load_account": {
+        "upload_bytes": 7602176,
+        "download_bytes": 15204352,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:28.378553+00:00",
+      "elapsed": 89.34694440002204,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 235,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:27.066638+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7602176,
+        "download_bytes": 15204352,
+        "upload_bytes_per_second": 52538.799433251355,
+        "download_bytes_per_second": 105077.59886650271
+      },
+      "load_account": {
+        "upload_bytes": 7602176,
+        "download_bytes": 15204352,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:29.391167+00:00",
+      "elapsed": 90.35954750000383,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 238,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:28.539300+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7667712,
+        "download_bytes": 15335424,
+        "upload_bytes_per_second": 32727.78083011923,
+        "download_bytes_per_second": 65455.56166023846
+      },
+      "load_account": {
+        "upload_bytes": 7667712,
+        "download_bytes": 15335424,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:30.405189+00:00",
+      "elapsed": 91.373573400022,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54317056,
+      "threads": 13,
+      "handles": 392,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 241,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:30.051414+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7798784,
+        "download_bytes": 15597568,
+        "upload_bytes_per_second": 52556.177253594586,
+        "download_bytes_per_second": 157668.53176078375
+      },
+      "load_account": {
+        "upload_bytes": 7798784,
+        "download_bytes": 15597568,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:31.425777+00:00",
+      "elapsed": 92.39415910001844,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 243,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:31.080556+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7864320,
+        "download_bytes": 15728640,
+        "upload_bytes_per_second": 96945.20629528533,
+        "download_bytes_per_second": 193890.41259057066
+      },
+      "load_account": {
+        "upload_bytes": 7864320,
+        "download_bytes": 15728640,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:32.439636+00:00",
+      "elapsed": 93.40801750001265,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 243,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:31.080556+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7864320,
+        "download_bytes": 15728640,
+        "upload_bytes_per_second": 96945.20629528533,
+        "download_bytes_per_second": 193890.41259057066
+      },
+      "load_account": {
+        "upload_bytes": 7864320,
+        "download_bytes": 15728640,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:33.460470+00:00",
+      "elapsed": 94.42885450000176,
+      "cpu_one_core_percent": 9.4,
+      "cpu_machine_percent": 0.29375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 246,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:32.594122+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 7995392,
+        "download_bytes": 15990784,
+        "upload_bytes_per_second": 64677.024437997374,
+        "download_bytes_per_second": 129354.04887599475
+      },
+      "load_account": {
+        "upload_bytes": 7995392,
+        "download_bytes": 15990784,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:34.481115+00:00",
+      "elapsed": 95.44949680002173,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 248,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:33.609016+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8060928,
+        "download_bytes": 15990784,
+        "upload_bytes_per_second": 65078.808356448855,
+        "download_bytes_per_second": 65078.808356448855
+      },
+      "load_account": {
+        "upload_bytes": 8060928,
+        "download_bytes": 15990784,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:35.494297+00:00",
+      "elapsed": 96.4626777000085,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 250,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:34.621706+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8126464,
+        "download_bytes": 16121856,
+        "upload_bytes_per_second": 64030.82734225555,
+        "download_bytes_per_second": 64030.82734225555
+      },
+      "load_account": {
+        "upload_bytes": 8126464,
+        "download_bytes": 16121856,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:36.507271+00:00",
+      "elapsed": 97.47565480001504,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 252,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:35.639143+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8192000,
+        "download_bytes": 16384000,
+        "upload_bytes_per_second": 64766.073866656516,
+        "download_bytes_per_second": 194298.22159996955
+      },
+      "load_account": {
+        "upload_bytes": 8192000,
+        "download_bytes": 16384000,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:37.521245+00:00",
+      "elapsed": 98.48962619999656,
+      "cpu_one_core_percent": 1.6,
+      "cpu_machine_percent": 0.05,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 254,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:36.652109+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8257536,
+        "download_bytes": 16515072,
+        "upload_bytes_per_second": 64611.155914242685,
+        "download_bytes_per_second": 193833.46774272807
+      },
+      "load_account": {
+        "upload_bytes": 8257536,
+        "download_bytes": 16515072,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:38.534927+00:00",
+      "elapsed": 99.50330929999473,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 257,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:38.152076+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8323072,
+        "download_bytes": 16646144,
+        "upload_bytes_per_second": 65286.16941608984,
+        "download_bytes_per_second": 130572.33883217968
+      },
+      "load_account": {
+        "upload_bytes": 8323072,
+        "download_bytes": 16646144,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:39.548191+00:00",
+      "elapsed": 100.51657150001847,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 257,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:38.152076+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8323072,
+        "download_bytes": 16646144,
+        "upload_bytes_per_second": 65286.16941608984,
+        "download_bytes_per_second": 130572.33883217968
+      },
+      "load_account": {
+        "upload_bytes": 8323072,
+        "download_bytes": 16646144,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:40.562220+00:00",
+      "elapsed": 101.53060490000644,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98553856,
+      "private_bytes": 54284288,
+      "threads": 12,
+      "handles": 390,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 260,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:39.645887+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8454144,
+        "download_bytes": 16908288,
+        "upload_bytes_per_second": 65447.65221393919,
+        "download_bytes_per_second": 130895.30442787838
+      },
+      "load_account": {
+        "upload_bytes": 8454144,
+        "download_bytes": 16908288,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:41.573122+00:00",
+      "elapsed": 102.54150500000105,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98537472,
+      "private_bytes": 54251520,
+      "threads": 11,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 262,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:40.685340+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8519680,
+        "download_bytes": 17039360,
+        "upload_bytes_per_second": 78793.68332742134,
+        "download_bytes_per_second": 157587.36665484268
+      },
+      "load_account": {
+        "upload_bytes": 8519680,
+        "download_bytes": 17039360,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:42.585691+00:00",
+      "elapsed": 103.55407189999823,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98537472,
+      "private_bytes": 54251520,
+      "threads": 11,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 265,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:42.181064+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8585216,
+        "download_bytes": 17170432,
+        "upload_bytes_per_second": 65032.77637638361,
+        "download_bytes_per_second": 130065.55275276722
+      },
+      "load_account": {
+        "upload_bytes": 8585216,
+        "download_bytes": 17170432,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:43.599974+00:00",
+      "elapsed": 104.56835780001711,
+      "cpu_one_core_percent": 7.8,
+      "cpu_machine_percent": 0.24375,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 267,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:43.189275+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8650752,
+        "download_bytes": 17301504,
+        "upload_bytes_per_second": 65298.987530607774,
+        "download_bytes_per_second": 130597.97506121555
+      },
+      "load_account": {
+        "upload_bytes": 8650752,
+        "download_bytes": 17301504,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:44.613790+00:00",
+      "elapsed": 105.58217190002324,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 269,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:44.191254+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8716288,
+        "download_bytes": 17432576,
+        "upload_bytes_per_second": 65366.191706865044,
+        "download_bytes_per_second": 130732.38341373009
+      },
+      "load_account": {
+        "upload_bytes": 8716288,
+        "download_bytes": 17432576,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:45.627169+00:00",
+      "elapsed": 106.59555110000656,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 269,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:44.191254+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8716288,
+        "download_bytes": 17432576,
+        "upload_bytes_per_second": 65366.191706865044,
+        "download_bytes_per_second": 130732.38341373009
+      },
+      "load_account": {
+        "upload_bytes": 8716288,
+        "download_bytes": 17432576,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:46.648080+00:00",
+      "elapsed": 107.61646030002157,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 272,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:45.678393+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8847360,
+        "download_bytes": 17694720,
+        "upload_bytes_per_second": 79155.33501746866,
+        "download_bytes_per_second": 158310.67003493733
+      },
+      "load_account": {
+        "upload_bytes": 8847360,
+        "download_bytes": 17694720,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:47.660286+00:00",
+      "elapsed": 108.62866690001101,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 274,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:46.697872+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 8978432,
+        "download_bytes": 17825792,
+        "upload_bytes_per_second": 105173.18265141381,
+        "download_bytes_per_second": 157759.77397712073
+      },
+      "load_account": {
+        "upload_bytes": 8978432,
+        "download_bytes": 17825792,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:48.673799+00:00",
+      "elapsed": 109.64217960002134,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 276,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:47.735077+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9043968,
+        "download_bytes": 17956864,
+        "upload_bytes_per_second": 96128.3134620098,
+        "download_bytes_per_second": 128171.08461601306
+      },
+      "load_account": {
+        "upload_bytes": 9043968,
+        "download_bytes": 17956864,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:49.687222+00:00",
+      "elapsed": 110.65560300002107,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 279,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:49.259976+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9043968,
+        "download_bytes": 18087936,
+        "upload_bytes_per_second": 31943.395616762788,
+        "download_bytes_per_second": 127773.58246705115
+      },
+      "load_account": {
+        "upload_bytes": 9043968,
+        "download_bytes": 18087936,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:50.714566+00:00",
+      "elapsed": 111.68294759999844,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 281,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:50.267692+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9109504,
+        "download_bytes": 18219008,
+        "upload_bytes_per_second": 32423.973534820172,
+        "download_bytes_per_second": 129695.89413928069
+      },
+      "load_account": {
+        "upload_bytes": 9109504,
+        "download_bytes": 18219008,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:51.729813+00:00",
+      "elapsed": 112.69819450000068,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 402,
+      "accounts": 163,
+      "snapshot_count": 281,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:50.267692+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9109504,
+        "download_bytes": 18219008,
+        "upload_bytes_per_second": 32423.973534820172,
+        "download_bytes_per_second": 129695.89413928069
+      },
+      "load_account": {
+        "upload_bytes": 9109504,
+        "download_bytes": 18219008,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:52.750693+00:00",
+      "elapsed": 113.71907459999784,
+      "cpu_one_core_percent": 9.4,
+      "cpu_machine_percent": 0.29375,
+      "working_set_bytes": 98549760,
+      "private_bytes": 54276096,
+      "threads": 11,
+      "handles": 390,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 284,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:51.766906+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9240576,
+        "download_bytes": 18481152,
+        "upload_bytes_per_second": 65367.22835310055,
+        "download_bytes_per_second": 130734.4567062011
+      },
+      "load_account": {
+        "upload_bytes": 9240576,
+        "download_bytes": 18481152,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:53.764772+00:00",
+      "elapsed": 114.7331538000144,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98549760,
+      "private_bytes": 54276096,
+      "threads": 11,
+      "handles": 390,
+      "processes": 400,
+      "accounts": 163,
+      "snapshot_count": 287,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:53.240628+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9371648,
+        "download_bytes": 18612224,
+        "upload_bytes_per_second": 52500.25074135696,
+        "download_bytes_per_second": 105000.50148271392
+      },
+      "load_account": {
+        "upload_bytes": 9371648,
+        "download_bytes": 18612224,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:54.780553+00:00",
+      "elapsed": 115.74893530001282,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 290,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:54.738530+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9502720,
+        "download_bytes": 19005440,
+        "upload_bytes_per_second": 105344.36258845989,
+        "download_bytes_per_second": 210688.72517691978
+      },
+      "load_account": {
+        "upload_bytes": 9502720,
+        "download_bytes": 19005440,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:55.794565+00:00",
+      "elapsed": 116.76294700001017,
+      "cpu_one_core_percent": 1.6,
+      "cpu_machine_percent": 0.05,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 292,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:55.754252+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9502720,
+        "download_bytes": 19005440,
+        "upload_bytes_per_second": 52486.20100907201,
+        "download_bytes_per_second": 157458.603027216
+      },
+      "load_account": {
+        "upload_bytes": 9502720,
+        "download_bytes": 19005440,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:56.815922+00:00",
+      "elapsed": 117.78430300002219,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 294,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:56.767344+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9568256,
+        "download_bytes": 19136512,
+        "upload_bytes_per_second": 32477.147656380897,
+        "download_bytes_per_second": 64954.295312761795
+      },
+      "load_account": {
+        "upload_bytes": 9568256,
+        "download_bytes": 19136512,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:57.842700+00:00",
+      "elapsed": 118.81108100002166,
+      "cpu_one_core_percent": 4.7,
+      "cpu_machine_percent": 0.146875,
+      "working_set_bytes": 98545664,
+      "private_bytes": 54259712,
+      "threads": 11,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 294,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:56.767344+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9568256,
+        "download_bytes": 19136512,
+        "upload_bytes_per_second": 32477.147656380897,
+        "download_bytes_per_second": 64954.295312761795
+      },
+      "load_account": {
+        "upload_bytes": 9568256,
+        "download_bytes": 19136512,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:58.856153+00:00",
+      "elapsed": 119.82453460001852,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54292480,
+      "threads": 12,
+      "handles": 390,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 297,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:58.278884+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9633792,
+        "download_bytes": 19267584,
+        "upload_bytes_per_second": 65104.43895069756,
+        "download_bytes_per_second": 130208.87790139511
+      },
+      "load_account": {
+        "upload_bytes": 9633792,
+        "download_bytes": 19267584,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:26:59.870062+00:00",
+      "elapsed": 120.83844290001434,
+      "cpu_one_core_percent": 6.2,
+      "cpu_machine_percent": 0.19375,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54292480,
+      "threads": 12,
+      "handles": 390,
+      "processes": 401,
+      "accounts": 163,
+      "snapshot_count": 299,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:26:59.298919+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9764864,
+        "download_bytes": 19398656,
+        "upload_bytes_per_second": 97943.12366371573,
+        "download_bytes_per_second": 130590.83155162097
+      },
+      "load_account": {
+        "upload_bytes": 9764864,
+        "download_bytes": 19398656,
+        "active_process_count": 1
+      }
+    },
+    {
+      "at": "2026-10-10T04:27:00.881827+00:00",
+      "elapsed": 121.85021000000415,
+      "cpu_one_core_percent": 3.1,
+      "cpu_machine_percent": 0.096875,
+      "working_set_bytes": 98562048,
+      "private_bytes": 54292480,
+      "threads": 12,
+      "handles": 390,
+      "processes": 399,
+      "accounts": 163,
+      "snapshot_count": 302,
+      "network_status": "available",
+      "last_gui_sample_at": "2026-10-10T04:27:00.793298+00:00",
+      "load_network": {
+        "pid": 19408,
+        "upload_bytes": 9895936,
+        "download_bytes": 19791872,
+        "upload_bytes_per_second": 104762.47148547672,
+        "download_bytes_per_second": 209524.94297095345
+      },
+      "load_account": {
+        "upload_bytes": 9895936,
+        "download_bytes": 19791872,
+        "active_process_count": 1
+      }
+    }
+  ],
+  "gui_identity": {
+    "at": "2026-10-10T04:24:28.694889+00:00",
+    "kind": "identity",
+    "pid": 27432,
+    "create_time": 1791606267.5441487,
+    "python": "D:\\code\\net-monitor\\.venv\\Scripts\\pythonw.exe",
+    "source": "D:\\code\\net-monitor\\src\\net_monitor\\__init__.py",
+    "elevated": true,
+    "qt_platform": "windows",
+    "source_sha256": {
+      "src/net_monitor/__init__.py": "4257b0a41c9671b655994c925fbacb3a3d5f28aa49d02666f3f473129203416e",
+      "src/net_monitor/__main__.py": "b38bee51eb14ad9eeb05e56d8f38146b40fef40321ef7916f71f9fd7018704f3",
+      "src/net_monitor/app.py": "e129349ff26cae668f5a200c1721945d2897718d15a887df6271258f6704fc52",
+      "src/net_monitor/collectors/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/collectors/base.py": "603b0899559cecef8895184177a29fd8958e921e24d38cefb5228fc912a646d3",
+      "src/net_monitor/collectors/etw/__init__.py": "a5bf1d02cdcd46b440ab4b95673bf139f230a61c4898b80329fa3491ac03b5fb",
+      "src/net_monitor/collectors/etw/__main__.py": "ab113df9f31c3804f1cc318719501e8d45e055e387a82a173b276001dd013cfa",
+      "src/net_monitor/collectors/etw/api.py": "72d211d629c8eab0e3f1c958edc65915527e62b44ebced877d900d06128df00b",
+      "src/net_monitor/collectors/etw/collector_probe.py": "c1af3a624d8674043a9f4be00dfd1a55e39042a35a859138528f455fd1f54835",
+      "src/net_monitor/collectors/etw/constants.py": "c05f0aedca588883f584b8a33244723fa0addec576e5c3d0e075feeb10ad2187",
+      "src/net_monitor/collectors/etw/events.py": "5aa839894c412cd706b653ffa5d3974e218e837471665f5bef5fbdcc05a96f02",
+      "src/net_monitor/collectors/etw/network.py": "322847156210a0782a6efa6a54708b23639c3d182a9000f8f3006a163af41e13",
+      "src/net_monitor/collectors/etw/parser.py": "a0c00d31ec8136adcc0d4359ef0f223d5361b944ce2e6bc635e85ef40ebecc05",
+      "src/net_monitor/collectors/etw/permission_probe.py": "becae59efa2877177ecbc299afb7aef98cde98e1f2d76a0e22a56f1427d14821",
+      "src/net_monitor/collectors/etw/probe.py": "ddf68f2f9e5363e3a69c3310adcba6b7c64aa9bc1b8d502619934bfafc029d84",
+      "src/net_monitor/collectors/etw/session.py": "a7d67293a22c1abd528aebffdef123013bee7c6e96b9f8e139cfb9d78beaa79c",
+      "src/net_monitor/collectors/process.py": "29dd92b156091bd6be9ac64365baff56db10ceef6c2a94ef90f550dbc8b0cd53",
+      "src/net_monitor/collectors/system_network.py": "13655c9c3b16d67451be6ab59b243946ff01bb3d3105be9a90386523e6803cfd",
+      "src/net_monitor/collectors/windows_network.py": "f564d9a86cdb604dd8298821397bc1285e8dafd933a578360cc153817803662e",
+      "src/net_monitor/core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/core/application_aggregation.py": "952cbdaf9ab246c75d2ce4f23b07da09c202582b4e41190ae120b33ff2a0adba",
+      "src/net_monitor/core/application_session.py": "ebe582904927cb2684284879157d32691b011635afcc510d7ae53dc6c546c25b",
+      "src/net_monitor/core/elevation.py": "1df6e02674663e1b4950f48c6cbb1f1fe77773ad242a82b569ef263bcb8f4a3a",
+      "src/net_monitor/core/formatting.py": "dcb64b1dbad53a0434de68a93860385a8e5e7aaa2686d7f928643ba0a211095f",
+      "src/net_monitor/core/models.py": "649952a625b47560efa6fd4c1f3c1f7895a41f5f4b8e5703902af2b619871a6a",
+      "src/net_monitor/core/process_visibility.py": "93fa1434526b156f575aa30991b069bf6d06fe15c4a3c3b6711100b4aa635141",
+      "src/net_monitor/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/services/monitor_service.py": "991d03a525fc37378b0267c64dbdb906ab70d33838d47b594ef87573ef270bcc",
+      "src/net_monitor/ui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/ui/compact_window.py": "93f00fb887bc3c2fdd79601de6c14f28deab6539e7cfe93e00705fce44ddaf73",
+      "src/net_monitor/ui/controller.py": "61ab069e84b520ec19d72dd12a8ce01eaccb909c9d5afcb8c99c7bad708a22be",
+      "src/net_monitor/ui/detail_window.py": "85a66e471cee22efeef020e2d7cf44bf114c4dc5bddbf259bdf8bd1d05f251e7",
+      "src/net_monitor/ui/icon_cache.py": "bfe166b78dead48c665ad8ce18c2fea1d4c397d75611896ceaac896856b65304",
+      "src/net_monitor/ui/main_window.py": "f732ebb23169143703f65919cff2636130a37a97420f2aec19a4ff3cc13fe579",
+      "src/net_monitor/ui/micro_model.py": "fadfda156bcf9889449da081dd9c2de694c11c72422000dfe2a8fba612efbee1",
+      "src/net_monitor/ui/micro_window.py": "d68f581bdae0f1045a722ac9ae629e78248fb0b6bc22850a4058a790b4fe17fc",
+      "src/net_monitor/ui/network_spotlight.py": "1204c5e70f5c73edcef8530e40f26e699ddb65dd1ab8f335133ecf378e9d04e2",
+      "src/net_monitor/ui/preferences.py": "7a32be461de887097a4d4ac35871e9b9def610706821442467dba0d7be8ef0cd",
+      "src/net_monitor/ui/rate_history.py": "01a3260b415503b19290dfe2011b58f29f43f7699e39e31f1816cce560c4cbf2",
+      "src/net_monitor/ui/sampling_worker.py": "9d833a659127a8b4515b28d9e05f9875777dcdc7dece862a66542ef292b8f969",
+      "src/net_monitor/ui/session_model.py": "9ad57868f626f512682c9281f2a2b712f87816c2f7f72b08f903fb2e8f698d47",
+      "src/net_monitor/ui/session_view.py": "fb7d3e5b8d1fc05eb71f5581fa6816f9c0d4b12ed2a5adface601b61c5c5cd70",
+      "src/net_monitor/ui/sparkline.py": "7ee0748cd3deb2375a5006cad2d493f27b14e733044e437426c9bb6218a5926a",
+      "src/net_monitor/ui/theme.py": "155c19dbfb930aa876304abd64771815eedc43394552f0e6b85d1b2dc006faea",
+      "src/net_monitor/ui/tray.py": "e8af891eb19e8421ec6a68bae01275b3c941441ef7e67b519ad940025b7382d9",
+      "src/net_monitor/ui/window_geometry.py": "0502631c7095caf50d0f2e213faeec11db465c4d397542277017043171eb0837",
+      "src/net_monitor/ui/windows_foreground.py": "899b4fc5ce187464c96666f24ed123b44a3076aa7f2c56b7d9be27a69d4b12f5",
+      "src/net_monitor/ui/windows_icons.py": "f608a07b0dcba5dcf2df537fbdf28f70db98c96495c8a595b9803346da4f99ab"
+    },
+    "instrumentation": "existing heartbeat observer; temporary preferences; Compact title only"
+  },
+  "etw_session": "NetMonitor-ProcessNetwork-PoC-1127f392-c4a0-4ced-8acf-aa2ed8190717",
+  "load_started_at": "2026-10-10T04:24:29.031330+00:00",
+  "actual_warmup_seconds": 30.000185099983355,
+  "measurement_started_at": "2026-10-10T04:24:59.031632+00:00",
+  "observed_seconds": 121.86188599999878,
+  "measurement_finished_at": "2026-10-10T04:27:00.893518+00:00",
+  "load_result": {
+    "exit_code": 0,
+    "stdout": "{\"sent\": 10485760, \"received\": 20971520, \"seconds\": 159.00033700000495}\n",
+    "stderr": ""
+  },
+  "server_errors": [],
+  "gui_exit_code": 0,
+  "session_query_after_exit": 4201,
+  "last_gui_samples": [
+    {
+      "at": "2026-10-10T04:27:34.047872+00:00",
+      "kind": "sample",
+      "elapsed": 185.37963769998169,
+      "mode": "micro",
+      "compact_visible": false,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": 2076332477312,
+      "detail_visible": true,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 368,
+      "processes": 399,
+      "accounts": 163,
+      "load_pid": 19408,
+      "load_create_time": null,
+      "load_network": null,
+      "load_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-1127f392-c4a0-4ced-8acf-aa2ed8190717"
+    },
+    {
+      "at": "2026-10-10T04:27:35.547136+00:00",
+      "kind": "sample",
+      "elapsed": 186.87889910000376,
+      "mode": "micro",
+      "compact_visible": false,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": 2076332477312,
+      "detail_visible": true,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 371,
+      "processes": 399,
+      "accounts": 163,
+      "load_pid": 19408,
+      "load_create_time": null,
+      "load_network": null,
+      "load_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-1127f392-c4a0-4ced-8acf-aa2ed8190717"
+    },
+    {
+      "at": "2026-10-10T04:27:36.564370+00:00",
+      "kind": "sample",
+      "elapsed": 187.89617689998704,
+      "mode": "micro",
+      "compact_visible": false,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": 2076332477312,
+      "detail_visible": true,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 373,
+      "processes": 400,
+      "accounts": 163,
+      "load_pid": 19408,
+      "load_create_time": null,
+      "load_network": null,
+      "load_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-1127f392-c4a0-4ced-8acf-aa2ed8190717"
+    },
+    {
+      "at": "2026-10-10T04:27:37.575886+00:00",
+      "kind": "sample",
+      "elapsed": 188.90759679998155,
+      "mode": "micro",
+      "compact_visible": false,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": 2076332477312,
+      "detail_visible": true,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 375,
+      "processes": 400,
+      "accounts": 163,
+      "load_pid": 19408,
+      "load_create_time": null,
+      "load_network": null,
+      "load_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-1127f392-c4a0-4ced-8acf-aa2ed8190717"
+    },
+    {
+      "at": "2026-10-10T04:27:39.075695+00:00",
+      "kind": "sample",
+      "elapsed": 190.40742499998305,
+      "mode": "micro",
+      "compact_visible": false,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": 2076332477312,
+      "detail_visible": true,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 378,
+      "processes": 400,
+      "accounts": 163,
+      "load_pid": 19408,
+      "load_create_time": null,
+      "load_network": null,
+      "load_account": {
+        "upload_bytes": 10354688,
+        "download_bytes": 20709376,
+        "active_process_count": 0
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-1127f392-c4a0-4ced-8acf-aa2ed8190717"
+    }
+  ],
+  "gui_exit_record": {
+    "at": "2026-10-10T04:27:39.118507+00:00",
+    "kind": "event_loop_exited",
+    "exit_code": 0,
+    "shutdown_complete": true,
+    "worker_running": false
+  },
+  "summary": {
+    "cpu_one_core_percent": {
+      "mean": 5.279166666666667,
+      "p95": 7.8,
+      "min": 1.6,
+      "max": 9.4
+    },
+    "cpu_machine_percent": {
+      "mean": 0.16497395833333334,
+      "p95": 0.24375,
+      "min": 0.05,
+      "max": 0.29375
+    },
+    "working_set_bytes": {
+      "mean": 98504055.46666667,
+      "p95": 98562048,
+      "min": 98115584,
+      "max": 98562048
+    },
+    "private_bytes": {
+      "mean": 54294493.86666667,
+      "p95": 54431744,
+      "min": 53997568,
+      "max": 54431744
+    },
+    "threads": {
+      "mean": 13.308333333333334,
+      "p95": 16,
+      "min": 11,
+      "max": 16
+    },
+    "handles": {
+      "mean": 391.96666666666664,
+      "p95": 394,
+      "min": 390,
+      "max": 394
+    },
+    "processes": {
+      "mean": 401.15,
+      "p95": 403,
+      "min": 399,
+      "max": 405
+    },
+    "accounts": {
+      "mean": 162.83333333333334,
+      "p95": 163,
+      "min": 162,
+      "max": 163
+    }
+  },
+  "qualified": true,
+  "finished_at": "2026-10-10T04:27:39.187791+00:00"
+}

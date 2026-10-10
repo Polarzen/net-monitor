@@ -1,0 +1,80 @@
+395 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.8
+395 INFO: Python: 3.14.7
+447 INFO: Platform: Windows-11-10.0.26200-SP0
+447 INFO: Python environment: D:\code\net-monitor\.venv-build-stage5
+454 INFO: Removing temporary files and cleaning cache in %USERPROFILE%\AppData\Local\pyinstaller
+459 INFO: Module search paths (PYTHONPATH):
+['D:\\code\\net-monitor',
+ '%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\python314.zip',
+ '%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\DLLs',
+ '%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib',
+ '%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64',
+ 'D:\\code\\net-monitor\\.venv-build-stage5',
+ 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages',
+ 'D:\\code\\net-monitor\\packaging',
+ 'D:\\code\\net-monitor\\src']
+1431 INFO: checking Analysis
+1432 INFO: Building Analysis because Analysis-00.toc is non existent
+1432 INFO: Looking for Python shared library...
+1432 INFO: Using Python shared library: %USERPROFILE%\AppData\Local\Python\pythoncore-3.14-64\python314.dll
+1432 INFO: Running Analysis Analysis-00.toc
+1432 INFO: Target bytecode optimization level: 0
+1432 INFO: Initializing module dependency graph...
+1438 INFO: Initializing module graph hook caches...
+1465 INFO: Analyzing modules for base_library.zip ...
+5008 INFO: Processing standard module hook 'hook-encodings.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+6193 INFO: Processing standard module hook 'hook-pickle.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+6449 INFO: Processing standard module hook 'hook-math.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+6608 INFO: Processing standard module hook 'hook-difflib.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+6628 INFO: Processing standard module hook 'hook-heapq.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+9710 INFO: Caching module dependency graph...
+9753 INFO: Analyzing D:\code\net-monitor\packaging\entry.py
+9768 INFO: Processing standard module hook 'hook-PySide6.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+10392 INFO: Processing standard module hook 'hook-shiboken6.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+10719 INFO: Processing standard module hook 'hook-PySide6.QtNetwork.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+14021 INFO: Processing standard module hook 'hook-PySide6.QtCore.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+18007 INFO: Processing standard module hook 'hook-PySide6.QtWidgets.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+22735 INFO: Processing standard module hook 'hook-PySide6.QtGui.py' from 'D:\\code\\net-monitor\\packaging\\hooks'
+46030 INFO: Processing standard module hook 'hook-psutil.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+46130 INFO: Processing standard module hook 'hook-sysconfig.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+46141 INFO: Processing standard module hook 'hook-_ctypes.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+46303 INFO: Processing standard module hook 'hook-platform.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+46568 INFO: Processing module hooks (post-graph stage)...
+46585 INFO: Performing binary vs. data reclassification (118 entries)
+46667 INFO: Looking for ctypes DLLs
+46698 INFO: Analyzing run-time hooks ...
+46699 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+46702 INFO: Including run-time hook 'pyi_rth_pyside6.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+46705 INFO: Processing pre-find-module-path hook 'hook-_pyi_rth_utils.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+46709 INFO: Processing standard module hook 'hook-_pyi_rth_utils.py' from 'D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PyInstaller\\hooks'
+46722 INFO: Creating base_library.zip...
+46743 INFO: Looking for dynamic libraries
+47408 INFO: Extra DLL search directories (AddDllDirectory): ['D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\shiboken6']
+47408 INFO: Extra DLL search directories (PATH): ['D:\\code\\net-monitor\\.venv-build-stage5\\Lib\\site-packages\\PySide6']
+49530 INFO: Warnings written to D:\code\net-monitor\build\stage5\56f049bf32a5-f21fe663\pyinstaller\NetMonitor\warn-NetMonitor.txt
+49551 INFO: Graph cross-reference written to D:\code\net-monitor\build\stage5\56f049bf32a5-f21fe663\pyinstaller\NetMonitor\xref-NetMonitor.html
+49665 INFO: checking PYZ
+49665 INFO: Building PYZ because PYZ-00.toc is non existent
+49666 INFO: Building PYZ (ZlibArchive) D:\code\net-monitor\build\stage5\56f049bf32a5-f21fe663\pyinstaller\NetMonitor\PYZ-00.pyz
+49791 INFO: Building PYZ (ZlibArchive) D:\code\net-monitor\build\stage5\56f049bf32a5-f21fe663\pyinstaller\NetMonitor\PYZ-00.pyz completed successfully.
+49801 INFO: checking PKG
+49801 INFO: Building PKG because PKG-00.toc is non existent
+49801 INFO: Building PKG (CArchive) NetMonitor.pkg
+49823 INFO: Building PKG (CArchive) NetMonitor.pkg completed successfully.
+49824 INFO: Bootloader D:\code\net-monitor\.venv-build-stage5\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+49824 INFO: checking EXE
+49824 INFO: Building EXE because EXE-00.toc is non existent
+49824 INFO: Building EXE from EXE-00.toc
+49825 INFO: Copying bootloader EXE to D:\code\net-monitor\build\stage5\56f049bf32a5-f21fe663\pyinstaller\NetMonitor\NetMonitor.exe
+49834 INFO: Copying icon to EXE
+49841 INFO: Copying version information to EXE
+49852 INFO: Copying 0 resources to EXE
+49852 INFO: Embedding manifest in EXE
+49860 INFO: Appending PKG archive to EXE
+49863 INFO: Fixing EXE headers
+49938 INFO: Building EXE from EXE-00.toc completed successfully.
+49941 INFO: checking COLLECT
+49941 INFO: Building COLLECT because COLLECT-00.toc is non existent
+49943 INFO: Building COLLECT COLLECT-00.toc
+50667 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+50672 INFO: Build complete! The results are available in: D:\code\net-monitor\build\stage5\56f049bf32a5-f21fe663\dist

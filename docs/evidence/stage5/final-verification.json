@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-10-10T07:47:38.351595+00:00",
+  "source_commit": "56f049bf32a570d4e6aa16a6d94471a1df607a25",
+  "all_build_source_hashes_match_current_files": true,
+  "source_inputs_checked": 189,
+  "signature_status": "NotSigned (Get-AuthenticodeSignature)",
+  "temporary_acl_restored_sddl_equal": true,
+  "normal_exit_pids": [
+    7128,
+    51080
+  ],
+  "packaged_uac": "Blocked: user reported no native UAC prompt after prior package button click; not repeated",
+  "packaged_etw": "Not verified",
+  "clean_machine": "Not tested; isolated directories on Windows 11 development machine only",
+  "micro_card_tray": "Not verified with current Computer Use window visibility",
+  "corrupt_config": "Source regression only; final EXE visual fallback not run",
+  "push": "Rejected for missing OAuth workflow scope; TLS errors also observed",
+  "ci": "Not triggered by this Stage 5 work",
+  "private_process_list_screenshots_committed": false,
+  "markdown_local_links_valid": true
+}

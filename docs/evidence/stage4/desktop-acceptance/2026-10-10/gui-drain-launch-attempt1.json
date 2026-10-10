@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-10T05:01:25.069681+00:00",
+  "stage": "native elevation launch",
+  "api": "ShellExecuteW",
+  "return_value": 5,
+  "output_created": false,
+  "matching_diagnostic_processes": [],
+  "user_response": "pending; do not infer acceptance/cancellation from missing answer",
+  "prepared_script": "tools/verify_stage4_gui_drain.py",
+  "script_sha256": "5dfc4b32ac1928bee67fbfc281179f615424b64058abeea4be8281063fa6825c",
+  "not_etw_result": true
+}

@@ -1,0 +1,11 @@
+{
+  "source_commit": "56f049bf32a570d4e6aa16a6d94471a1df607a25",
+  "version": "0.2.1.dev1",
+  "zip": "D:\\code\\net-monitor\\artifacts\\stage5\\NetMonitor-0.2.1.dev1-windows-x64-56f049bf32a5-test\\NetMonitor-0.2.1.dev1-windows-x64-56f049bf32a5-test.zip",
+  "zip_bytes": 38756980,
+  "zip_sha256": "8304662d2fa61da592fb99729911f3fa9949723e791d3b75f237f6f63d0a9362",
+  "directory_bytes": 98869116,
+  "file_count": 303,
+  "build_log": "D:\\code\\net-monitor\\artifacts\\stage5\\NetMonitor-0.2.1.dev1-windows-x64-56f049bf32a5-test\\build.log",
+  "static_inspection": "D:\\code\\net-monitor\\artifacts\\stage5\\NetMonitor-0.2.1.dev1-windows-x64-56f049bf32a5-test\\static-inspection.json"
+}

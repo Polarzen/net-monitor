@@ -1,0 +1,270 @@
+{
+  "started_at": "2026-10-10T03:38:17.875073+00:00",
+  "observer_pid": 10216,
+  "observer_create_time": 1791603497.4427664,
+  "python": "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+  "elevated": true,
+  "scope": "real Windows ETW; loopback only; no GUI/performance claim",
+  "payload_per_transfer_per_direction": 524288,
+  "maximum_transfers": 4,
+  "head": "7f25287cdf675acbb8788d1d3a45552ec6245a3b",
+  "source_sha256": {
+    "src/net_monitor/__init__.py": "4257b0a41c9671b655994c925fbacb3a3d5f28aa49d02666f3f473129203416e",
+    "src/net_monitor/__main__.py": "b38bee51eb14ad9eeb05e56d8f38146b40fef40321ef7916f71f9fd7018704f3",
+    "src/net_monitor/app.py": "e129349ff26cae668f5a200c1721945d2897718d15a887df6271258f6704fc52",
+    "src/net_monitor/collectors/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/net_monitor/collectors/base.py": "603b0899559cecef8895184177a29fd8958e921e24d38cefb5228fc912a646d3",
+    "src/net_monitor/collectors/etw/__init__.py": "a5bf1d02cdcd46b440ab4b95673bf139f230a61c4898b80329fa3491ac03b5fb",
+    "src/net_monitor/collectors/etw/__main__.py": "ab113df9f31c3804f1cc318719501e8d45e055e387a82a173b276001dd013cfa",
+    "src/net_monitor/collectors/etw/api.py": "72d211d629c8eab0e3f1c958edc65915527e62b44ebced877d900d06128df00b",
+    "src/net_monitor/collectors/etw/collector_probe.py": "c1af3a624d8674043a9f4be00dfd1a55e39042a35a859138528f455fd1f54835",
+    "src/net_monitor/collectors/etw/constants.py": "c05f0aedca588883f584b8a33244723fa0addec576e5c3d0e075feeb10ad2187",
+    "src/net_monitor/collectors/etw/events.py": "5aa839894c412cd706b653ffa5d3974e218e837471665f5bef5fbdcc05a96f02",
+    "src/net_monitor/collectors/etw/network.py": "322847156210a0782a6efa6a54708b23639c3d182a9000f8f3006a163af41e13",
+    "src/net_monitor/collectors/etw/parser.py": "a0c00d31ec8136adcc0d4359ef0f223d5361b944ce2e6bc635e85ef40ebecc05",
+    "src/net_monitor/collectors/etw/permission_probe.py": "becae59efa2877177ecbc299afb7aef98cde98e1f2d76a0e22a56f1427d14821",
+    "src/net_monitor/collectors/etw/probe.py": "ddf68f2f9e5363e3a69c3310adcba6b7c64aa9bc1b8d502619934bfafc029d84",
+    "src/net_monitor/collectors/etw/session.py": "a7d67293a22c1abd528aebffdef123013bee7c6e96b9f8e139cfb9d78beaa79c",
+    "src/net_monitor/collectors/process.py": "29dd92b156091bd6be9ac64365baff56db10ceef6c2a94ef90f550dbc8b0cd53",
+    "src/net_monitor/collectors/system_network.py": "13655c9c3b16d67451be6ab59b243946ff01bb3d3105be9a90386523e6803cfd",
+    "src/net_monitor/collectors/windows_network.py": "f564d9a86cdb604dd8298821397bc1285e8dafd933a578360cc153817803662e",
+    "src/net_monitor/core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/net_monitor/core/application_aggregation.py": "952cbdaf9ab246c75d2ce4f23b07da09c202582b4e41190ae120b33ff2a0adba",
+    "src/net_monitor/core/application_session.py": "ebe582904927cb2684284879157d32691b011635afcc510d7ae53dc6c546c25b",
+    "src/net_monitor/core/elevation.py": "1df6e02674663e1b4950f48c6cbb1f1fe77773ad242a82b569ef263bcb8f4a3a",
+    "src/net_monitor/core/formatting.py": "dcb64b1dbad53a0434de68a93860385a8e5e7aaa2686d7f928643ba0a211095f",
+    "src/net_monitor/core/models.py": "649952a625b47560efa6fd4c1f3c1f7895a41f5f4b8e5703902af2b619871a6a",
+    "src/net_monitor/core/process_visibility.py": "93fa1434526b156f575aa30991b069bf6d06fe15c4a3c3b6711100b4aa635141",
+    "src/net_monitor/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/net_monitor/services/monitor_service.py": "991d03a525fc37378b0267c64dbdb906ab70d33838d47b594ef87573ef270bcc",
+    "src/net_monitor/ui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/net_monitor/ui/compact_window.py": "93f00fb887bc3c2fdd79601de6c14f28deab6539e7cfe93e00705fce44ddaf73",
+    "src/net_monitor/ui/controller.py": "61ab069e84b520ec19d72dd12a8ce01eaccb909c9d5afcb8c99c7bad708a22be",
+    "src/net_monitor/ui/detail_window.py": "85a66e471cee22efeef020e2d7cf44bf114c4dc5bddbf259bdf8bd1d05f251e7",
+    "src/net_monitor/ui/icon_cache.py": "bfe166b78dead48c665ad8ce18c2fea1d4c397d75611896ceaac896856b65304",
+    "src/net_monitor/ui/main_window.py": "f732ebb23169143703f65919cff2636130a37a97420f2aec19a4ff3cc13fe579",
+    "src/net_monitor/ui/micro_model.py": "fadfda156bcf9889449da081dd9c2de694c11c72422000dfe2a8fba612efbee1",
+    "src/net_monitor/ui/micro_window.py": "d68f581bdae0f1045a722ac9ae629e78248fb0b6bc22850a4058a790b4fe17fc",
+    "src/net_monitor/ui/network_spotlight.py": "1204c5e70f5c73edcef8530e40f26e699ddb65dd1ab8f335133ecf378e9d04e2",
+    "src/net_monitor/ui/preferences.py": "7a32be461de887097a4d4ac35871e9b9def610706821442467dba0d7be8ef0cd",
+    "src/net_monitor/ui/rate_history.py": "01a3260b415503b19290dfe2011b58f29f43f7699e39e31f1816cce560c4cbf2",
+    "src/net_monitor/ui/sampling_worker.py": "9d833a659127a8b4515b28d9e05f9875777dcdc7dece862a66542ef292b8f969",
+    "src/net_monitor/ui/session_model.py": "9ad57868f626f512682c9281f2a2b712f87816c2f7f72b08f903fb2e8f698d47",
+    "src/net_monitor/ui/session_view.py": "fb7d3e5b8d1fc05eb71f5581fa6816f9c0d4b12ed2a5adface601b61c5c5cd70",
+    "src/net_monitor/ui/sparkline.py": "7ee0748cd3deb2375a5006cad2d493f27b14e733044e437426c9bb6218a5926a",
+    "src/net_monitor/ui/theme.py": "155c19dbfb930aa876304abd64771815eedc43394552f0e6b85d1b2dc006faea",
+    "src/net_monitor/ui/tray.py": "e8af891eb19e8421ec6a68bae01275b3c941441ef7e67b519ad940025b7382d9",
+    "src/net_monitor/ui/window_geometry.py": "0502631c7095caf50d0f2e213faeec11db465c4d397542277017043171eb0837",
+    "src/net_monitor/ui/windows_foreground.py": "899b4fc5ce187464c96666f24ed123b44a3076aa7f2c56b7d9be27a69d4b12f5",
+    "src/net_monitor/ui/windows_icons.py": "f608a07b0dcba5dcf2df537fbdf28f70db98c96495c8a595b9803346da4f99ab"
+  },
+  "results": [
+    {
+      "kind": "permission",
+      "command": [
+        "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+        "-m",
+        "net_monitor.collectors.etw.permission_probe"
+      ],
+      "pid": 7584,
+      "create_time": 1791603498.09496,
+      "exit_code": 0,
+      "stdout": "{\"success\": true}\n",
+      "stderr": "",
+      "elapsed_seconds": 0.44505300000309944,
+      "data": {
+        "success": true
+      }
+    },
+    {
+      "kind": "raw",
+      "iteration": 1,
+      "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+      "command": [
+        "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+        "-m",
+        "net_monitor.collectors.etw.probe"
+      ],
+      "pid": 35336,
+      "create_time": 1791603498.5405734,
+      "exit_code": 0,
+      "stdout": "{\n  \"bytes_received\": 524288,\n  \"bytes_sent\": 524288,\n  \"pid_matched\": true,\n  \"provider_guid\": \"{7DD42A49-5329-4832-8DFD-43D979153A88}\",\n  \"provider_name\": \"Microsoft-Windows-Kernel-Network\",\n  \"receive_events\": 6,\n  \"send_events\": 1,\n  \"session_name\": \"NetMonitor-Stage4-Acceptance-9a23eafdff62-raw\",\n  \"test_pid\": 45436\n}\n",
+      "stderr": "",
+      "elapsed_seconds": 2.51480299999821,
+      "data": {
+        "bytes_received": 524288,
+        "bytes_sent": 524288,
+        "pid_matched": true,
+        "provider_guid": "{7DD42A49-5329-4832-8DFD-43D979153A88}",
+        "provider_name": "Microsoft-Windows-Kernel-Network",
+        "receive_events": 6,
+        "send_events": 1,
+        "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+        "test_pid": 45436
+      },
+      "post_exit_session_query": {
+        "command": [
+          "logman",
+          "query",
+          "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+          "-ets"
+        ],
+        "pid": 38068,
+        "create_time": 1791603501.0584886,
+        "exit_code": 2150629378,
+        "stdout": "\n����:\n�Ҳ��������ռ�������\n",
+        "stderr": "",
+        "elapsed_seconds": 0.25896469998406246
+      }
+    },
+    {
+      "kind": "raw",
+      "iteration": 2,
+      "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+      "command": [
+        "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+        "-m",
+        "net_monitor.collectors.etw.probe"
+      ],
+      "pid": 49520,
+      "create_time": 1791603501.3153465,
+      "exit_code": 0,
+      "stdout": "{\n  \"bytes_received\": 524288,\n  \"bytes_sent\": 524288,\n  \"pid_matched\": true,\n  \"provider_guid\": \"{7DD42A49-5329-4832-8DFD-43D979153A88}\",\n  \"provider_name\": \"Microsoft-Windows-Kernel-Network\",\n  \"receive_events\": 7,\n  \"send_events\": 1,\n  \"session_name\": \"NetMonitor-Stage4-Acceptance-9a23eafdff62-raw\",\n  \"test_pid\": 42672\n}\n",
+      "stderr": "",
+      "elapsed_seconds": 2.49104220001027,
+      "data": {
+        "bytes_received": 524288,
+        "bytes_sent": 524288,
+        "pid_matched": true,
+        "provider_guid": "{7DD42A49-5329-4832-8DFD-43D979153A88}",
+        "provider_name": "Microsoft-Windows-Kernel-Network",
+        "receive_events": 7,
+        "send_events": 1,
+        "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+        "test_pid": 42672
+      },
+      "post_exit_session_query": {
+        "command": [
+          "logman",
+          "query",
+          "NetMonitor-Stage4-Acceptance-9a23eafdff62-raw",
+          "-ets"
+        ],
+        "pid": 32724,
+        "create_time": 1791603503.8072736,
+        "exit_code": 2150629378,
+        "stdout": "\n����:\n�Ҳ��������ռ�������\n",
+        "stderr": "",
+        "elapsed_seconds": 0.05912890000035986
+      }
+    },
+    {
+      "kind": "production",
+      "iteration": 1,
+      "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-production",
+      "command": [
+        "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+        "-m",
+        "net_monitor.collectors.etw.collector_probe"
+      ],
+      "pid": 49820,
+      "create_time": 1791603503.8665931,
+      "exit_code": 0,
+      "stdout": "{\n  \"collector_available\": true,\n  \"collector_closed\": true,\n  \"download_bytes\": 524288,\n  \"download_bytes_per_second\": 2092494.1079699364,\n  \"identity\": {\n    \"create_time\": 1791603504.2386608,\n    \"executable\": \"%USERPROFILE%\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\python.exe\",\n    \"name\": \"python.exe\",\n    \"pid\": 34092\n  },\n  \"identity_verified\": true,\n  \"idle_download_bytes\": 524288,\n  \"idle_download_bytes_per_second\": 0.0,\n  \"idle_totals_stable\": true,\n  \"idle_upload_bytes\": 524288,\n  \"idle_upload_bytes_per_second\": 0.0,\n  \"idle_window_seconds\": 0.5004801999893971,\n  \"rates_recovered\": true,\n  \"test_pid\": 34092,\n  \"upload_bytes\": 524288,\n  \"upload_bytes_per_second\": 2092494.1079699364\n}\n",
+      "stderr": "",
+      "elapsed_seconds": 3.0606695999740623,
+      "data": {
+        "collector_available": true,
+        "collector_closed": true,
+        "download_bytes": 524288,
+        "download_bytes_per_second": 2092494.1079699364,
+        "identity": {
+          "create_time": 1791603504.2386608,
+          "executable": "%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+          "name": "python.exe",
+          "pid": 34092
+        },
+        "identity_verified": true,
+        "idle_download_bytes": 524288,
+        "idle_download_bytes_per_second": 0.0,
+        "idle_totals_stable": true,
+        "idle_upload_bytes": 524288,
+        "idle_upload_bytes_per_second": 0.0,
+        "idle_window_seconds": 0.5004801999893971,
+        "rates_recovered": true,
+        "test_pid": 34092,
+        "upload_bytes": 524288,
+        "upload_bytes_per_second": 2092494.1079699364
+      },
+      "post_exit_session_query": {
+        "command": [
+          "logman",
+          "query",
+          "NetMonitor-Stage4-Acceptance-9a23eafdff62-production",
+          "-ets"
+        ],
+        "pid": 9368,
+        "create_time": 1791603506.928394,
+        "exit_code": 2150629378,
+        "stdout": "\n����:\n�Ҳ��������ռ�������\n",
+        "stderr": "",
+        "elapsed_seconds": 0.05801119998795912
+      }
+    },
+    {
+      "kind": "production",
+      "iteration": 2,
+      "session_name": "NetMonitor-Stage4-Acceptance-9a23eafdff62-production",
+      "command": [
+        "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+        "-m",
+        "net_monitor.collectors.etw.collector_probe"
+      ],
+      "pid": 31524,
+      "create_time": 1791603506.9863164,
+      "exit_code": 0,
+      "stdout": "{\n  \"collector_available\": true,\n  \"collector_closed\": true,\n  \"download_bytes\": 524288,\n  \"download_bytes_per_second\": 2093035.4177832752,\n  \"identity\": {\n    \"create_time\": 1791603507.3410995,\n    \"executable\": \"%USERPROFILE%\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\python.exe\",\n    \"name\": \"python.exe\",\n    \"pid\": 12124\n  },\n  \"identity_verified\": true,\n  \"idle_download_bytes\": 524288,\n  \"idle_download_bytes_per_second\": 0.0,\n  \"idle_totals_stable\": true,\n  \"idle_upload_bytes\": 524288,\n  \"idle_upload_bytes_per_second\": 0.0,\n  \"idle_window_seconds\": 0.5010096000041813,\n  \"rates_recovered\": true,\n  \"test_pid\": 12124,\n  \"upload_bytes\": 524288,\n  \"upload_bytes_per_second\": 2093035.4177832752\n}\n",
+      "stderr": "",
+      "elapsed_seconds": 3.039496900019003,
+      "data": {
+        "collector_available": true,
+        "collector_closed": true,
+        "download_bytes": 524288,
+        "download_bytes_per_second": 2093035.4177832752,
+        "identity": {
+          "create_time": 1791603507.3410995,
+          "executable": "%USERPROFILE%\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+          "name": "python.exe",
+          "pid": 12124
+        },
+        "identity_verified": true,
+        "idle_download_bytes": 524288,
+        "idle_download_bytes_per_second": 0.0,
+        "idle_totals_stable": true,
+        "idle_upload_bytes": 524288,
+        "idle_upload_bytes_per_second": 0.0,
+        "idle_window_seconds": 0.5010096000041813,
+        "rates_recovered": true,
+        "test_pid": 12124,
+        "upload_bytes": 524288,
+        "upload_bytes_per_second": 2093035.4177832752
+      },
+      "post_exit_session_query": {
+        "command": [
+          "logman",
+          "query",
+          "NetMonitor-Stage4-Acceptance-9a23eafdff62-production",
+          "-ets"
+        ],
+        "pid": 41640,
+        "create_time": 1791603510.0267406,
+        "exit_code": 2150629378,
+        "stdout": "\n����:\n�Ҳ��������ռ�������\n",
+        "stderr": "",
+        "elapsed_seconds": 0.05495369998971
+      }
+    }
+  ],
+  "status": "probes completed; inspect semantic results and session query codes",
+  "finished_at": "2026-10-10T03:38:30.081125+00:00"
+}

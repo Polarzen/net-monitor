@@ -1,0 +1,50 @@
+........................................................................ [ 25%]
+..............................................................s......... [ 50%]
+...............................................F........................ [ 75%]
+.......................................................................  [100%]
+================================== FAILURES ===================================
+______ test_fake_renderer_handles_cp1252_stdout_and_keeps_utf8_manifest _______
+
+tmp_path = WindowsPath('C:/Users/Dai/AppData/Local/Temp/pytest-of-Dai/pytest-101/test_fake_renderer_handles_cp10')
+
+    def test_fake_renderer_handles_cp1252_stdout_and_keeps_utf8_manifest(tmp_path):
+        root = Path(__file__).resolve().parents[1]
+        environment = dict(os.environ, QT_QPA_PLATFORM="offscreen", QT_SCALE_FACTOR="1",
+                           PYTHONIOENCODING="cp1252:strict")
+        result = subprocess.run(
+            [sys.executable, str(root / "tools/render_stage3c.py"),
+             "--output", str(tmp_path), "--platform", "encoding-regression"],
+            cwd=root, env=environment, capture_output=True, timeout=45,
+        )
+>       assert result.returncode == 0, result.stderr.decode("ascii", errors="backslashreplace")
+E       AssertionError: Traceback (most recent call last):
+
+E           File "D:\code\net-monitor\tools\render_stage3c.py", line 161, in <module>
+
+E             raise SystemExit(main())
+
+E                              ~~~~^^
+
+E           File "D:\code\net-monitor\tools\render_stage3c.py", line 106, in main
+
+E             check_micro("micro-active")
+
+E             ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+
+E           File "D:\code\net-monitor\tools\render_stage3c.py", line 101, in check_micro
+
+E             assert label.sizeHint().height() <= label.contentsRect().height(), f"State clipped: {metrics}"
+
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+E         AssertionError: State clipped: {'scene': 'micro-active', 'text': '\u5f53\u524d\u6709\u6d41\u91cf \xb7 \u81ea\u52a8\u663e\u793a\n\u524d\u53f0\u672a\u77e5', 'width': 206, 'height': 22, 'contents_width': 206, 'advance': 202, 'font_height': 20, 'font_pixel_size': 14, 'logical_dpi': 96}
+
+E
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['D:\\code\\net-monitor\\.venv\\Scripts\\python.exe', 'D:\\code\\net-monitor\\tools\\render_stag...22, \'contents_width\': 206, \'advance\': 202, \'font_height\': 20, \'font_pixel_size\': 14, \'logical_dpi\': 96}\r\n').returncode
+
+tests\test_stage3c_render.py:20: AssertionError
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_stage3a_ui.py:268: runner has no real system tray
+FAILED tests/test_stage3c_render.py::test_fake_renderer_handles_cp1252_stdout_and_keeps_utf8_manifest
+1 failed, 285 passed, 1 skipped in 12.06s

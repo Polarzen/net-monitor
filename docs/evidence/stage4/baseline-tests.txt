@@ -1,0 +1,52 @@
+........................................................................ [ 25%]
+..............................................................s......... [ 50%]
+...............................................F........................ [ 75%]
+.......................................................................  [100%]
+================================== FAILURES ===================================
+______ test_fake_renderer_handles_cp1252_stdout_and_keeps_utf8_manifest _______
+
+tmp_path = WindowsPath('C:/Users/Dai/AppData/Local/Temp/pytest-of-Dai/pytest-100/test_fake_renderer_handles_cp10')
+
+    def test_fake_renderer_handles_cp1252_stdout_and_keeps_utf8_manifest(tmp_path):
+        root = Path(__file__).resolve().parents[1]
+        environment = dict(os.environ, QT_QPA_PLATFORM="offscreen", QT_SCALE_FACTOR="1",
+                           PYTHONIOENCODING="cp1252:strict")
+        result = subprocess.run(
+            [sys.executable, str(root / "tools/render_stage3c.py"),
+             "--output", str(tmp_path), "--platform", "encoding-regression"],
+            cwd=root, env=environment, capture_output=True, timeout=45,
+        )
+>       assert result.returncode == 0, result.stderr.decode("ascii", errors="backslashreplace")
+E       AssertionError: Traceback (most recent call last):
+
+E           File "D:\code\net-monitor\tools\render_stage3c.py", line 161, in <module>
+
+E             raise SystemExit(main())
+
+E                              ~~~~^^
+
+E           File "D:\code\net-monitor\tools\render_stage3c.py", line 63, in main
+
+E             font_evidence = configure_application(app)
+
+E           File "D:\code\net-monitor\tools\layout_fonts.py", line 59, in configure_application
+
+E             raise RuntimeError(f"Offscreen font coverage missing: {missing}; prepare the layout font first")
+
+E         RuntimeError: Offscreen font coverage missing: ['\u4e2d', '\u6587', '\u5e94', '\u7528', '\u672c', '\u6b21', '\u76d1', '\u63a7', '\u7d2f', '\u8ba1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'K', 'i', 'B', '/', 's', '\u2191', '\u2193', '\x97', '\x85', '\u25cf']; prepare the layout font first
+
+E
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['D:\\code\\net-monitor\\.venv\\Scripts\\python.exe', 'D:\\code\\net-monitor\\tools\\render_stag...', \'B\', \'/\', \'s\', \'\\u2191\', \'\\u2193\', \'\x97\', \'\x85\', \'\\u25cf\']; prepare the layout font first\r\n').returncode
+
+tests\test_stage3c_render.py:20: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\cacheprovider.py:423
+  D:\code\net-monitor\.venv\Lib\site-packages\_pytest\cacheprovider.py:423: PytestCacheWarning: cache could not write path D:\code\net-monitor\.pytest_cache\v\cache\lastfailed: [Errno 13] Permission denied: 'D:\\code\\net-monitor\\.pytest_cache\\v\\cache\\lastfailed'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_stage3a_ui.py:268: runner has no real system tray
+FAILED tests/test_stage3c_render.py::test_fake_renderer_handles_cp1252_stdout_and_keeps_utf8_manifest
+1 failed, 285 passed, 1 skipped, 1 warning in 11.72s

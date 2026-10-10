@@ -1,0 +1,44 @@
+[
+  {
+    "file": "build.log",
+    "redaction": "Windows user profile path prefix replaced by %USERPROFILE%; original retained only in local ignored artifact acceptance-raw",
+    "original_sha256": "31c69b97a639258c47eac06bb32de14b8ae13d5f99a1773261d66256815ce1f6",
+    "shared_sha256": "5d1bb96906a9c34980d755a999eee0aff275964bfb9d5a7891b30d5b67cb305a",
+    "line_endings": "normalized LF in shared text"
+  },
+  {
+    "file": "compact-launch.json",
+    "redaction": "Windows user profile path prefix replaced by %USERPROFILE%; original retained only in local ignored artifact acceptance-raw",
+    "original_sha256": "265ddaa7502552f2ea78eef7ac459e73cf03b08ed0976174cfbff0914b6184dd",
+    "shared_sha256": "85250950ecb7791ad07c98bcfdc49663b1d58e55180710874ff1a73781fd8fe6",
+    "line_endings": "normalized LF in shared text"
+  },
+  {
+    "file": "corrected-launch.json",
+    "redaction": "Windows user profile path prefix replaced by %USERPROFILE%; original retained only in local ignored artifact acceptance-raw",
+    "original_sha256": "63477f2086407350c9fefb097b95e3c27db46b943e8df26cd2c172e7a3e99082",
+    "shared_sha256": "d66605857ada708dd0712406feb04bebfb266e3ee5fd12fdf3ac63661b04b771",
+    "line_endings": "normalized LF in shared text"
+  },
+  {
+    "file": "final-launch.json",
+    "redaction": "Windows user profile path prefix replaced by %USERPROFILE%; original retained only in local ignored artifact acceptance-raw",
+    "original_sha256": "ae91a8c8bc58ccb3ce42171946076cbae47dbbebf50907e7a630f5405c67c441",
+    "shared_sha256": "914df5175ff38fe72b1ab7db721643b8d8f66bcd39ca9485c6a48cdaa84d1339",
+    "line_endings": "normalized LF in shared text"
+  },
+  {
+    "file": "final-lifecycle.json",
+    "redaction": "Windows user profile path prefix replaced by %USERPROFILE%; original retained only in local ignored artifact acceptance-raw",
+    "original_sha256": "a1f7c5c42ddc0f0e2014d5748d9a2dd799ce9058ff3e6995d9db68f340924b21",
+    "shared_sha256": "3c555325b2a33d024373b0bf5e434e4350258fc3ed44595746ce5342d412fbad",
+    "line_endings": "normalized LF in shared text"
+  },
+  {
+    "file": "initial-launch.json",
+    "redaction": "Windows user profile path prefix replaced by %USERPROFILE%; original retained only in local ignored artifact acceptance-raw",
+    "original_sha256": "fa40e11dea67ac45b9277f9992b428aee260007bf17eb8dd375de6ce307fff86",
+    "shared_sha256": "08bebef93e4be1c343c54c85f940ffd5633fd7fbf9eac2e8fd803afad1c2e3f4",
+    "line_endings": "normalized LF in shared text"
+  }
+]

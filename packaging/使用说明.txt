@@ -1,0 +1,21 @@
+Net Monitor 0.2.1.dev2 — Windows 11 x64 内部测试版（未签名）
+
+请先解压整个 ZIP，保留 NetMonitor 目录内的全部文件，再双击 NetMonitor.exe。
+不能单独复制 EXE；不需要另外安装 Python、pip 或 PySide6。
+默认按普通用户权限启动。真实按进程 ETW 采集需要管理员权限，请使用程序已有
+的“以管理员身份重启”入口，并自行决定是否接受 Windows 原生 UAC。
+
+关闭主窗口通常隐藏到托盘；真正结束监控请使用托盘菜单“退出”。
+本次累计只表示此次运行期间观察到的网络活动，不是运营商账单或长期历史。
+配置位置：%LOCALAPPDATA%\NetMonitor\ui.json，只保存界面偏好。
+删除发行目录不会删除该用户配置；需要重置偏好时可另行备份并删除该文件。
+本版没有新增持久错误日志；未处理的启动异常沿用 PyInstaller windowed 错误对话框。
+遇到错误请保留提示原文，不要通过关闭 Defender、SmartScreen 或 UAC 来处理。
+
+构建来源、版本与依赖见同目录 BUILD-INFO.json；组件说明见 THIRD-PARTY-NOTICES.txt。
+ZIP 外的 SHA256SUMS.txt 校验下载字节，不代表数字签名或发布者认证。
+
+验收边界：本版用于内部试用，不是稳定发布。干净 Windows 机器验证以及部分
+Micro/Card 悬停拖动、固定关注、托盘恢复和点击退出交互可能尚未完成；本次产物
+的实际运行、ETW 与 UAC 状态以随交付提供的 Stage 5 验收记录为准。
+第三方再分发审查和项目许可证授权未完成前，不应将此包当作可公开发行版本。

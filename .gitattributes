@@ -1,0 +1,2 @@
+# Preserve upstream license/attribution bytes and their recorded hashes.
+packaging/licenses/** -text

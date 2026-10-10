@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-10-09T15:54:01.726630+00:00",
+  "start_branch": "feat/stage-4-lean-core",
+  "start_head": "89e6c1f5d000f75790b034155135aa965bea372c",
+  "initial_staged": [
+    "README.md",
+    "docs/stage4-lean-core.md"
+  ],
+  "initial_untracked": [
+    "goal.md"
+  ],
+  "windows": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "interpreter": "D:\\code\\net-monitor\\.venv\\Scripts\\python.exe",
+  "qt": "6.11.2",
+  "pyside": "6.11.2",
+  "psutil": "7.2.2",
+  "logical_processors": 32,
+  "elevated": false,
+  "etw_probe_command": ".venv/Scripts/python.exe -m net_monitor.collectors.etw.permission_probe",
+  "etw_probe_exit_code": 0,
+  "etw_probe": {
+    "api": "EnableTraceEx2",
+    "error": "EnableTraceEx2 failed with Windows error 5 ({7DD42A49-5329-4832-8DFD-43D979153A88})",
+    "error_code": 5,
+    "success": false
+  },
+  "desktop_automation": {
+    "status": "blocked",
+    "error": "Computer Use native pipe is unavailable: failed to connect native pipe: 系统找不到指定的文件。 (os error 2)",
+    "latest_recheck": {
+      "at": "2026-10-10T02:04:30.518662+00:00",
+      "source_head": "bb7f81d8e699e49944e13847d988bca609fed971",
+      "user_authorized": true,
+      "attempts": 2,
+      "kernel_reset_before_second_attempt": true,
+      "operation": "sky.list_windows()",
+      "result": "Computer Use native pipe is unavailable: failed to connect native pipe: 系统找不到指定的文件。 (os error 2)",
+      "windows_observed": false,
+      "desktop_checks_executed": false,
+      "responsibility": "Ordinary desktop checks stay assigned to Computer Use; only necessary UAC or physical-device actions need user participation."
+    }
+  },
+  "physical_desktop_verified": false,
+  "system_scale_changed": false,
+  "uac_requested": false
+}

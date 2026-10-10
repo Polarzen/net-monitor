@@ -1,0 +1,438 @@
+{
+  "started_at": "2026-10-10T05:55:01.276921+00:00",
+  "observer_pid": 33828,
+  "observer_create_time": 1791611700.9757452,
+  "original_qt_overrides": {},
+  "scope": "real Compact GUI rate-window drain; no CU interaction claim",
+  "load_identity": {
+    "kind": "identity",
+    "at": "2026-10-10T05:55:01.525317+00:00",
+    "pid": 22988,
+    "create_time": 1791611701.3128707
+  },
+  "gui_identity": {
+    "at": "2026-10-10T05:55:02.472936+00:00",
+    "kind": "identity",
+    "pid": 40352,
+    "create_time": 1791611701.6144228,
+    "python": "D:\\code\\net-monitor\\.venv\\Scripts\\pythonw.exe",
+    "source": "D:\\code\\net-monitor\\src\\net_monitor\\__init__.py",
+    "elevated": true,
+    "qt_platform": "windows",
+    "rate_window_seconds": 2.0,
+    "source_sha256": {
+      "src/net_monitor/__init__.py": "4257b0a41c9671b655994c925fbacb3a3d5f28aa49d02666f3f473129203416e",
+      "src/net_monitor/__main__.py": "b38bee51eb14ad9eeb05e56d8f38146b40fef40321ef7916f71f9fd7018704f3",
+      "src/net_monitor/app.py": "e129349ff26cae668f5a200c1721945d2897718d15a887df6271258f6704fc52",
+      "src/net_monitor/collectors/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/collectors/base.py": "603b0899559cecef8895184177a29fd8958e921e24d38cefb5228fc912a646d3",
+      "src/net_monitor/collectors/etw/__init__.py": "a5bf1d02cdcd46b440ab4b95673bf139f230a61c4898b80329fa3491ac03b5fb",
+      "src/net_monitor/collectors/etw/__main__.py": "ab113df9f31c3804f1cc318719501e8d45e055e387a82a173b276001dd013cfa",
+      "src/net_monitor/collectors/etw/api.py": "72d211d629c8eab0e3f1c958edc65915527e62b44ebced877d900d06128df00b",
+      "src/net_monitor/collectors/etw/collector_probe.py": "c1af3a624d8674043a9f4be00dfd1a55e39042a35a859138528f455fd1f54835",
+      "src/net_monitor/collectors/etw/constants.py": "c05f0aedca588883f584b8a33244723fa0addec576e5c3d0e075feeb10ad2187",
+      "src/net_monitor/collectors/etw/events.py": "5aa839894c412cd706b653ffa5d3974e218e837471665f5bef5fbdcc05a96f02",
+      "src/net_monitor/collectors/etw/network.py": "322847156210a0782a6efa6a54708b23639c3d182a9000f8f3006a163af41e13",
+      "src/net_monitor/collectors/etw/parser.py": "a0c00d31ec8136adcc0d4359ef0f223d5361b944ce2e6bc635e85ef40ebecc05",
+      "src/net_monitor/collectors/etw/permission_probe.py": "becae59efa2877177ecbc299afb7aef98cde98e1f2d76a0e22a56f1427d14821",
+      "src/net_monitor/collectors/etw/probe.py": "ddf68f2f9e5363e3a69c3310adcba6b7c64aa9bc1b8d502619934bfafc029d84",
+      "src/net_monitor/collectors/etw/session.py": "a7d67293a22c1abd528aebffdef123013bee7c6e96b9f8e139cfb9d78beaa79c",
+      "src/net_monitor/collectors/process.py": "29dd92b156091bd6be9ac64365baff56db10ceef6c2a94ef90f550dbc8b0cd53",
+      "src/net_monitor/collectors/system_network.py": "13655c9c3b16d67451be6ab59b243946ff01bb3d3105be9a90386523e6803cfd",
+      "src/net_monitor/collectors/windows_network.py": "f564d9a86cdb604dd8298821397bc1285e8dafd933a578360cc153817803662e",
+      "src/net_monitor/core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/core/application_aggregation.py": "952cbdaf9ab246c75d2ce4f23b07da09c202582b4e41190ae120b33ff2a0adba",
+      "src/net_monitor/core/application_session.py": "ebe582904927cb2684284879157d32691b011635afcc510d7ae53dc6c546c25b",
+      "src/net_monitor/core/elevation.py": "1df6e02674663e1b4950f48c6cbb1f1fe77773ad242a82b569ef263bcb8f4a3a",
+      "src/net_monitor/core/formatting.py": "dcb64b1dbad53a0434de68a93860385a8e5e7aaa2686d7f928643ba0a211095f",
+      "src/net_monitor/core/models.py": "649952a625b47560efa6fd4c1f3c1f7895a41f5f4b8e5703902af2b619871a6a",
+      "src/net_monitor/core/process_visibility.py": "93fa1434526b156f575aa30991b069bf6d06fe15c4a3c3b6711100b4aa635141",
+      "src/net_monitor/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/services/monitor_service.py": "991d03a525fc37378b0267c64dbdb906ab70d33838d47b594ef87573ef270bcc",
+      "src/net_monitor/ui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/net_monitor/ui/compact_window.py": "93f00fb887bc3c2fdd79601de6c14f28deab6539e7cfe93e00705fce44ddaf73",
+      "src/net_monitor/ui/controller.py": "61ab069e84b520ec19d72dd12a8ce01eaccb909c9d5afcb8c99c7bad708a22be",
+      "src/net_monitor/ui/detail_window.py": "85a66e471cee22efeef020e2d7cf44bf114c4dc5bddbf259bdf8bd1d05f251e7",
+      "src/net_monitor/ui/icon_cache.py": "bfe166b78dead48c665ad8ce18c2fea1d4c397d75611896ceaac896856b65304",
+      "src/net_monitor/ui/main_window.py": "f732ebb23169143703f65919cff2636130a37a97420f2aec19a4ff3cc13fe579",
+      "src/net_monitor/ui/micro_model.py": "fadfda156bcf9889449da081dd9c2de694c11c72422000dfe2a8fba612efbee1",
+      "src/net_monitor/ui/micro_window.py": "d68f581bdae0f1045a722ac9ae629e78248fb0b6bc22850a4058a790b4fe17fc",
+      "src/net_monitor/ui/network_spotlight.py": "1204c5e70f5c73edcef8530e40f26e699ddb65dd1ab8f335133ecf378e9d04e2",
+      "src/net_monitor/ui/preferences.py": "7a32be461de887097a4d4ac35871e9b9def610706821442467dba0d7be8ef0cd",
+      "src/net_monitor/ui/rate_history.py": "01a3260b415503b19290dfe2011b58f29f43f7699e39e31f1816cce560c4cbf2",
+      "src/net_monitor/ui/sampling_worker.py": "9d833a659127a8b4515b28d9e05f9875777dcdc7dece862a66542ef292b8f969",
+      "src/net_monitor/ui/session_model.py": "9ad57868f626f512682c9281f2a2b712f87816c2f7f72b08f903fb2e8f698d47",
+      "src/net_monitor/ui/session_view.py": "fb7d3e5b8d1fc05eb71f5581fa6816f9c0d4b12ed2a5adface601b61c5c5cd70",
+      "src/net_monitor/ui/sparkline.py": "7ee0748cd3deb2375a5006cad2d493f27b14e733044e437426c9bb6218a5926a",
+      "src/net_monitor/ui/theme.py": "155c19dbfb930aa876304abd64771815eedc43394552f0e6b85d1b2dc006faea",
+      "src/net_monitor/ui/tray.py": "e8af891eb19e8421ec6a68bae01275b3c941441ef7e67b519ad940025b7382d9",
+      "src/net_monitor/ui/window_geometry.py": "0502631c7095caf50d0f2e213faeec11db465c4d397542277017043171eb0837",
+      "src/net_monitor/ui/windows_foreground.py": "899b4fc5ce187464c96666f24ed123b44a3076aa7f2c56b7d9be27a69d4b12f5",
+      "src/net_monitor/ui/windows_icons.py": "f608a07b0dcba5dcf2df537fbdf28f70db98c96495c8a595b9803346da4f99ab"
+    },
+    "instrumentation": "existing heartbeat observer; temporary preferences; Compact title only"
+  },
+  "baseline_samples": [
+    {
+      "at": "2026-10-10T05:55:02.663517+00:00",
+      "kind": "sample",
+      "elapsed": 0.21563679998507723,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 1,
+      "processes": 408,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 0,
+        "download_bytes": 0,
+        "upload_bytes_per_second": 0.0,
+        "download_bytes_per_second": 0.0
+      },
+      "load_account": {
+        "upload_bytes": 0,
+        "download_bytes": 0,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    },
+    {
+      "at": "2026-10-10T05:55:03.667864+00:00",
+      "kind": "sample",
+      "elapsed": 1.2199668000102974,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 3,
+      "processes": 408,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 0,
+        "download_bytes": 0,
+        "upload_bytes_per_second": 0.0,
+        "download_bytes_per_second": 0.0
+      },
+      "load_account": {
+        "upload_bytes": 0,
+        "download_bytes": 0,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    }
+  ],
+  "load_started_at": "2026-10-10T05:55:03.860299+00:00",
+  "load_exit_code": 0,
+  "server_errors": [],
+  "gui_exit_code": 0,
+  "traffic": {
+    "kind": "traffic_finished",
+    "at": "2026-10-10T05:55:10.905425+00:00",
+    "sent": 524288,
+    "received": 1048576
+  },
+  "idle_samples": [
+    {
+      "at": "2026-10-10T05:55:11.178847+00:00",
+      "kind": "sample",
+      "elapsed": 8.730940799985547,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 18,
+      "processes": 407,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 393216,
+        "download_bytes": 786432,
+        "upload_bytes_per_second": 65428.62834973004,
+        "download_bytes_per_second": 130857.25669946008
+      },
+      "load_account": {
+        "upload_bytes": 393216,
+        "download_bytes": 786432,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    },
+    {
+      "at": "2026-10-10T05:55:12.185517+00:00",
+      "kind": "sample",
+      "elapsed": 9.737602000008337,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 20,
+      "processes": 407,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 458752,
+        "download_bytes": 917504,
+        "upload_bytes_per_second": 65135.21649964445,
+        "download_bytes_per_second": 130270.4329992889
+      },
+      "load_account": {
+        "upload_bytes": 458752,
+        "download_bytes": 917504,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    },
+    {
+      "at": "2026-10-10T05:55:13.674460+00:00",
+      "kind": "sample",
+      "elapsed": 11.226547300000675,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 23,
+      "processes": 407,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "upload_bytes_per_second": 52242.35330991676,
+        "download_bytes_per_second": 104484.70661983352
+      },
+      "load_account": {
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    },
+    {
+      "at": "2026-10-10T05:55:15.182263+00:00",
+      "kind": "sample",
+      "elapsed": 12.73432600000524,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 26,
+      "processes": 405,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "upload_bytes_per_second": 0.0,
+        "download_bytes_per_second": 0.0
+      },
+      "load_account": {
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    },
+    {
+      "at": "2026-10-10T05:55:16.674924+00:00",
+      "kind": "sample",
+      "elapsed": 14.227036299998872,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 29,
+      "processes": 408,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "upload_bytes_per_second": 0.0,
+        "download_bytes_per_second": 0.0
+      },
+      "load_account": {
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    },
+    {
+      "at": "2026-10-10T05:55:17.699305+00:00",
+      "kind": "sample",
+      "elapsed": 15.25140109998756,
+      "mode": "compact",
+      "compact_visible": true,
+      "micro_visible": false,
+      "card_visible": false,
+      "detail_instance": null,
+      "detail_visible": false,
+      "micro_size": [
+        220,
+        112
+      ],
+      "device_pixel_ratio": 1.5,
+      "tray_available": true,
+      "network_status": "available",
+      "snapshot_count": 31,
+      "processes": 408,
+      "accounts": 161,
+      "load_pid": 22988,
+      "load_create_time": 1791611701.3128707,
+      "load_network": {
+        "pid": 22988,
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "upload_bytes_per_second": 0.0,
+        "download_bytes_per_second": 0.0
+      },
+      "load_account": {
+        "upload_bytes": 524288,
+        "download_bytes": 1048576,
+        "active_process_count": 1
+      },
+      "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+      "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+    }
+  ],
+  "first_zero_after_traffic_seconds": 4.276838,
+  "final_sample": {
+    "at": "2026-10-10T05:56:22.308111+00:00",
+    "kind": "sample",
+    "elapsed": 79.860159200005,
+    "mode": "compact",
+    "compact_visible": true,
+    "micro_visible": false,
+    "card_visible": false,
+    "detail_instance": 2026048790336,
+    "detail_visible": false,
+    "micro_size": [
+      220,
+      112
+    ],
+    "device_pixel_ratio": 1.5,
+    "tray_available": true,
+    "network_status": "available",
+    "snapshot_count": 160,
+    "processes": 394,
+    "accounts": 162,
+    "load_pid": 22988,
+    "load_create_time": null,
+    "load_network": null,
+    "load_account": {
+      "upload_bytes": 524288,
+      "download_bytes": 1048576,
+      "active_process_count": 0
+    },
+    "load_key_sha256": "5fd79f2ad9bd7e99ea24ef35794c870eadaba8a7f68f345db68cff271af9fed5",
+    "etw_session": "NetMonitor-ProcessNetwork-PoC-f9109a34-7f18-469d-86e8-3b66c9c2dd50"
+  },
+  "gui_exit_record": {
+    "at": "2026-10-10T05:56:22.842741+00:00",
+    "kind": "event_loop_exited",
+    "exit_code": 0,
+    "shutdown_complete": true,
+    "worker_running": false
+  },
+  "session_query_after_exit": 4201,
+  "checks": {
+    "native_elevated_gui": true,
+    "gui_rate_window_2s": true,
+    "available_throughout": true,
+    "positive_both_directions": true,
+    "monotonic_cumulative": true,
+    "idle_tail_zero_and_stable": true,
+    "retained_account": true,
+    "normal_exits": true,
+    "own_session_absent": true
+  },
+  "qualified": true,
+  "finished_at": "2026-10-10T05:56:22.933037+00:00"
+}

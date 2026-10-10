@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "net-monitor"
-version = "0.1.0"
-description = "Windows 11 desktop network monitor"
+dynamic = ["version"]
+description = "Windows 11 compact per-application network monitor"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -13,11 +13,17 @@ dependencies = [
   "psutil",
 ]
 
+[project.gui-scripts]
+net-monitor = "net_monitor.app:main"
+
 [project.optional-dependencies]
 dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "net_monitor.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

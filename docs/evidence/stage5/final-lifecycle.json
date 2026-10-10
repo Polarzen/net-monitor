@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-10T07:40:14.406923+00:00",
+  "first_final_run": {
+    "pid": 7128,
+    "create_time": 1791617078.98634,
+    "exit_action": "Computer Use: Compact window menu -> 退出",
+    "process_absent_after_action": true,
+    "not_tray_exit": true,
+    "saved_preferences": {
+      "version": 1,
+      "mode": "compact",
+      "micro_position": [
+        1470,
+        40
+      ],
+      "compact_position": [
+        55,
+        48
+      ],
+      "micro_on_top": false
+    },
+    "preferences_outside_distribution": true,
+    "manifest_files_unchanged": 302
+  },
+  "relocated_to": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\迁移后的 NetMonitor",
+  "original_directory_acl_restored": true,
+  "relocated_run": {
+    "pid": 51080,
+    "create_time": 1791618014.4086685,
+    "exe": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\迁移后的 NetMonitor\\NetMonitor.exe",
+    "cwd": "%USERPROFILE%\\AppData\\Local\\Temp\\Net Monitor 最终测试 56f049bf32a5\\工作 目录",
+    "removed_environment_names": [],
+    "observed_window": "Computer Use returned and displayed QApplication.CompactWindow from relocated EXE",
+    "saved_mode_restored": true,
+    "window_position_observation": "Configuration has compact_position [55,48]; bounded screenshot alone does not prove physical screen coordinates",
+    "exit_action": "Computer Use: Compact window menu -> Exit",
+    "process_absent_after_action": true,
+    "not_tray_exit": true,
+    "manifest_files_unchanged": 302,
+    "checked_at": "2026-10-10T07:41:22.284438+00:00"
+  }
+}
