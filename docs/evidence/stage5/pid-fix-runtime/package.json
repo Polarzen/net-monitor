@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "version": "0.2.1.dev2",
+  "source_commit": "82ba3a1f21f240e114a112d2b94800ef3b285696",
+  "source_inputs_dirty": false,
+  "ci_run": 38056842914,
+  "artifact_id": 11671937543,
+  "artifact_url": "https://github.com/Polarzen/net-monitor/actions/runs/38056842914/artifacts/11671937543",
+  "artifact_expires_at": "2026-10-24T13:45:05Z",
+  "zip_name": "NetMonitor-0.2.1.dev2-windows-x64-82ba3a1f21f2-test.zip",
+  "zip_bytes": 38757694,
+  "zip_sha256": "400f047c83ec3d8341f9356fa41db6de202f4ca28b3bef19ce07f70d4648cb9d",
+  "zip_crc": "passed",
+  "extracted_manifest_files_verified": 302,
+  "exe_path": "%TEMP%\\NetMonitor-CI-82ba3a1-pid-runtime-20261010\\NetMonitor\\NetMonitor.exe",
+  "exe_sha256": "b2e376749333b19414ffe1449a3721526ec8661413ff7eb771fa4ffdb73f660f",
+  "ci_scope": "Historical main CI, not rerun in this task",
+  "ci_tests": {
+    "windows_x64": {
+      "passed": 343,
+      "skipped": 1,
+      "failed": 0
+    },
+    "windows_arm64": {
+      "passed": 343,
+      "skipped": 1,
+      "failed": 0
+    }
+  },
+  "ci_test_skip": "test_real_system_tray_can_be_created_when_supported: no real system tray on runner",
+  "prior_closeout_url": "https://github.com/Polarzen/net-monitor/pull/1#issuecomment-6098201814",
+  "zip_checked_at": "2026-10-10T14:16:39.830817+00:00",
+  "extracted_files_checked_at": "2026-10-10T14:21:03.096891+00:00"
+}
