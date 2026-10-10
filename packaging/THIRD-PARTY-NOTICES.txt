@@ -1,0 +1,46 @@
+Net Monitor 0.2.1.dev1 — third-party components, internal test build
+
+This notice does not grant a new license for Net Monitor's own source code.
+The repository currently has no project LICENSE file. Public redistribution
+authorization and a complete redistribution review have not been established.
+
+Runtime components:
+- CPython 3.14.7: Python Software Foundation License and incorporated notices.
+  Text: licenses/Python-LICENSE.txt; source: https://github.com/python/cpython/tree/v3.14.7
+- PySide6 / PySide6_Essentials / PySide6_Addons / shiboken6 6.11.2:
+  installed metadata declares LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only.
+  Official PyPI wheels offer open-source and commercial licensing alternatives.
+  The wheel's included commercial notice is preserved; it does not establish
+  that this project has purchased a commercial license.
+  Source: https://github.com/pyside/pyside-setup/tree/v6.11.2
+  Texts: licenses/pyside-setup/LICENSES/ and licenses/<distribution>/.
+- Qt 6.11.2: dynamically linked Qt DLLs and plugins selected by official hooks.
+  Exact DLL/plugin inventory: FILE-MANIFEST.json. QtCore, QtGui, QtWidgets and
+  the Windows platform plugin are mandatory; other collected modules/plugins
+  are identified by their file names in that manifest.
+  Sources: https://github.com/qt/qtbase/tree/v6.11.2
+           https://github.com/qt/qtsvg/tree/v6.11.2
+           https://github.com/qt/qtimageformats/tree/v6.11.2
+  License texts and third-party attribution records are in the corresponding
+  licenses/ directories. These records retain component versions, copyright,
+  license identifiers and upstream references. They are an upstream superset,
+  so their presence is not a claim that every listed component is compiled in.
+- psutil 7.2.2: BSD-3-Clause; text: licenses/psutil/LICENSE.
+  Source: https://github.com/giampaolo/psutil/tree/release-7.2.2
+- PyInstaller 6.22.3 bootloader: GPL with the distribution exception included
+  in licenses/pyinstaller/COPYING.txt. PyInstaller is a build tool; it is not
+  imported by Net Monitor. Source: https://github.com/pyinstaller/pyinstaller/tree/v6.22.3
+- Microsoft C/C++ runtime files, if listed in FILE-MANIFEST.json, retain their
+  Microsoft ownership. Redistribution rights must be checked against the
+  applicable Microsoft runtime terms before public distribution.
+
+Build-only dependencies (not automatically runtime components) and exact
+versions are recorded in BUILD-INFO.json. This includes hooks-contrib,
+setuptools, packaging, pefile, altgraph and pywin32-ctypes.
+
+License provenance and SHA-256: licenses/sources.json.
+Installed wheel metadata/text inventory: licenses/installed-components.json.
+Qt/PySide source availability, relinking/replacement and all applicable LGPL
+or other redistribution obligations still require release review. No claim of
+complete legal clearance or suitability for public release is made by this
+internal test package. SHA-256 is an integrity checksum, not a code signature.

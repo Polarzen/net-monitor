@@ -36,13 +36,24 @@ def restart_as_administrator() -> bool:
     ]
     shell_execute.restype = wintypes.HINSTANCE
 
-    parameters = subprocess.list2cmdline(["-m", "net_monitor"])
-    result = shell_execute(
-        None,
-        "runas",
-        gui_python_executable(),
-        parameters,
-        os.getcwd(),
-        1,
-    )
+    frozen = bool(getattr(sys, "frozen", False))
+    executable = str(Path(sys.executable).resolve()) if frozen else gui_python_executable()
+    parameters = "" if frozen else subprocess.list2cmdline(["-m", "net_monitor"])
+    directory = str(Path(executable).parent) if frozen else os.getcwd()
+    # PyInstaller >= 6.9 requires a fresh bootloader environment for an independent
+    # restart. ShellExecute has no environment argument; scope this to the launch
+    # and restore it even when Windows rejects or cancels the request.
+    previous_reset = os.environ.get("PYINSTALLER_RESET_ENVIRONMENT")
+    try:
+        if frozen:
+            os.environ["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+        result = shell_execute(None, "runas", executable, parameters, directory, 1)
+    except OSError:
+        return False
+    finally:
+        if frozen:
+            if previous_reset is None:
+                os.environ.pop("PYINSTALLER_RESET_ENVIRONMENT", None)
+            else:
+                os.environ["PYINSTALLER_RESET_ENVIRONMENT"] = previous_reset
     return bool(result) and int(result) > 32

@@ -2,6 +2,9 @@ __pycache__/
 *.py[cod]
 *.pyo
 .venv/
+.venv-build-stage5/
+artifacts/stage5/
+build-stage5-resolve.json
 .pytest_cache/
 build/
 dist/

@@ -155,3 +155,37 @@ jobs:
       - name: Show repository status
         shell: pwsh
         run: git status --short
+
+  package-x64:
+    name: Windows x64 internal test package
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14.7'
+          architecture: x64
+      - name: Prepare isolated pinned build environment
+        shell: pwsh
+        run: |
+          python -m venv .venv-build-stage5
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\.venv-build-stage5\Scripts\python.exe -m pip install --require-hashes -r packaging/requirements-windows-x64.lock
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build and inspect onedir package
+        shell: pwsh
+        run: ./tools/build_windows.ps1
+      - name: Upload internal test package and build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetMonitor-windows-x64-internal-test-${{ github.sha }}
+          retention-days: 14
+          path: |
+            artifacts/stage5/**/*.zip
+            artifacts/stage5/**/SHA256SUMS.txt
+            artifacts/stage5/**/build-result.json
+            artifacts/stage5/**/static-inspection.json
+            artifacts/stage5/**/build.log
+          if-no-files-found: error
