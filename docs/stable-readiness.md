@@ -67,3 +67,7 @@
 本次 2 小时观察只记录指定最终 EXE 的身份及资源；程序全程存活不能单独证明 GUI 一直响应、采集没有停顿或没有内存泄漏。开始和结束负载、最终累计 CSV、窗口响应及正常退出必须分别有证据。资源报告列出首尾区间及峰值，进程退出、身份变化、采样权限错误或休眠造成的长采样缺口单独记录。
 
 签名另起发布步骤：确定发布者身份和可用签名服务后，对最终构建执行签名及时间戳验证，再重新生成文件清单、ZIP、校验和，并验证新的实际发行包。不能给已公开 ZIP 换字节、沿用旧哈希，或把第三方 DLL 自带签名当作 Net Monitor 已签名；证书和密钥不写进仓库或聊天。
+
+可选择代码签名证书或适用的托管签名服务；例如 Microsoft Artifact Signing 的公开信任配置需要验证发布者身份，配置与签名角色分别授权，当前未假定本项目已具备资格或已开通服务。[Microsoft 资源和角色说明](https://learn.microsoft.com/en-us/azure/artifact-signing/concept-resources-roles)
+
+选定服务后，按其要求使用 SHA-256 文件摘要和 RFC 3161 时间戳，并用 `signtool verify /pa /all /v NetMonitor.exe` 验证普通应用的签名链，另外核对时间戳与发布者。`/fd`、`/td`、`/tr` 及验证策略的含义以 [Microsoft SignTool 文档](https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool) 为准。签名验证成功不等于所有 Windows 环境都不会出现安全提示。
