@@ -117,10 +117,10 @@ jobs:
           "NET_MONITOR_LAYOUT_FONT=$env:RUNNER_TEMP/stage3c-fonts/NotoSansCJKsc-Regular.otf" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "QT_QPA_FONTDIR=$env:RUNNER_TEMP/stage3c-fonts" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Render fake snapshot layouts at 100 125 and 150 percent
+      - name: Render fake snapshot layouts at 100 through 250 percent
         shell: pwsh
         run: |
-          foreach ($scale in @("1", "1.25", "1.5")) {
+          foreach ($scale in @("1", "1.25", "1.5", "1.75", "2", "2.5")) {
             $env:QT_SCALE_FACTOR = $scale
             .\.venv\Scripts\python.exe tools/render_stage3c.py --output "$env:RUNNER_TEMP/stage3c-layouts" --platform "${{ matrix.image }}"
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -4,11 +4,11 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 默认的微型窗口占用 **220 × 112 Qt 逻辑像素**；需要更多信息时，可以展开应用卡片、切换 Compact 列表，或打开按应用和进程组织的详细窗口。
 
-**[下载 Windows x64 公开测试版 0.2.1.dev3](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev3)** · [产品 ZIP](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/NetMonitor-0.2.1.dev3-windows-x64-e5e4329b48f5-prerelease.zip) · [校验文件](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/SHA256SUMS.txt) · [中文说明](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/USAGE.zh-CN.txt)
+**[下载 Windows x64 公开测试版 0.2.1.dev4](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev4)** · [产品 ZIP](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/NetMonitor-0.2.1.dev4-windows-x64-4bf4e02fce84-prerelease.zip) · [校验文件](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/SHA256SUMS.txt) · [中文说明](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/USAGE.zh-CN.txt)
 
-本版已作为 GitHub **Pre-release** 发布，未签名，不是稳定版。包含 PID 身份归属修复及 Compact 权限说明自动换行修复；最终 ZIP 已完成实际启动、管理员实例核验、短回环采集和正常退出的最低确认，界面显示由用户定性确认。完整范围与尚未验证项见[本版发布记录](docs/releases/0.2.1.dev3.md)。
+本版已作为 GitHub **Pre-release** 发布，未签名，不是稳定版。新增累计搜索和 CSV 导出，并减少隐藏详细视图的无用刷新。最终 ZIP 已完成实际启动、管理员身份核验、两小时资源观察、两轮回环累计 CSV 精确核对、正常退出及所观察 ETW 会话清理。完整范围与尚未验证项见[本版发布记录](docs/releases/0.2.1.dev4.md)。
 
-发布包固定来自源码 `e5e4329b48f55fd48dbf7c72673a7a287690da1b`，标签 `v0.2.1.dev3` 精确指向它；main 可包含其后的合并和文档提交。后续 CI 产物不会自动替换已发布 ZIP。PID 身份不确定区间采用保守归属，可能少计未知区间或退出尾部。
+发布包固定来自源码 `4bf4e02fce841a721f59f786e2f5fc8ec758db97`，标签 `v0.2.1.dev4` 精确指向它；main 可包含其后的合并和文档提交。后续 CI 产物不会自动替换已发布 ZIP。PID 身份不确定区间采用保守归属，可能少计未知区间或退出尾部。
 
 [使用方法](#使用方法) · [源码运行](#从源码运行) · [构建测试包](#构建-windows-x64-测试包) · [历史包](#历史包对照)
 
@@ -17,7 +17,7 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 - **按应用观察网络活动**：查看上传、下载速率、活跃应用排行，以及应用下属的进程。
 - **微型窗口与应用卡片**：平时只显示一个应用；展开后查看短期曲线、Top 3 和本次累计。
 - **自动显示与固定关注**：自动选择活跃应用，也可以固定一个应用，避免显示对象随排行榜变化。
-- **详细窗口**：按应用／PID 展开、排序和筛选，单独查看本次监控累计；有流量的已退出应用仍保留累计记录。
+- **详细窗口**：按应用／PID 展开、排序和筛选，单独查看本次监控累计；有流量的已退出应用仍保留累计记录。累计页支持搜索和手动 CSV 导出。
 - **托盘与显示偏好**：隐藏主窗口后继续采集，保存主模式、窗口位置和微型窗口置顶偏好。
 - **区分零值与未知**：权限不足、采集不可用或数据过期时显示 `—`，不会用 `0 B/s` 代替未知流量。
 
@@ -37,7 +37,7 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 ### 获取公开测试版
 
-1. 打开 [v0.2.1.dev3 Release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev3)，下载 `NetMonitor-0.2.1.dev3-windows-x64-e5e4329b48f5-prerelease.zip`。
+1. 打开 [v0.2.1.dev4 Release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev4)，下载 `NetMonitor-0.2.1.dev4-windows-x64-4bf4e02fce84-prerelease.zip`。
 2. 将产品 ZIP **完整解压**，打开其中的 `NetMonitor` 文件夹。
 3. 双击 `NetMonitor.exe`。首次默认微型模式；之后按已保存偏好恢复。
 
@@ -45,15 +45,17 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 | 产物信息 | 值 |
 | --- | --- |
-| 版本／标签 | `0.2.1.dev3` / `v0.2.1.dev3` |
-| 构建源码 S | `e5e4329b48f55fd48dbf7c72673a7a287690da1b` |
-| 产品 ZIP 大小 | 38,786,616 字节 |
-| SHA-256 | `062f0efcc43149a174e1c7ebd95fc86f0250f57fcf003e022e323b694ea9c241` |
-| 构建来源 | [push CI 38066558624](https://github.com/Polarzen/net-monitor/actions/runs/38066558624) |
+| 版本／标签 | `0.2.1.dev4` / `v0.2.1.dev4` |
+| 构建源码 S | `4bf4e02fce841a721f59f786e2f5fc8ec758db97` |
+| 产品 ZIP 大小 | 38,790,423 字节 |
+| SHA-256 | `640e10c7bd00cd71aff3030935421cbf674104e0f9941d80d0fcceda7d1af9f2` |
+| 构建来源 | Windows 11 x64 本地锁定构建，见[发布记录](docs/releases/0.2.1.dev4.md#产物身份)；对应源码 CI 通过 |
 
-需要校验时，可将 `Get-FileHash -Algorithm SHA256` 的结果与 Release 的 [SHA256SUMS.txt](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev3/SHA256SUMS.txt) 对照；校验和不是数字签名。包内 `BUILD-INFO.json`、中文说明及第三方材料对应同一源码；发布记录集中在 [0.2.1.dev3.md](docs/releases/0.2.1.dev3.md)。
+需要校验时，可将 `Get-FileHash -Algorithm SHA256` 的结果与 Release 的 [SHA256SUMS.txt](https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/SHA256SUMS.txt) 对照；校验和不是数字签名。包内 `BUILD-INFO.json`、中文说明及第三方材料对应同一源码；发布记录集中在 [0.2.1.dev4.md](docs/releases/0.2.1.dev4.md)。
 
 ### 历史包对照
+
+旧 [0.2.1.dev3 Pre-release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev3) 保留原资产：源码 `e5e4329b48f55fd48dbf7c72673a7a287690da1b`，ZIP SHA-256 `062f0efcc43149a174e1c7ebd95fc86f0250f57fcf003e022e323b694ea9c241`。其采集界面由用户定性确认，未取得精确 CSV；详细边界见[dev3 发布记录](docs/releases/0.2.1.dev3.md)，不继承 dev4 的两小时观察和精确导出结果。
 
 旧 `0.2.1.dev2 / 82ba3a1` 修复候选保留为历史：源码 `82ba3a1f21f240e114a112d2b94800ef3b285696`，产品 `NetMonitor-0.2.1.dev2-windows-x64-82ba3a1f21f2-test.zip`，SHA-256 `400f047c83ec3d8341f9356fa41db6de202f4ca28b3bef19ce07f70d4648cb9d`。[原 artifact](https://github.com/Polarzen/net-monitor/actions/runs/38056842914/artifacts/11671937543) 可能到期；该包当时由用户停止运行确认，未取得有效采集结论，不自动继承 dev3 结果。
 
@@ -69,7 +71,7 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 程序默认以普通权限启动，不自动要求提权。提示需要管理员权限时，展开应用卡片，或切换到 Compact，点击 **“以管理员身份重启”**，再由你决定是否接受 Windows 原生 UAC。
 
-权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。dev3 已核实同一发行目录的管理员新实例与有效令牌；原生取消仍只有自动测试证据。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
+权限不足时仍可查看界面，但上传、下载显示为 `—`，不能据此判断应用没有流量。dev4 已核实同一发行目录的管理员新实例与有效令牌；原生取消仍只有自动测试证据。如果没有出现 UAC 或重启后仍提示权限不足，保留提示和构建信息用于反馈。
 
 ## 使用方法
 
@@ -97,6 +99,12 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 固定关注后，其他应用更活跃也不会抢走显示对象。无法可靠识别身份的应用不能固定关注；关注状态仅在当前运行期间保留。
 
 **固定关注与窗口置顶是两件事**：前者决定看哪个应用，后者决定窗口是否盖在其他窗口上方。“前台／后台”描述应用状态，也不代表它是否被固定关注。
+
+### 搜索和导出本次累计
+
+打开“详细信息 → 本次监控累计”，按应用名称、路径或账户标识搜索；清空搜索可以恢复全部累计记录。点击“导出 CSV…”会保存点击时可见的搜索结果和排序，取消或完成导出都不会清零累计。
+
+默认不导出路径及账户标识；只有勾选“导出包含路径和账户标识”才加入这两列。应用名称本身仍可能包含私人信息，分享前请检查文件。字节列使用原始整数，电子表格可能舍入超长数值，需要精确处理时按文本导入。导出仅写入你选择的位置，不自动上传或定时保存。
 
 ### 隐藏、恢复与退出
 
@@ -157,7 +165,7 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 ## 从源码运行
 
-当前开发分支的 `0.2.1.dev4` 增加累计搜索和 CSV 导出，尚未公开发布；功能边界和验证状态见 [dev4 开发候选](docs/dev4-candidate.md)。上方公开下载仍为 dev3，不能将开发分支能力视为 dev3 已有功能。
+当前公开版本为 `0.2.1.dev4`。main 可包含其后的验收工具和文档提交；发布包始终对应上方固定源码和 ZIP 哈希。内部候选的历史记录见 [dev4 开发候选](docs/dev4-candidate.md)。
 
 需要 Windows、Git 和 Python **3.14 或更新版本**。当前验收及打包使用 Python **3.14.7**；构建 x64 测试包时还需匹配下节的精确版本和架构。
 
@@ -223,19 +231,20 @@ try {
 
 ## 验证状态与已知限制
 
-以下状态只对应上述最终 dev3 ZIP；不自动适用于其他源码或哈希。
+以下状态只对应上述最终 dev4 ZIP；不自动适用于其他源码或哈希。
 
 | 范围 | 本版结果 |
 | --- | --- |
-| 自动回归 | 本地、CI x64／ARM64 各 347 passed、1 skipped；x64 打包成功 |
-| 产物身份 | CI 来源、ZIP、322 个清单条目、62 个二进制来源、PE 版本及 asInvoker 已复核 |
+| 自动回归 | 本地完整回归 364 passed、1 skipped，打包检查 23 passed；源码 CI x64／ARM64 与 x64 打包通过 |
+| 产物身份 | ZIP CRC、322 个清单条目及 205 个构建输入已复核；公开 ZIP 与实际运行包哈希一致 |
 | 实际启动／提权 | 中文和空格目录、不同工作目录启动；管理员新实例路径、PID、创建时间和令牌已核实 |
-| 真实采集 | 有上限的 60 秒本机回环负载；用户确认目标 Python 应用上下行及累计“正常显示”，未提供具体 UI 数值或有效截图 |
-| 正常退出 | 用户经 Compact“窗口 → 退出”，只读确认目标实例与负载进程均结束 |
+| 真实采集与导出 | 起止两轮 60 秒本机回环负载；实际 CSV 的两个账户上下行原始字节与负载日志精确一致，默认不含路径／账户标识 |
+| 两小时资源观察 | 同一实例 1,436 次采样，读取错误 0、最大间隔 5.271 秒；首尾区间与峰值见发布记录，不据此宣称无泄漏或全程界面响应 |
+| 正常退出与 ETW | 用户经 Compact“窗口 → 退出”，确认目标实例与负载进程结束；结束时三个 ETW 丢失计数为 0，退出后原会话查询为 4201 |
 | PID 复用 | 当前完整回归包含 10 项受控身份归属回归；没有现场制造 OS PID 复用 |
-| 仍未完整验证 | 干净机器、全部 Micro/Card/DPI/多屏/关注/托盘交互、原生取消、显式零值、长时间稳定性、性能与 ETW 会话清理 |
+| 仍未完整验证 | 干净 Windows、真实多屏／混合缩放、全部 Micro/Card/关注/托盘交互、原生取消、显式零值、完整性能三场景及更长时间运行 |
 
-本版达到带上述限制的公开测试版最低确认范围，不代表全套 Stage 4／Stage 5 验收通过。初次负载工具启动失败及随后有效补验均如实保留在[发布记录](docs/releases/0.2.1.dev3.md)，历史 dev1/dev2 结果保留各自源码与哈希边界。
+本版达到带上述限制的公开测试版确认范围，不代表全套 Stage 4／Stage 5 或稳定版验收通过。详细数值与证据边界见[发布记录](docs/releases/0.2.1.dev4.md)，后续环境及签名步骤见[稳定版验收](docs/stable-readiness.md)；历史版本保留各自源码与哈希边界。
 
 ## 技术与文档
 
@@ -245,7 +254,8 @@ try {
 
 | 文档 | 内容 |
 | --- | --- |
-| [dev3 公开发布记录](docs/releases/0.2.1.dev3.md) | 已发布资产、源码/标签、实际验证及限制 |
+| [dev4 公开发布记录](docs/releases/0.2.1.dev4.md) | 已发布资产、源码/标签、实际验证及限制 |
+| [稳定版验收](docs/stable-readiness.md) | 干净 Windows、多屏、运行观察及独立签名步骤 |
 | [Stage 5 打包与交付](docs/stage5-windows-package.md) | 构建、版本、校验值、实际 EXE 验证及 CI artifact |
 | [Stage 4 轻量化与验收](docs/stage4-lightweight.md) | 隐藏刷新、真实桌面／ETW、资源测量及限制 |
 | [微型窗口设计](docs/stage3c-micro-widget.md) | 卡片、选择、关注、窗口和显示偏好 |
