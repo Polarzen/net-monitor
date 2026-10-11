@@ -35,12 +35,15 @@ class DetailWindow(MainWindow):
         )
         self._controller_shutdown = False
         self._last_spotlight = None
+        self._shared_groups = None
+        self._live_dirty = False
         # Reparent the existing live page, preserving its tree, filters and signals.
         self.live_page = self.takeCentralWidget()
         # Spotlight summary label
         from PySide6.QtWidgets import QLabel
         from PySide6.QtCore import Qt
         self._spotlight_label = QLabel()
+        self._spotlight_label.setTextFormat(Qt.TextFormat.PlainText)
         self._spotlight_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self._spotlight_label.setWordWrap(True)
         self._spotlight_label.setStyleSheet('QLabel { padding: 8px; background: #2a2a2a; border-radius: 4px; margin: 4px; }')
@@ -60,10 +63,12 @@ class DetailWindow(MainWindow):
         central_layout.addWidget(self._spotlight_label)
         central_layout.addWidget(self.tabs, 1)
         self.setCentralWidget(central)
+        self.tabs.currentChanged.connect(self._apply_latest_snapshot)
 
     def update_spotlight(self, frame) -> None:
         """Update spotlight summary from WidgetFrame."""
         if frame is None or not hasattr(frame, 'spotlight') or frame.spotlight is None:
+            self._last_spotlight = None
             self._spotlight_label.setVisible(False)
             return
         
@@ -117,8 +122,23 @@ class DetailWindow(MainWindow):
 
     def apply_snapshot(self, snapshot: MonitorSnapshot, groups: dict = None) -> None:
         self._latest_snapshot = snapshot
-        self._apply_snapshot(snapshot, shared_groups=groups)
+        self._shared_groups = groups
+        self._live_dirty = True
+        if self.tabs.currentWidget() is self.live_page:
+            self._refresh_live_page()
         self.session_view.apply_snapshot(snapshot)
+
+    def _refresh_live_page(self) -> None:
+        if self._latest_snapshot is not None and self._live_dirty:
+            self._apply_snapshot(self._latest_snapshot, shared_groups=self._shared_groups)
+            self._live_dirty = False
+
+    def _apply_latest_snapshot(self) -> None:
+        # Filters affect only the live page. While hidden, keep just the latest
+        # immutable snapshot; switching back renders it once with current filters.
+        self._live_dirty = True
+        if self.tabs.currentWidget() is self.live_page:
+            self._refresh_live_page()
 
     def set_shutdown_in_progress(self, shutting_down: bool) -> None:
         self._controller_shutdown = shutting_down
