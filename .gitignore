@@ -1,14 +1,20 @@
+# Python 缓存和安装元数据
 __pycache__/
 *.py[cod]
-*.pyo
+*.egg-info/
+.pytest_cache/
+
+# 本地开发和打包环境
 .venv/
 .venv-build-stage5/
-artifacts/stage5/
-artifacts/releases/
+
+# 构建产物、原始验证输出及本地检查点
+artifacts/
 build-stage5-resolve.json
-.pytest_cache/
 build/
 dist/
-*.egg-info/
+
+# 编辑器本地状态
+.vs/
 .idea/
 .vscode/
