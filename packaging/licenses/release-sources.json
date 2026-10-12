@@ -12,7 +12,7 @@
       "sha256": "37eab455b79a0889242bdb048cf78f0dcb698b94c055b729f3c16472631e1546",
       "files": 22856,
       "git_submodules": 0,
-      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/qtbase-6.11.2-source.tar.gz"
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev5/qtbase-6.11.2-source.tar.gz"
     },
     {
       "file": "pyside-setup-6.11.2-source.tar.gz",
@@ -24,7 +24,7 @@
       "sha256": "930d443f53b9e7d506947c7a546e1422e1b705ebccb85c080f11379d16dde6b8",
       "files": 4600,
       "git_submodules": 0,
-      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/pyside-setup-6.11.2-source.tar.gz"
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev5/pyside-setup-6.11.2-source.tar.gz"
     },
     {
       "file": "qtsvg-everywhere-src-6.11.2.tar.xz",
@@ -33,7 +33,7 @@
       "bytes": 2341860,
       "sha256": "d594337feca84c26fb67fe87b85e6a5c12fda404b611d905f9d138210c311876",
       "files": 641,
-      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/qtsvg-everywhere-src-6.11.2.tar.xz"
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev5/qtsvg-everywhere-src-6.11.2.tar.xz"
     },
     {
       "file": "qtimageformats-everywhere-src-6.11.2.tar.xz",
@@ -42,7 +42,7 @@
       "bytes": 2050424,
       "sha256": "cecd8900f34b6550076309bc94f62f828008b633a4239e0a08c86788f41001f8",
       "files": 564,
-      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev4/qtimageformats-everywhere-src-6.11.2.tar.xz"
+      "release_asset": "https://github.com/Polarzen/net-monitor/releases/download/v0.2.1.dev5/qtimageformats-everywhere-src-6.11.2.tar.xz"
     }
   ]
 }
