@@ -81,6 +81,7 @@ def test_entry_with_no_standard_streams(monkeypatch):
     calls = []
     application = SimpleNamespace(setApplicationName=lambda v: calls.append(v),
         setApplicationVersion=lambda v: calls.append(v), setStyleSheet=lambda v: None,
+        setWindowIcon=lambda v: None,
         exec=lambda: 0)
     monkeypatch.setattr(app, "QApplication", SimpleNamespace(instance=lambda: application))
     monkeypatch.setattr(app, "UiController", lambda: SimpleNamespace(
@@ -116,7 +117,7 @@ def test_single_version_source_and_thin_entry():
     project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
     assert project['project']['dynamic'] == ['version']
     assert project['tool']['setuptools']['dynamic']['version']['attr'] == 'net_monitor.__version__'
-    assert __version__ == "0.2.1.dev4"
+    assert __version__ == "0.2.1.dev5"
     tree = ast.parse((root / "packaging/entry.py").read_text(encoding="utf-8"))
     imports = [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)]
     assert imports == ["net_monitor.app"]

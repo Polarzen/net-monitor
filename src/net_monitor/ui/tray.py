@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QApplication, QMenu, QStyle, QSystemTrayIcon
+from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
 
 class TrayController:
@@ -16,9 +16,7 @@ class TrayController:
         if not self.available:
             return
 
-        style = QApplication.style()
-        icon = style.standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
-        tray = QSystemTrayIcon(icon)
+        tray = QSystemTrayIcon(QApplication.windowIcon())
         tray.setToolTip("Net Monitor")
         menu = QMenu()
 

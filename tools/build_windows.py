@@ -84,6 +84,42 @@ def build_environment() -> dict[str, str]:
     return env
 
 
+def inspect_application_icon(pe, folder: Path) -> dict:
+    source = ROOT / "src/net_monitor/assets/net-monitor.ico"
+    bundled = folder / "_internal/net_monitor/assets/net-monitor.ico"
+    content = source.read_bytes()
+    if not bundled.is_file() or bundled.read_bytes() != content:
+        raise RuntimeError("Bundled application icon is missing or differs from source")
+    reserved, kind, count = struct.unpack_from("<HHH", content)
+    if (reserved, kind) != (0, 1) or not count:
+        raise RuntimeError("Invalid application ICO")
+    frames, sizes = [], []
+    for index in range(count):
+        width, height, _, _, _, _, length, offset = struct.unpack_from(
+            "<BBBBHHII", content, 6 + 16 * index)
+        frames.append(content[offset:offset + length])
+        sizes.append([width or 256, height or 256])
+    resources = {}
+    for resource_type in pe.DIRECTORY_ENTRY_RESOURCE.entries:
+        for name in resource_type.directory.entries:
+            for language in name.directory.entries:
+                data = language.data.struct
+                resources.setdefault(resource_type.id, []).append(
+                    (name.id, pe.get_data(data.OffsetToData, data.Size)))
+    groups = resources.get(14, [])  # RT_GROUP_ICON links the actual RT_ICON frames.
+    images = dict(resources.get(3, []))
+    if len(groups) != 1 or struct.unpack_from("<HHH", groups[0][1]) != (0, 1, count):
+        raise RuntimeError("EXE icon group differs from source ICO")
+    group = groups[0][1]
+    for index, frame in enumerate(frames):
+        entry = group[6 + 14 * index:6 + 14 * (index + 1)]
+        image_id = struct.unpack_from("<H", entry, 12)[0]
+        if entry[:12] != content[6 + 16 * index:18 + 16 * index] or images.get(image_id) != frame:
+            raise RuntimeError("EXE embedded icon frame differs from source ICO")
+    return {"sizes": sizes, "sha256": sha256(source), "embedded_frames_match": True,
+            "bundled_file": bundled.relative_to(folder).as_posix()}
+
+
 def inspect_distribution(folder: Path, version: str) -> dict:
     import pefile
     exe = folder / "NetMonitor.exe"
@@ -105,6 +141,7 @@ def inspect_distribution(folder: Path, version: str) -> dict:
                            pe.VS_FIXEDFILEINFO[0].FileVersionMS & 65535,
                            pe.VS_FIXEDFILEINFO[0].FileVersionLS >> 16,
                            pe.VS_FIXEDFILEINFO[0].FileVersionLS & 65535]
+        application_icon = inspect_application_icon(pe, folder)
     if architecture != 0x8664 or subsystem != 2:
         raise RuntimeError("EXE is not Windows x64 GUI subsystem")
     if len(manifests) != 1 or 'level="asInvoker"' not in manifests[0] or 'uiAccess="false"' not in manifests[0]:
@@ -117,7 +154,7 @@ def inspect_distribution(folder: Path, version: str) -> dict:
     required = ["_internal/python314.dll", "_internal/PySide6/plugins/platforms/qwindows.dll",
                 "_internal/PySide6/Qt6Core.dll", "_internal/PySide6/Qt6Gui.dll",
                 "_internal/PySide6/Qt6Widgets.dll", "_internal/PySide6/__init__.py",
-                "_internal/shiboken6/__init__.py"]
+                "_internal/shiboken6/__init__.py", "_internal/PySide6/plugins/imageformats/qico.dll"]
     missing = [name for name in required if not (folder / name).is_file()]
     if missing:
         raise RuntimeError(f"Missing runtime files: {missing}")
@@ -133,6 +170,7 @@ def inspect_distribution(folder: Path, version: str) -> dict:
     if unused_plugins:
         raise RuntimeError(f"Unused PDF/virtual-keyboard dependencies collected: {unused_plugins}")
     return {"machine": hex(architecture), "subsystem": subsystem, "manifest": manifests[0],
+            "application_icon": application_icon,
             "version_strings": strings, "numeric_version": numeric_version,
             "required_runtime_files": required, "forbidden_files": forbidden,
             "dlls_and_extensions": [p for p in files if p.lower().endswith((".dll", ".pyd"))]}
