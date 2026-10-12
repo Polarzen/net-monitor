@@ -1,0 +1,70 @@
+name: 下载后的使用反馈 / Release feedback
+description: 反馈从 GitHub 下载发行包后的实际使用情况，正常使用和遇到问题均可。
+title: "[使用反馈] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请按实际使用情况填写，没有操作过的项目写“未测试”，不清楚的写“不确定”。无需为填写表单额外安装软件或运行命令。
+        产品下载见 [dev4 Release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev4)，完整解压 ZIP 并保留 `_internal`。
+        **内容会公开。** 请勿提交账户名、私人路径、IP、凭据、整个发行目录或完整进程列表。截图和可选 CSV 先检查隐私；默认 CSV 也可能含私人应用名称。
+  - type: input
+    id: package
+    attributes:
+      label: 实际使用的 ZIP 文件名或公开下载链接
+      description: 填写你实际取得的包；如自行核对过 SHA-256，可一并填写，不要求运行校验命令。
+      placeholder: NetMonitor-版本-windows-x64-源码-prerelease.zip 或公开下载链接
+    validations:
+      required: true
+  - type: dropdown
+    id: download_route
+    attributes:
+      label: 实际取得程序的方式
+      options:
+        - 从本项目 GitHub Release 直接下载产品 ZIP
+        - 他人转交或测试光盘中的程序
+        - 自行从源码构建
+        - 不确定
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 使用环境
+      description: 写明 Windows 版本、x64 或 ARM64、实体电脑或虚拟机；以及此前是否安装 Python、Qt、开发工具或额外运行库。不清楚的部分写“不确定”，不用提供账户名或设备编号。
+    validations:
+      required: true
+  - type: dropdown
+    id: overall
+    attributes:
+      label: 本次实际使用结果
+      description: 此项是使用反馈，不代表所有验收项目已通过。
+      options:
+        - 已使用，暂未发现问题
+        - 可以使用，但遇到部分问题
+        - 无法启动或无法使用
+        - 仅下载，尚未使用
+    validations:
+      required: true
+  - type: textarea
+    id: observations
+    attributes:
+      label: 实际操作与观察
+      description: 简述使用时长、做过哪些操作、实际看到的结果。未操作的项目保持“未测试”；如果失败，请附错误原文或重现步骤。
+      value: |
+        下载、完整解压和启动：未测试
+        管理员重启（同意或取消）及权限状态：未测试
+        实际联网时的应用名和上下行变化：未测试
+        Micro / Card / Compact / 详细信息 / 托盘：未测试
+        搜索、排序、累计和 CSV 导出：未测试
+        菜单退出和再次启动：未测试
+        使用时长及其他问题：
+    validations:
+      required: true
+  - type: textarea
+    id: displays_and_evidence
+    attributes:
+      label: 显示器与补充证据（可选）
+      description: 若实际使用过多屏，可填写实体屏幕数量、各屏缩放比例，以及跨屏、断开或重接后的表现。可补充已遮挡隐私的截图、原始字节对照或 CSV；不要求附件。单屏、虚拟显示或未测试请如实标明。
+    validations:
+      required: false

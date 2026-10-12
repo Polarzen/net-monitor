@@ -159,6 +159,8 @@ Net Monitor 是一个面向 **Windows 11** 的桌面应用网络活动监视器�
 
 ### 反馈问题
 
+从 GitHub 下载产品后，正常使用和遇到问题都可以填写[下载后的使用反馈](https://github.com/Polarzen/net-monitor/issues/new?template=release_feedback.yml)。请记录实际包来源、Windows 环境和做过的操作；未测试的项目如实标明，不需要为反馈额外安装开发工具。
+
 遇到问题可填写[问题反馈表单](https://github.com/Polarzen/net-monitor/issues/new?template=bug_report.yml)，也可从[反馈入口](https://github.com/Polarzen/net-monitor/issues/new/choose)选择空白 Issue。请提供版本或下载来源、Windows 版本／架构、实际与预期结果、操作步骤及频率。版本可从 ZIP 文件名或 `BUILD-INFO.json` 查看，无法取得可写“不确定”；偶发问题可写“暂时不能稳定复现”。无需安装 Python 或准备诊断包。源码提交、视图、权限状态、错误原文及截图均可按需补充。
 
 **Issue 内容会公开。** 不必上传完整 `BUILD-INFO.json`、整个发行目录、私人日志或完整进程列表。截图只保留相关窗口，并遮挡私人路径、无关应用和浏览器内容；不要公开个人联系方式、IP、MAC、订阅地址或访问令牌。可能涉及安全漏洞时，请勿公开敏感利用细节。问题如何分类、修复及发布见[维护说明](docs/maintenance.md)。
