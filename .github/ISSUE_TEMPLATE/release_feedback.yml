@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         请按实际使用情况填写，没有操作过的项目写“未测试”，不清楚的写“不确定”。无需为填写表单额外安装软件或运行命令。
-        产品下载见 [dev4 Release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev4)，完整解压 ZIP 并保留 `_internal`。
+        产品下载见 [dev5 Release](https://github.com/Polarzen/net-monitor/releases/tag/v0.2.1.dev5)，完整解压 ZIP 并保留 `_internal`。
         **内容会公开。** 请勿提交账户名、私人路径、IP、凭据、整个发行目录或完整进程列表。截图和可选 CSV 先检查隐私；默认 CSV 也可能含私人应用名称。
   - type: input
     id: package
