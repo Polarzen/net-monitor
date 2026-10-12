@@ -2,6 +2,8 @@
 
 本说明用于处理已发布版本的真实反馈。用户可通过[问题反馈表单](https://github.com/Polarzen/net-monitor/issues/new?template=bug_report.yml)或[空白 Issue 入口](https://github.com/Polarzen/net-monitor/issues/new/choose)报告问题；填写前参阅 [README 常见问题与隐私提示](../README.md#常见问题)。各版本的运行证据和验证缺口统一见 README 链接的对应发布记录，不在此复制历史验收。
 
+从 GitHub 获取产品后的正常使用和失败结果均可提交[下载后的使用反馈](https://github.com/Polarzen/net-monitor/issues/new?template=release_feedback.yml)。维护者先确认包身份、实际获取方式和环境，再按用户实际操作逐项记录；“暂未发现问题”不是全部项目通过，没有 Issue 或有下载次数也不是运行成功证据。转交包、测试光盘和源码运行的结果保留其各自来源，不能改记为 GitHub 直接下载验收。
+
 ## 反馈分类
 
 按证据区分五类：已复现的产品缺陷、需要更多证据的问题、使用或环境问题、尚未覆盖的验证范围、可选功能建议。记录观察到的现象、涉及版本和证据来源，并把推测与事实分开。报告者不必先证明根因；偶发问题可先保留当时的操作与频率，再询问解决疑点所需的最少信息。
