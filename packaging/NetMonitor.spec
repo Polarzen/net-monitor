@@ -11,6 +11,7 @@ from PyInstaller.utils.win32.versioninfo import (
 )
 
 root = Path(SPECPATH).parent
+app_icon = root / "src/net_monitor/assets/net-monitor.ico"
 tree = ast.parse((root / "src/net_monitor/__init__.py").read_text(encoding="utf-8"))
 version = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
                and any(isinstance(t, ast.Name) and t.id == "__version__" for t in n.targets))
@@ -28,7 +29,8 @@ version_info = VSVersionInfo(
     ])]), VarFileInfo([VarStruct("Translation", [1033, 1200])])],
 )
 a = Analysis([str(root / "packaging/entry.py")], pathex=[str(root / "src")],
-             binaries=[], datas=[], hiddenimports=[], hookspath=[str(root / "packaging/hooks")],
+             binaries=[], datas=[(str(app_icon), "net_monitor/assets")],
+             hiddenimports=[], hookspath=[str(root / "packaging/hooks")],
              hooksconfig={}, runtime_hooks=[], excludes=[], noarchive=False,
              # Keep LGPL Python wrappers replaceable alongside their DLLs.
              module_collection_mode={"PySide6": "py", "shiboken6": "py"})
@@ -53,6 +55,6 @@ Path(os.environ["NET_MONITOR_BINARY_ORIGINS"]).write_text(
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="NetMonitor",
           debug=False, bootloader_ignore_signals=False, strip=False, upx=False,
-          console=False, disable_windowed_traceback=False, version=version_info,
+          console=False, disable_windowed_traceback=False, version=version_info, icon=str(app_icon),
           uac_admin=False, uac_uiaccess=False)
 coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name="NetMonitor")

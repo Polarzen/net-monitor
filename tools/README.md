@@ -10,6 +10,7 @@
 | --- | --- |
 | [build_windows.ps1](build_windows.ps1) / [build_windows.py](build_windows.py) | 使用锁定环境构建 Windows x64 包，检查产物并生成清单；默认输出到 `artifacts/stage5/` |
 | [verify_windows_release.ps1](verify_windows_release.ps1) | 只读核对指定 ZIP、解压目录、版本和哈希，输出新的 JSON；不启动程序或提权 |
+| [build_icon.py](build_icon.py) | 使用项目 PySide6 环境将[图标原稿](../packaging/branding/README.md)编码为多尺寸 ICO |
 
 操作步骤见 [README 构建说明](../README.md#构建-windows-x64-测试包)和[稳定版验收](../docs/stable-readiness.md)。已有公开包保持不变；新构建不会替代原包的运行证据。
 
