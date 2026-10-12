@@ -1,4 +1,4 @@
-Library replacement and distribution information — Net Monitor 0.2.1.dev4
+Library replacement and distribution information — Net Monitor 0.2.1.dev5
 
 Qt / PySide / shiboken
 

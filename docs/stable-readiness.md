@@ -1,10 +1,16 @@
 # 稳定版验收
 
-验收对象固定为 dev4 最终公开候选，源码 `4bf4e02fce841a721f59f786e2f5fc8ec758db97`。发布状态以 [GitHub Releases](https://github.com/Polarzen/net-monitor/releases) 为准；本文件中的测试准备不代表稳定版已通过。
+当前发布对象为 dev5，源码 `206b9f0b6bf087b94126b18bfc4d9530f27cbb9a`。产品 ZIP：`NetMonitor-0.2.1.dev5-windows-x64-206b9f0b6bf0-prerelease.zip`，38,909,912 字节，SHA-256 为 `616ee24172f2eb9a989faeabd3a84c0ac5258164ae1e1bad04f4b7f0c01f4428`。本版为未签名 Pre-release；不能继承 dev4 的全部实测结论。
 
-产品 ZIP：`NetMonitor-0.2.1.dev4-windows-x64-4bf4e02fce84-prerelease.zip`，38,790,423 字节，SHA-256 为 `640e10c7bd00cd71aff3030935421cbf674104e0f9941d80d0fcceda7d1af9f2`。任何产品字节变化都需要重新识别候选并补做受影响的验收，不能继承旧包全部结论。
+## 当前 dev5 证据
 
-## 当前证据
+图标源码完整回归 365 passed、1 skipped，x64／ARM64 与 x64 打包 CI 通过。最终公开包通过 CRC、323 个清单条目及 208 个构建输入核对，Windows 原生 API 成功读取新图标，EXE 内嵌的 9 个图标尺寸与运行资源一致。详见[dev5 发布记录](releases/0.2.1.dev5.md)。
+
+dev5 未重复进行实际启动／提权、长时间采集和原生 CSV 核对。虚拟机验证继续按用户决定跳过，Windows 部署部分等待 GitHub 下载后的真实反馈；真实多屏、完整交互／性能覆盖和代码签名仍未完成。没有将尚缺资源或反馈的项目记为通过。
+
+## dev4 历史证据（仅对应原包）
+
+以下表格固定对应源码 `4bf4e02fce841a721f59f786e2f5fc8ec758db97`、ZIP SHA-256 `640e10c7bd00cd71aff3030935421cbf674104e0f9941d80d0fcceda7d1af9f2` 的 dev4 包。任何新产品字节都应重新识别候选并补做受影响的验收。
 
 | 项目 | 状态 | 证据及边界 |
 | --- | --- | --- |
@@ -26,11 +32,11 @@
 
 ```powershell
 .\verify_windows_release.ps1 `
-  -ZipPath '.\NetMonitor-0.2.1.dev4-windows-x64-4bf4e02fce84-prerelease.zip' `
+  -ZipPath '.\NetMonitor-0.2.1.dev5-windows-x64-206b9f0b6bf0-prerelease.zip' `
   -PackageDirectory '.\NetMonitor' `
-  -ExpectedZipSha256 '640e10c7bd00cd71aff3030935421cbf674104e0f9941d80d0fcceda7d1af9f2' `
-  -ExpectedSourceCommit '4bf4e02fce841a721f59f786e2f5fc8ec758db97' `
-  -ExpectedVersion '0.2.1.dev4' `
+  -ExpectedZipSha256 '616ee24172f2eb9a989faeabd3a84c0ac5258164ae1e1bad04f4b7f0c01f4428' `
+  -ExpectedSourceCommit '206b9f0b6bf087b94126b18bfc4d9530f27cbb9a' `
+  -ExpectedVersion '0.2.1.dev5' `
   -OutputPath '.\windows-package-check.json'
 ```
 
@@ -80,7 +86,7 @@
 
 ## 长时间观察与签名
 
-本次 2 小时观察固定最终 EXE 的身份及资源，已分别核对起止负载、最终累计 CSV、末尾导出交互、正常菜单退出和 ETW 会话清理。程序存活和末尾交互不能证明 GUI 全程响应、采集没有停顿或没有内存泄漏。资源报告列出首尾区间及峰值；后续观察仍应单独记录进程退出、身份变化、采样权限错误或休眠造成的长采样缺口。
+dev4 的 2 小时观察固定该版 EXE 的身份及资源，已分别核对起止负载、最终累计 CSV、末尾导出交互、正常菜单退出和 ETW 会话清理。程序存活和末尾交互不能证明 GUI 全程响应、采集没有停顿或没有内存泄漏。资源报告列出首尾区间及峰值；后续观察仍应单独记录进程退出、身份变化、采样权限错误或休眠造成的长采样缺口。
 
 签名另起发布步骤：确定发布者身份和可用签名服务后，对最终构建执行签名及时间戳验证，再重新生成文件清单、ZIP、校验和，并验证新的实际发行包。不能给已公开 ZIP 换字节、沿用旧哈希，或把第三方 DLL 自带签名当作 Net Monitor 已签名；证书和密钥不写进仓库或聊天。
 
